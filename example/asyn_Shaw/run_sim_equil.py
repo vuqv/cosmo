@@ -13,10 +13,9 @@ import hps
 
 # MD parameter
 # let's decide here now long we want to run the simulation and the file writing period
-mdsteps = 1000000
-dcdperiod = 1000
-logperiod = 100
-
+mdsteps = 100
+dcdperiod = 1
+logperiod = 1
 # stage of simulation equil, prod
 stage='equil'
 # which platform to run simulation: CPU/GPU

@@ -10,7 +10,6 @@ from simtk import unit
 from simtk.openmm import *
 from simtk.openmm.app import *
 
-from .geometry import geometry
 from ..parameters import ca_parameters
 
 
@@ -173,7 +172,7 @@ class system:
         # Define force attributes
         self.harmonicBondForce = None
         self.rf_sigma = None
-        self.rf_epsilon = None
+        # self.rf_epsilon = None
         self.rf_cutoff = None
         self.exclusion_NB = None
         self.particles_hps = None
@@ -300,6 +299,11 @@ class system:
             self.atoms.append(atom)
             self.n_atoms += 1
 
+        """
+        Prepare for pair-wire excluded interaction. If two atoms covalently bonded then is not appears in pair-wire
+        nonbonded interactions (still present in electrostatic interactions)
+        
+        """
         self.exclusion_NB = np.ones((self.n_atoms, self.n_atoms))
 
     def getBonds(self, except_chains=None):
@@ -456,7 +460,7 @@ class system:
     def addHarmonicBondForces(self):
         """
         Creates an openmm.HarmonicBondForce() object with the bonds and
-        parameters setted up in the "bonds" dictionary attribute. The force object
+        parameters set up in the "bonds" dictionary attribute. The force object
         is stored at the "harmonicBondForce" attribute.
 
         The force parameters must be contained in self.bonds as follows:
@@ -483,6 +487,7 @@ class system:
                                            bond[1].index,
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
+            # two atoms in bond will have nonbonded interaction matrix is 0 - do not interactions via nonbonded
             self.exclusion_NB[bond[0].index][bond[1].index] = 0.0
             self.exclusion_NB[bond[1].index][bond[0].index] = 0.0
 
@@ -574,7 +579,8 @@ class system:
         energy_function += 'sigma=0.5*(sigma1+sigma2);'
         energy_function += 'hps=0.5*(hps1+hps2)'
         self.pairWiseForce = CustomNonbondedForce(energy_function)
-        self.pairWiseForce.addTabulatedFunction('nb_matrix', Discrete2DFunction(self.n_atoms, self.n_atoms, nbMatrix_LST))
+        self.pairWiseForce.addTabulatedFunction('nb_matrix',
+                                                Discrete2DFunction(self.n_atoms, self.n_atoms, nbMatrix_LST))
         self.pairWiseForce.addGlobalParameter('muy', self.muy)
         self.pairWiseForce.addGlobalParameter('delta', self.delta)
         self.pairWiseForce.addGlobalParameter('epsilon', self.epsilon)
@@ -862,7 +868,8 @@ class system:
             ff.write('\n')
             if self.atoms != OrderedDict():
                 ff.write('[atoms]\n')
-                ff.write('# %2s %3s %9s %9s %9s \t %14s\n' % ('atom', 'mass', 'exc_radius', 'charge', 'hps', 'atom_name'))
+                ff.write(
+                    '# %2s %3s %9s %9s %9s \t %14s\n' % ('atom', 'mass', 'exc_radius', 'charge', 'hps', 'atom_name'))
 
                 for i, atom in enumerate(self.atoms):
 
@@ -885,11 +892,12 @@ class system:
                     res = atom.residue
 
                     ff.write('%4s %5s %9.3f %9.3f %9.3f\t# %12s\n' % (atom.index + 1,
-                                                          mass,
-                                                          sigma,
-                                                          charge,
-                                                          hps,
-                                                          atom.name + '_' + res.name + '_' + str(res.index + 1)))
+                                                                      mass,
+                                                                      sigma,
+                                                                      charge,
+                                                                      hps,
+                                                                      atom.name + '_' + res.name + '_' + str(
+                                                                          res.index + 1)))
             if self.bonds != OrderedDict():
                 ff.write('\n')
                 ff.write('[bonds]\n')

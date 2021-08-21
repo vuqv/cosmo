@@ -24,7 +24,7 @@ class models:
                    default_parameters=True,
                    default_forces=True,
                    create_system=True,
-                   minimize=False,
+                   minimize=True,
                    residue_masses=True,
                    residue_radii=True,
                    residue_charge=True,
@@ -134,11 +134,11 @@ class models:
                 sbm.setCARadiusPerResidueType()
             else:
                 sbm.setParticlesRadii(0.4)
-            sbm.rf_epsilon = 0.1
+            # sbm.rf_epsilon = 0.1
             print('')
 
         elif forcefield_file is not None:
-            sbm.rf_epsilon = 0.1
+            # sbm.rf_epsilon = 0.1
             sbm.loadForcefieldFromFile(forcefield_file)
 
         # Create default system force objects
