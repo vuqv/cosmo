@@ -128,13 +128,14 @@ class models:
             print('________________________________________')
             print('Adding default bond parameters:')
             sbm.setBondParameters(8368.0)
-            print('Adding default angle parameters:')
+
             if residue_radii:
                 print("Setting alpha-carbon atoms radii to their statistical residue radius.")
                 sbm.setCARadiusPerResidueType()
             else:
+                print('Setting default vdw radii for all atoms in the system')
                 sbm.setParticlesRadii(0.4)
-            # sbm.rf_epsilon = 0.1
+
             print('')
 
         elif forcefield_file is not None:
@@ -160,7 +161,7 @@ class models:
         if default_parameters and default_forces and create_system:
             print('Creating System Object:')
             print('______________________')
-            sbm.createSystemObject(minimize=minimize, check_bond_distances=False)
+            sbm.createSystemObject(minimize=minimize, check_bond_distances=True)
             print('OpenMM system Object created')
             print('')
 

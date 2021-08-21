@@ -13,8 +13,6 @@ from simtk.openmm.app import *
 from ..parameters import ca_parameters
 
 
-# In[ ]:
-
 class system:
     """
     A class containing methods and parameters for generating Structure Based
@@ -603,7 +601,7 @@ class system:
     ## Functions for creating OpenMM system object ##
 
     def createSystemObject(self, check_bond_distances=True, minimize=False, check_large_forces=True,
-                           force_threshold=10.0, bond_threshold=0.26):
+                           force_threshold=10.0, bond_threshold=0.39):
         """
         Creates an openmm.System() object using the force field parameters
         given to the SBM 'system' class. It adds particles, forces and
@@ -621,7 +619,7 @@ class system:
             Whether to print force summary of force groups
         force_threshold : float (10.0)
             Treshold to check for large forces.
-        bond_threshold : float (0.25)
+        bond_threshold : float (0.39)
             Treshold to check for large bond distances.
 
         Returns
@@ -650,7 +648,7 @@ class system:
             # Check for high forces in atoms and minimize the system if necessary
             self.checkLargeForces(minimize=minimize, threshold=force_threshold)
 
-    def checkBondDistances(self, threshold=0.26):
+    def checkBondDistances(self, threshold=0.39):
         """
         Searches for large bond distances for the atom pairs defined in
         the 'bonds' attribute. It raises an error when large bonds are found.
@@ -664,7 +662,7 @@ class system:
         -------
         None
         """
-
+        print('checking large bonds ...')
         if isinstance(threshold, float):
             threshold = threshold * unit.nanometer
 
@@ -679,6 +677,9 @@ class system:
                     print('of residues: ' + r1 + ' and ' + r2 + ', respectively.')
                 raise ValueError('The bond distance between them ' + str(self.bonds[b][0]) +
                                  'nm is larger than ' + str(threshold) + ' nm. Please check your input structure.')
+            # else:
+        print(f'All bonds seem to be OK (less than threshold: {threshold})\n')
+        print('______________________')
 
     def checkLargeForces(self, threshold=1, minimize=False):
         """
@@ -730,9 +731,8 @@ class system:
                     atom = self.atoms[np.argmax(forces)]
                     residue = atom.residue
                     print('Large force %.3f kj/(mol nm) found in:' % np.max(forces))
-                    print('Atom: %s' % atom.index)
-                    print('Name: %s' % atom.name)
-                    print('Resiue: %s %s' % (residue.name, residue.index))
+                    print(f'Atom: {atom.index} {atom.name}')
+                    print(f'Resiue: {residue.name} {residue.index}')
                     print('Minimising system with energy tolerance of %.1f kj/mol' % tolerance)
                     print('')
 
@@ -749,6 +749,7 @@ class system:
                     raise ValueError('The system could no be minimized at the requested convergence\n' +
                                      'Try to increase the force threshold value to achieve convergence.')
 
+            print('______________________')
             state = simulation.context.getState(getPositions=True, getEnergy=True)
             print('After minimisation:')
             print('The Potential Energy of the system is : %s' % state.getPotentialEnergy())
@@ -757,6 +758,7 @@ class system:
                     unit.kilojoules_per_mole)
                 print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
             print('All forces are less than %.2f kj/mol/nm' % threshold)
+            print('______________________')
             print('Saving minimized positions')
             print('')
             self.positions = state.getPositions()
@@ -1150,3 +1152,4 @@ class system:
             assert len(parameters) == len(list(term.keys()))
             for i, item in enumerate(term):
                 term[item] = term[item][:-1] + (parameters[i],)
+
