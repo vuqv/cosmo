@@ -21,8 +21,8 @@ class models:
     """
 
     def getCAModel(structure_file,
-                   default_parameters=True,
-                   default_forces=True,
+                   # default_parameters=True,
+                   # default_forces=True,
                    create_system=True,
                    minimize=True,
                    residue_masses=True,
@@ -73,9 +73,9 @@ class models:
         minimize : boolean (False)
             If True the initial structure will undergo the energy minimization.
         residue_masses : boolean (True)
-            Set each alpha carbon atom mass to its average aminoacid residue mass.
+            Set each alpha carbon atom mass to its average amino acid residue mass.
         residue_radii : boolean (True)
-            Set each alpha carbon atom radius to its statistical aminoacid residue radius.
+            Set each alpha carbon atom radius to its statistical amino acid residue radius.
         residue_charge : boolean (True)
             set charge for atoms in the system
         residue_hps : boolean (True)
@@ -105,12 +105,19 @@ class models:
                 print("Setting alpha-carbon masses to their average residue mass.")
                 sbm.setCAMassPerResidueType()
 
+            if residue_radii:
+                print("Setting alpha-carbon atoms radii to their statistical residue radius.")
+                sbm.setCARadiusPerResidueType()
+            else:
+                print('Setting default vdw radii (0.4 nm) for all atoms in the system')
+                sbm.setParticlesRadii(0.4)
+
             if residue_charge:
                 print("Setting alpha-carbon charge to their residue charge.")
                 sbm.setCAChargePerResidueType()
 
             if residue_hps:
-                print("Setting alpha-carbon HPS to their residue HPS.")
+                print("Setting Urry hydropathy scale to their residue.")
                 sbm.setCAHPSPerResidueType()
 
             sbm.getBonds()
@@ -120,49 +127,30 @@ class models:
             print(
                 'Forcefield file given. Bonds, angles, torsions and native contacts definitions will be read from it!')
 
+        # print('')
+        print('Adding default bond force constant...')
+        sbm.setBondParameters(8368.0)
         print('')
+        print('_________________________________')
 
-        # Add default parameters to each interaction term
-        if default_parameters and forcefield_file is None:
-            print('Setting up default forcefield parameters:')
-            print('________________________________________')
-            print('Adding default bond parameters:')
-            sbm.setBondParameters(8368.0)
+        print('Adding Forces:')
+        sbm.addHarmonicBondForces()
+        print('Added Harmonic Bond Forces')
 
-            if residue_radii:
-                print("Setting alpha-carbon atoms radii to their statistical residue radius.")
-                sbm.setCARadiusPerResidueType()
-            else:
-                print('Setting default vdw radii for all atoms in the system')
-                sbm.setParticlesRadii(0.4)
+        sbm.addYukawaForces()
+        print('Added Yukawa Force')
 
-            print('')
-
-        elif forcefield_file is not None:
-            # sbm.rf_epsilon = 0.1
-            sbm.loadForcefieldFromFile(forcefield_file)
-
-        # Create default system force objects
-        if default_parameters and default_forces:
-            print('Adding Forces:')
-            print('_____________')
-            sbm.addHarmonicBondForces()
-            print('Added Harmonic Bond Forces')
-
-            sbm.addYukawaForces()
-            print('Added Yukawa Force')
-
-            sbm.addPairWiseForces()
-            print('Added PairWise Force')
-
-            print('')
+        sbm.addPairWiseForces()
+        print('Added PairWise Force')
+        print('')
+        print('_________________________________')
 
         # Generate the system object and add previously generated forces
-        if default_parameters and default_forces and create_system:
-            print('Creating System Object:')
-            print('______________________')
-            sbm.createSystemObject(minimize=minimize, check_bond_distances=True)
-            print('OpenMM system Object created')
-            print('')
+
+        print('Creating System Object:')
+        # print('______________________')
+        sbm.createSystemObject(minimize=minimize, check_bond_distances=True)
+        print('OpenMM system Object created')
+        print('')
 
         return sbm

@@ -52,20 +52,28 @@ class system:
         Stores the OpenMM HarmonicBondForce initialised-class. Implements
         an harmonic bond potential between pairs of particles, that depends
         quadratically on their distance.
+    yukawaForce : openmm.CustomNonbondedForce
+        Stores the OpenMM CustomNonbondedForce initialized-class.
+        Implements the Debye-Huckle potential.
+    pairWiseForce : openmm.CustomNonbondedForce
+        Stores the OpenMM CustomNonbondedForce initialized-class. Implements the pairwise short-range
+        potential.
     forceGroups : collections.OrderedDict
         A dict that uses force names as keys and their corresponding force
         as values.
     system : openmm.System
         Stores the OpenMM System initialised class. It stores all the forcefield
         information for the SBM model.
-    rf_epsilon : float
-        Epsilon parameter used in the repulsion force object.
     rf_sigma : float
-        Sigma parameter used in the repulsion force object.
+        Sigma parameter used in the pairwise force object.
     rf_cutoff : float
         Cutoff value used for repulsion force interactions.
-    exclusions : list
-        List of added exclusions for the repuslion non-bonded term.
+    exclusion_NB : NxN matrix
+        This is a pairwise interaction matrix.
+        initialize by np.ones((N, N)), N is the number of beads in the system.
+        By default, all atoms interact via pairwise. but this is not true, we should
+        exclude atom pairs that covalently bonded by when adding Harmonic bonds, we set matrix element of (i,j), (j,i)
+        to 0, where i and j are atom indices in bond
 
     Methods
     -------
@@ -84,17 +92,6 @@ class system:
         into a dictionary to store their forcefield properties.
     setBondParameters()
         Change the forcefield parameters for bonded terms.
-    setAngleParameters()
-        Change the forcefield parameters for angle terms.
-    setProperTorsionParameters()
-        Change the forcefield parameters for proper torsion terms.
-    setImproperParameters()
-        Change the forcefield parameters for improper torsion
-        terms.
-    setPlanarParameters()
-        Change the forcefield parameters for planar torsion terms.
-    setNativeContactParameters()
-        Change the forcefield parameters for native contact terms.
     setParticlesMasses()
         Change the mass parameter for each atom in the system.
     setParticlesRadii()
@@ -102,9 +99,10 @@ class system:
     addHarmonicBondForces()
         Creates an harmonic bonded force term for each bond in the main
         class using their defined forcefield parameters.
-    addLJRepulsionForces()
-        Creates a repulsive-only 12 Lennard-Jones non-bonded potential specifying
-        a exclusion list for bond, angle, torsion, and native contact terms.
+    addYukawaForces()
+        Creates a nonbonded force term for electrostatic interaction DH potential.
+    addPairWiseForces()
+        Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).
     createSystemObject()
         Creates OpenMM system object adding particles, masses and forces.
         It also groups the added forces into Force-Groups for the sbmReporter
@@ -116,6 +114,10 @@ class system:
         names for the added forces to include them in the reporter class.
     dumpStructure()
         Writes a structure file of the system in its current state.
+    dumpTopology()
+        Writes a topology file of the system in PSF format, this is used for visualization.
+        Be careful when using this for analysis since the atom masses are not correct,
+        it specifies every masses equal to Carbon masses.
     dumpForceFieldData()
         Writes to a file the parameters of the SBM forcefield.
     loadForcefieldFromFile()
@@ -123,10 +125,13 @@ class system:
         the dumpForceFieldData() method.
     setCAMassPerResidueType()
         Sets alpha carbon atoms to their average residue mass. Used specially for
-        modifying alpha-carbon (CA) corse-grained models.
+        modifying alpha-carbon (CA) coarse-grained models.
     setCARadiusPerResidueType()
         Sets alpha carbon atoms to their average residue mass. Used specially for
-        modifying alpha-carbon (CA) corse-grained models.
+        modifying alpha-carbon (CA) coarse-grained models.
+    setCAHPSPerResidueType()
+        Sets alpha carbon atoms to their residue Urry Hydropathy scale. Used specially for
+        modifying alpha-carbon (CA) coarse-grained models.
     """
 
     def __init__(self, structure_path, particles_mass=1.0):
@@ -175,7 +180,7 @@ class system:
         self.exclusion_NB = None
         self.particles_hps = None
 
-        self.exclusions = []
+        # self.exclusions = []
         # PairWise potential
         self.pairWiseForce = None
         self.muy = 1
@@ -214,7 +219,7 @@ class system:
         atomsToRemove = []
         _hydrogen = re.compile("[123 ]*H.*")
         for a in self.topology.atoms():
-            if except_chains != None:
+            if except_chains is not None:
                 if a.residue.chain.id not in except_chains:
                     if _hydrogen.match(a.name):
                         atomsToRemove.append(a)
@@ -323,7 +328,7 @@ class system:
         # Get Bonds From Topology
         bonds = []
         for bond in self.topology.bonds():
-            if except_chains != None:
+            if except_chains is not None:
                 if bond[0].residue.chain.id not in except_chains:
                     if bond[1].residue.chain.id not in except_chains:
                         if bond[0].index > bond[1].index:
@@ -503,14 +508,8 @@ class system:
 
         Parameters
         ----------
-        epsilon : float
-            Value of the epsilon constant in the energy function.
-        sigma : float or list
-            Value of the sigma constant (in nm) in the energy function. If float the
-            same sigma value is used for every particle. If list a unique
-            parameter is given for each particle.
-        cutoff : float
-            The cutoff distance (in nm) being used for the nonbonded interactions.
+        None
+
         Returns
         -------
         None
@@ -533,7 +532,7 @@ class system:
             for i, atom in enumerate(self.atoms):
                 self.yukawaForce.addParticle((self.particles_charge[i],))
 
-        self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
+        # self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
     def addPairWiseForces(self):
         """
@@ -656,7 +655,7 @@ class system:
         Parameters
         ----------
         threshold : float
-            Treshold to check for large bond distances.
+            Threshold to check for large bond distances.
 
         Returns
         -------
@@ -678,8 +677,8 @@ class system:
                 raise ValueError('The bond distance between them ' + str(self.bonds[b][0]) +
                                  'nm is larger than ' + str(threshold) + ' nm. Please check your input structure.')
             # else:
-        print(f'All bonds seem to be OK (less than threshold: {threshold})\n')
-        print('______________________')
+        print(f'All bonds seem to be OK (less than threshold: {threshold})')
+        print('')
 
     def checkLargeForces(self, threshold=1, minimize=False):
         """
@@ -701,7 +700,9 @@ class system:
         None
         """
 
-        minimized = False
+        # minimized = False
+        print('_________________________________')
+        print('Energy minimization:')
 
         # Define test simulation to extract forces
         integrator = LangevinIntegrator(1 * unit.kelvin, 1 / unit.picosecond, 0.0005 * unit.picoseconds)
@@ -732,12 +733,12 @@ class system:
                     residue = atom.residue
                     print('Large force %.3f kj/(mol nm) found in:' % np.max(forces))
                     print(f'Atom: {atom.index} {atom.name}')
-                    print(f'Resiue: {residue.name} {residue.index}')
+                    print(f'Residue: {residue.name} {residue.index}')
                     print('Minimising system with energy tolerance of %.1f kj/mol' % tolerance)
                     print('')
 
                 simulation.minimizeEnergy(tolerance=tolerance * unit.kilojoule / unit.mole)
-                minimized = True
+                # minimized = True
                 state = simulation.context.getState(getForces=True)
                 prev_force = np.max(forces)
                 forces = [np.linalg.norm([f.x, f.y, f.z]) for f in state.getForces()]
@@ -758,6 +759,7 @@ class system:
                     unit.kilojoules_per_mole)
                 print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
             print('All forces are less than %.2f kj/mol/nm' % threshold)
+            print('')
             print('______________________')
             print('Saving minimized positions')
             print('')
@@ -765,7 +767,7 @@ class system:
 
     def addParticles(self):
         """
-        Add a particle to the sbmOpenMM system for each atom in it. The mass
+        Add a particle to the system for each atom in it. The mass
         of each particle is set up with the values in the 'particles_mass'
         attribute.
 
@@ -791,7 +793,7 @@ class system:
 
     def addSystemForces(self):
         """
-        Adds generated forces to the sbmOpenMM system, also adding
+        Adds generated forces to the system, also adding
         a force group to the 'forceGroups' attribute dictionary.
 
         Parameters
@@ -923,6 +925,9 @@ class system:
         """
         Loads force field parameters from a force field file written by the
         dumpForceFieldData() method into the sbmOpenMM system.
+        NOTE: I still keep this function since I think I will use it later.
+        I have not customized this function yet so do not use loadForcefieldFromFile function in simulation.
+        Just keep here for prototype and customize later...
 
         Parameters
         ----------
@@ -1091,9 +1096,8 @@ class system:
 
     def setCAHPSPerResidueType(self):
         """
-        Sets the HPS of the alpha carbon atoms
-        to characteristic charge of their corresponding amino acid
-        residue.
+        Sets the HPS of the alpha carbon atoms.
+        The current implementation is using Urry scale.
 
         Parameters
         ----------
@@ -1104,7 +1108,7 @@ class system:
         None
         """
 
-        # Load charge from parameters package
+        # Load hydropathy scale from parameters package
         aa_hps = ca_parameters.aa_hps
 
         hps = []
@@ -1152,4 +1156,3 @@ class system:
             assert len(parameters) == len(list(term.keys()))
             for i, item in enumerate(term):
                 term[item] = term[item][:-1] + (parameters[i],)
-
