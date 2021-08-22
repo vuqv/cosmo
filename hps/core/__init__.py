@@ -1,7 +1,7 @@
 """
-core package of the sbmOpenMM package that contains the main sbmOpenMM classes. 
+core package of the HPS-Urry package that contains the main HPS-Urry classes.
 
-The sbmOpenMM.core package contains the three sbmOpenMM main classes:
+The hps_urry.core package contains the three sbmOpenMM main classes:
 
     1. geometry
 
@@ -9,7 +9,10 @@ The sbmOpenMM.core package contains the three sbmOpenMM main classes:
 
     3. system
 
-The first class, geometry, contains methods to calculate the geometrical parameters from the input structures. These parameters are used to define the input conformation as the global minimum configuration in the potential energy function. The second class, models, allows to easily set up predefined SBM models, that encompass coarse grained, all atom and multi basin potentials. The third class, system, is the main class that holds all the methods to define, modify and create SBMs to be simulated with OpenMM.
+The first class, geometry, contains methods to calculate the geometrical parameters from the input structures.
+
+The second class, models, allows to easily set up predefined CG models.
+The third class, system, is the main class that holds all the methods to define, modify and create CG to be simulated with OpenMM.
 
 """
 

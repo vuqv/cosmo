@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 4
 
    hps.core
-   hps.datasets
    hps.parameters
    hps.reporter
 

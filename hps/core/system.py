@@ -826,7 +826,7 @@ class system:
 
     def dumpStructure(self, output_file):
         """
-        Writes a PDB file containing the currently defined abmOpenMM system atoms.
+        Writes a PDB file containing the currently defined CG system atoms and its positions.
 
         Parameters
         ----------
@@ -861,7 +861,7 @@ class system:
     def dumpForceFieldData(self, output_file):
         """
         Writes a file containing the current forcefield parameters in the
-        sbmOpenMM system.
+        CG system.
 
         Parameters
         ----------
@@ -875,7 +875,7 @@ class system:
 
         with open(output_file, 'w') as ff:
 
-            ff.write('#### SBM Force Field Parameters ####\n')
+            ff.write('#### CG Force Field Parameters ####\n')
             ff.write('\n')
             if self.atoms != OrderedDict():
                 ff.write('[atoms]\n')
@@ -932,6 +932,7 @@ class system:
         """
         Loads force field parameters from a force field file written by the
         dumpForceFieldData() method into the sbmOpenMM system.
+
         NOTE: I still keep this function since I think I will use it later.
         I have not customized this function yet so do not use loadForcefieldFromFile function in simulation.
         Just keep here for prototype and customize later...
