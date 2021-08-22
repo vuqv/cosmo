@@ -594,10 +594,12 @@ class system:
             assert self.n_atoms == len(self.rf_sigma) and self.n_atoms == len(self.particles_hps)
             for i, atom in enumerate(self.atoms):
                 self.pairWiseForce.addParticle((atom.index, self.rf_sigma[i], self.particles_hps[i],))
-
+                """Or can be add as follow"""
+                # self.pairWiseForce.addParticle([atom.index, self.rf_sigma[i], self.particles_hps[i]])
+        # set cut off for nonbonded interaction
         # self.pairWiseForce.setCutoffDistance(self.rf_cutoff)
 
-    ## Functions for creating OpenMM system object ##
+    """ Functions for creating OpenMM system object """
 
     def createSystemObject(self, check_bond_distances=True, minimize=False, check_large_forces=True,
                            force_threshold=10.0, bond_threshold=0.39):
