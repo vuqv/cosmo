@@ -540,6 +540,11 @@ class system:
         sigma and epsilon given to this method. The custom non-bonded force
         is initialized with the formula: (note: hps here is lambda0 in the paper)
 
+        Unlike BondForce class, where we specify index for atoms pair to add bond, it means
+        that number of bondForces may differ from number of particle.
+        NonBondedForce is add to all particles, hence we don't need pass the atom index.
+
+
         energy = '
                 step(2^(1/6)*sigma - r) * (4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-muy*hps+delta)*epsilon )
                 +
