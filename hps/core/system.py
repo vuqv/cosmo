@@ -23,7 +23,7 @@ class system:
     Attributes
     ----------
     structure_path : string
-        Path to the pdb or cif input file
+        Path to the pdb or cif input file.
     structure : openmm.app.pdbfile.PDBFile or openmm.app.pdbxfile.PDBxFile
         Object that holds the information of OpenMM PDB or CIF parsing methods.
     topology : openmm.app.topology.Topology
@@ -73,7 +73,7 @@ class system:
         initialize by np.ones((N, N)), N is the number of beads in the system.
         By default, all atoms interact via pairwise. but this is not true, we should
         exclude atom pairs that covalently bonded by when adding Harmonic bonds, we set matrix element of (i,j), (j,i)
-        to 0, where i and j are atom indices in bond
+        to 0, where i and j are atom indices in bond.
 
     Methods
     -------
