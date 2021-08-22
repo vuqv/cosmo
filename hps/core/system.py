@@ -66,8 +66,7 @@ class system:
         information for the SBM model.
     rf_sigma : float
         Sigma parameter used in the pairwise force object.
-    rf_cutoff : float
-        Cutoff value used for repulsion force interactions.
+        This is vdw Radius of beads
     exclusion_NB : NxN matrix
         This is a pairwise interaction matrix.
         initialize by np.ones((N, N)), N is the number of beads in the system.
@@ -171,6 +170,7 @@ class system:
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
+        self.bond_length = 0.382
 
         # Define force attributes
         self.harmonicBondForce = None
@@ -350,7 +350,7 @@ class system:
             p1 = self.positions[bond[0].index]
             p2 = self.positions[bond[1].index]
             # bond_length = geometry.bond(p1, p2)
-            bond_length = 0.382 * unit.nanometer
+            bond_length = self.bond_length * unit.nanometer
             self.bonds[bond] = (bond_length, None)
             self.n_bonds += 1
 

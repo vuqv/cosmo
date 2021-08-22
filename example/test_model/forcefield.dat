@@ -1,4 +1,4 @@
-#### SBM Force Field Parameters ####
+#### CG Force Field Parameters ####
 
 [atoms]
 # atom mass exc_radius    charge       hps 	      atom_name
