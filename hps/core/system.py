@@ -596,7 +596,7 @@ class system:
                 self.pairWiseForce.addParticle((atom.index, self.rf_sigma[i], self.particles_hps[i],))
                 """Or can be add as follow"""
                 # self.pairWiseForce.addParticle([atom.index, self.rf_sigma[i], self.particles_hps[i]])
-        # set cut off for nonbonded interaction
+        """set cut off for nonbonded interaction"""
         # self.pairWiseForce.setCutoffDistance(self.rf_cutoff)
 
     """ Functions for creating OpenMM system object """
