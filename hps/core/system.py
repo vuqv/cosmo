@@ -67,7 +67,7 @@ class system:
     rf_sigma : float
         Sigma parameter used in the pairwise force object.
         This is vdw Radius of beads
-    exclusion_NB : NxN matrix
+    exclusion_NB : Matrix of size NxN
         This is a pairwise interaction matrix.
         initialize by np.ones((N, N)), N is the number of beads in the system.
         By default, all atoms interact via pairwise. but this is not true, we should
