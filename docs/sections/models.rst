@@ -16,14 +16,14 @@ The force field equations are:
 	H_A = \sum_{bonds}V_{bond}+\sum_{i,j}\Phi_{ij}^{vdw}+\sum_{i,j}\Phi_{i,j}^{el}
 
 The Bonded potential:
-++++
+++++++++++++++++++++++
 .. math::
         V_{bond} = \frac{k_b}{2}(r-r_0)^2
 
 Here the default values are :math:`k_b=20 kCal/(mol \times A^2), r_0=3.82 A^2`
 
 The Pairwise potential:
-++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++
 
 .. math::
         \Phi_{i,j}^{vdw}(r) = step(2^{1/6}\sigma_{ij}-r) \times \left( 4\epsilon\left[\left(\frac{\sigma_{ij}}{r}\right)^{12}- \left(\frac{\sigma_{ij}}{r}\right)^{6}\right]+(1-\mu\times\lambda_{ij}^{0}+\Delta)\times\epsilon\right)
@@ -46,7 +46,7 @@ where, :math:`\sigma_{i,j}=\frac{\sigma_i+\sigma_j}{2}`: is the vdW radius inter
 In the current implementation, hydropathy scales are taken from Urry model, :math:`(\mu, \Delta) = (1, 0.08)`
 
 The Debye-Huckle potential has following form:
-++++++++++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++
 .. math::
         \Phi_{ij}^{el}(r) = \frac{q_{i}q_{j}}{4\pi\epsilon_0 D r}e^{-\kappa r}
 
