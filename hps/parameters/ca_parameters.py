@@ -1,5 +1,6 @@
 """
 This module contains bead's parameters to use in simulation.
+
 They are mass, radius, hydropathy scale, charge
 """
 
@@ -11,7 +12,8 @@ aa_masses = {'ALA': 71.08, 'ARG': 156.20, 'ASN': 114.10,
              'SER': 87.08, 'THR': 101.10, 'TRP': 186.20,
              'TYR': 163.20, 'VAL': 99.07}
 """
-Mass of beads. Unit in amu
+Mass of the Coarse-grained beads are set to residue masses.
+Unit in amu
 """
 
 aa_radii = {'ALA': 0.504, 'ARG': 0.656, 'ASN': 0.568,
@@ -22,7 +24,8 @@ aa_radii = {'ALA': 0.504, 'ARG': 0.656, 'ASN': 0.568,
             'SER': 0.518, 'THR': 0.562, 'TRP': 0.667,
             'TYR': 0.646, 'VAL': 0.586}
 """
-vdw radius of beads. Unit in Angstrom
+vdw radius of the coarse-grained beads. 
+Unit in nanometer
 """
 
 aa_hps = {'ALA': 0.602942, 'ARG': 0.558824, 'ASN': 0.588236,
@@ -47,6 +50,12 @@ aa_charge = {'ALA': 0.0, 'ARG': 1.0, 'ASN': 0.0,
              'SER': 0.0, 'THR': 0.0, 'TRP': 0.0,
              'TYR': 0.0, 'VAL': 0.0}
 """
-Charge of beads, assigns to it alpha-carbon atoms.
+Charge of the coarse-grain beads, assigns to it alpha-carbon atoms.
+Charges are determined at neutral pH (pH=7).
+Setting to the values from, where ARG, LYS =1 and ASP, GLU = -1,
+Other residues have charge of 0.
+Regy, R. M., Thompson, J., Kim, Y. C., & Mittal, J. (2021). 
+Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins. 
+Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094.
 Unit in elementary charge
 """

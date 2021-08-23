@@ -21,8 +21,6 @@ class models:
     """
 
     def getCAModel(structure_file,
-                   # default_parameters=True,
-                   # default_forces=True,
                    create_system=True,
                    minimize=True,
                    residue_masses=True,
@@ -61,11 +59,6 @@ class models:
         ----------
         structure_file : string
             Path to the input structure file.
-        default_parameters : boolean (True)
-            Whether to add default SBM CA forcefield parameters to the model.
-        default_forces : boolean (True)
-            Whether to initialize default SBM CA force objects. Set to False if
-            the parameters will be different from the default ones.
         create_system : boolean (True)
             If True the function will call the createSystemObject() method
             to create an OpenMM system object. If modifications to the default
@@ -87,7 +80,7 @@ class models:
         -------
         sbm : sbmOpenMM.system
             Initialized sbmOpenMM.system class with default options for defining
-            a coarse-grained CA SBM force field.
+            a coarse-grained CA force field.
         """
 
         print('Generating CA SBM for structure file ' + structure_file)

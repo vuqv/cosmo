@@ -15,64 +15,62 @@ from ..parameters import ca_parameters
 
 class system:
     """
-    A class containing methods and parameters for generating Structure Based
-    Models (SBM) systems to be simulated using the OpenMM interface. It offers
-    flexibility to create default and custom SBM systems and to easily
-    modify their parameters.
+    A class containing methods and parameters for generating CG systems to be simulated using the OpenMM interface.
+    It offers flexibility to create default and custom CG systems and to easily modify their parameters.
 
     Attributes
     ----------
-    structure_path : string
+    structure_path : :code:`string`
         Path to the pdb or cif input file.
-    structure : openmm.app.pdbfile.PDBFile or openmm.app.pdbxfile.PDBxFile
+    structure : :code:`openmm.app.pdbfile.PDBFile or openmm.app.pdbxfile.PDBxFile`
         Object that holds the information of OpenMM PDB or CIF parsing methods.
-    topology : openmm.app.topology.Topology
+    topology : :code:`openmm.app.topology.Topology`
         OpenMM topology of the model.
-    positions : unit.quantity.Quantity
+    positions : :code:`unit.quantity.Quantity`
         Atomic positions of the model.
-    particles_mass : float or list
+    particles_mass : :code:`float or list`
         Mass of each particle. If float then uniform masses are given to all
         particles. If list per-particle masses are assigned.
-    model_type : string
+    model_type : :code:`string`
         String representing the model type: All-atom (AA), alpha-carbon (CA)
         or multi-basin variants (AA-MB, CA-MB).
-    atoms : list
-        A list of the current atoms in the model. The items are simtk.openmm.app.topology.Atom
+    atoms : :code:`list`
+        A list of the current atoms in the model. The items are :code:`simtk.openmm.app.topology.Atom`
         initialised classes.
-    n_atoms : int
+    n_atoms : :code:`int`
         Total numer of atoms in the model.
-    bonds : collections.OrderedDict
-        A dict that uses bonds (2-tuple of simtk.openmm.app.topology.Atom objects)
+    bonds : :code:`collections.OrderedDict`
+        A dict that uses bonds (2-tuple of :code:`simtk.openmm.app.topology.Atom` objects)
         present in the model as keys and their forcefield properties as values.
-    bonds_indexes : list
+    bonds_indexes : :code:`list`
         A list containing the zero-based indexes of the atoms defining the bonds in the model.
-    n_bonds : int
-        Total numer of bonds in the model.
-    harmonicBondForce : openmm.HarmonicBondForce
-        Stores the OpenMM HarmonicBondForce initialised-class. Implements
+    n_bonds : :code:`int`
+        Total number of bonds in the model.
+    harmonicBondForce : :code:`openmm.HarmonicBondForce`
+        Stores the OpenMM :code:`HarmonicBondForce` initialised-class. Implements
         an harmonic bond potential between pairs of particles, that depends
         quadratically on their distance.
-    yukawaForce : openmm.CustomNonbondedForce
-        Stores the OpenMM CustomNonbondedForce initialized-class.
+    yukawaForce : :code:`openmm.CustomNonbondedForce`
+        Stores the OpenMM :code:`CustomNonbondedForce` initialized-class.
         Implements the Debye-Huckle potential.
-    pairWiseForce : openmm.CustomNonbondedForce
-        Stores the OpenMM CustomNonbondedForce initialized-class. Implements the pairwise short-range
+    pairWiseForce : :code:`openmm.CustomNonbondedForce`
+        Stores the OpenMM :code:`CustomNonbondedForce` initialized-class. Implements the pairwise short-range
         potential.
-    forceGroups : collections.OrderedDict
+    forceGroups : :code:`collections.OrderedDict`
         A dict that uses force names as keys and their corresponding force
         as values.
-    system : openmm.System
+    system : :code:`openmm.System`
         Stores the OpenMM System initialised class. It stores all the forcefield
         information for the SBM model.
-    rf_sigma : float
+    rf_sigma : :code:`float`
         Sigma parameter used in the pairwise force object.
         This is vdw Radius of beads
     exclusion_NB : Matrix of size NxN
         This is a pairwise interaction matrix.
-        initialize by np.ones((N, N)), N is the number of beads in the system.
+        initialize by :code:`np.ones((N, N))`, N is the number of beads in the system.
         By default, all atoms interact via pairwise. but this is not true, we should
-        exclude atom pairs that covalently bonded by when adding Harmonic bonds, we set matrix element of (i,j), (j,i)
-        to 0, where i and j are atom indices in bond.
+        exclude atom pairs that covalently bonded by when adding Harmonic bonds, we set matrix element of :code:`(i,j)=
+        (j,i)=0`, where i and j are atom indices in bond.
 
     Methods
     -------
@@ -114,14 +112,12 @@ class system:
     dumpStructure()
         Writes a structure file of the system in its current state.
     dumpTopology()
-        Writes a topology file of the system in PSF format, this is used for visualization.
-        Be careful when using this for analysis since the atom masses are not correct,
-        it specifies every masses equal to Carbon masses.
+        Writes a topology file of the system in PSF format, this is used for visualization and post-analysis.
     dumpForceFieldData()
-        Writes to a file the parameters of the SBM forcefield.
+        Writes to a file the parameters of the forcefield.
     loadForcefieldFromFile()
-        Loads forcefield parameters from a sbmOpenMM force field file written with
-        the dumpForceFieldData() method.
+        Loads forcefield parameters from a force field file written with
+        the :code:`dumpForceFieldData()` method.
     setCAMassPerResidueType()
         Sets alpha carbon atoms to their average residue mass. Used specially for
         modifying alpha-carbon (CA) coarse-grained models.
@@ -462,14 +458,14 @@ class system:
 
     def addHarmonicBondForces(self):
         """
-        Creates an openmm.HarmonicBondForce() object with the bonds and
+        Creates an :code:`openmm.HarmonicBondForce()` object with the bonds and
         parameters set up in the "bonds" dictionary attribute. The force object
-        is stored at the "harmonicBondForce" attribute.
+        is stored at the :code:`harmonicBondForce` attribute.
 
         The force parameters must be contained in self.bonds as follows:
         self.bonds is a dictionary:
 
-            - The keys are 2-tuples for two atom items in self.topology.atoms attribute.
+            - The keys are 2-tuples for two atom items in :code:`self.topology.atoms` attribute.
             - The values are a 2-tuple of parameters in the following order:
 
                 - first  -> bond0 (quantity)
@@ -496,15 +492,18 @@ class system:
 
     def addYukawaForces(self):
         """
-        Creates an openmm.CustomNonbondedForce() object with the parameters
+        Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
         is initialized with the formula:
 
-        energy = 'factor*charge1*charge2/epsilon/r*exp(-r/lD)'
-        where factor is for short to convert dimensionless in calculation to kj.nm/mol/e^2 unit
+        .. math::
+            energy = f \\times \\frac{q_1q_2}{\epsilon_r \\times r}\\times e^{(-r/lD)}
 
 
-        The force object is stored at the "yukawaForce" attribute.
+        where :math:`f=\\frac{1}{4\\pi\\epsilon_0}=138.935458` is the factor for short to convert dimensionless
+        in calculation to :math:`kj.nm/(mol\\times e^2)` unit.
+
+        The force object is stored at the :code:`yukawaForce` attribute.
 
         Parameters
         ----------
@@ -536,27 +535,29 @@ class system:
 
     def addPairWiseForces(self):
         """
-        Creates an openmm.CustomNonbondedForce() object with the parameters
+        Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
-        is initialized with the formula: (note: hps here is lambda0 in the paper)
+        is initialized with the formula: (note: hps here is :math:`\lambda_{ij}^{0}` in the paper)
 
-        Unlike BondForce class, where we specify index for atoms pair to add bond, it means
+        Unlike :code:`BondForce` class, where we specify index for atoms pair to add bond, it means
         that number of bondForces may differ from number of particle.
-        NonBondedForce is add to all particles, hence we don't need pass the atom index.
+        :code:`NonBondedForce` is add to all particles, hence we don't need to pass the :code:`atom index`.
+
+        .. math::
+            \\Phi_{i,j}^{vdw}(r) = step(2^{1/6}\\sigma_{ij}-r) \\times
+            \\left( 4\\epsilon\\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-
+            \\left(\\frac{\\sigma_{ij}}{r}\\right)^{6}\\right]+(1-\\mu\\times\\lambda_{ij}^{0}+\\Delta)\\epsilon\\right)
+
+            + \\left[1-step(2^{1/6}\\sigma_{ij}-r)\\right]\\times\\left[(\\mu \\lambda_{ij}^{0}-\\Delta)\\times 4\\pi
+            \\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-\\left(\\frac{\\sigma_{ij}}{r}\\right)^6\\right]\\right]
 
 
-        energy = '
-                step(2^(1/6)*sigma - r) * (4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-muy*hps+delta)*epsilon )
-                +
-                (1-step(2^(1/6)-r)) * ((muy*hps-delta)*4*epsilon*((sigma/r)^12-(sigma/r)^6))
 
-                sigma   = 0.5*(sigma1+sigma2)
-                hps  = 0.5*(hps1+hps2)
-                muy     = 1
-                delta   = 0.08
-                epsilon = 0.2 kcal/mol
-        '
-        The force object is stored at the "pairWiseForce" attribute.
+        Here, :math:`\\sigma= \\frac{(\\sigma_1+\\sigma_2)}{2}; \\lambda_{ij}^{0}=\\frac{(\\lambda_i+\\lambda_j)}{2};
+        \\mu= 1;\\Delta= 0.08; \\epsilon = 0.8368 kj/mol`
+
+        The
+        The force object is stored at the :code:`pairWiseForce` attribute.
 
         Parameters
         ----------
@@ -609,8 +610,8 @@ class system:
     def createSystemObject(self, check_bond_distances=True, minimize=False, check_large_forces=True,
                            force_threshold=10.0, bond_threshold=0.39):
         """
-        Creates an openmm.System() object using the force field parameters
-        given to the SBM 'system' class. It adds particles, forces and
+        Creates an :code:`openmm.System()` object using the force field parameters
+        given to the 'system' class. It adds particles, forces and
         creates a force group for each force object. Optionally the method
         can check for large bond distances (default) and minimize the atomic
         positions if large forces are found in any atom (default False).
@@ -697,10 +698,10 @@ class system:
         Parameters
         ----------
         threshold : float
-            Treshold to check for large forces.
+            Threshold to check for large forces.
         minimize : float
             Whether to iteratively minimize the system until all forces are lower or equal to
-            the thresshold value.
+            the threshold value.
 
         Returns
         -------
@@ -775,7 +776,7 @@ class system:
     def addParticles(self):
         """
         Add a particle to the system for each atom in it. The mass
-        of each particle is set up with the values in the 'particles_mass'
+        of each particle is set up with the values in the :code:`particles_mass`
         attribute.
 
         Parameters
@@ -801,7 +802,7 @@ class system:
     def addSystemForces(self):
         """
         Adds generated forces to the system, also adding
-        a force group to the 'forceGroups' attribute dictionary.
+        a force group to the :code:`forceGroups` attribute dictionary.
 
         Parameters
         ----------
@@ -843,12 +844,16 @@ class system:
     def dumpTopology(self, output_file):
         """
         Writes a file containing the current topology in the
-        sbmOpenMM system.
+        sbmOpenMM system. This file contains topology of system, used in visualization and analysis.
+
+        Here, we used :code:`parmed` to load openMM topology, openMM system to create Structure object in parmed.
+        Because parmed automatically recognizes charge, mass of atoms by their name.
+        We need to set charge, mass back to residues properties.
 
         Parameters
         ----------
         output_file : string
-            name of the output file.
+            name of the output PSF file.
 
         Returns
         -------
@@ -856,6 +861,8 @@ class system:
         """
 
         top = pmd.openmm.load_topology(self.topology, self.system)
+        for i, a in enumerate(top.atoms):
+            a.mass, a.charge = self.particles_mass[i], self.particles_charge[i]
         top.save(f'{output_file}', overwrite=True)
 
     def dumpForceFieldData(self, output_file):
@@ -931,10 +938,10 @@ class system:
     def loadForcefieldFromFile(self, forcefield_file):
         """
         Loads force field parameters from a force field file written by the
-        dumpForceFieldData() method into the sbmOpenMM system.
+        :code:`dumpForceFieldData()` method into the sbmOpenMM system.
 
         NOTE: I still keep this function since I think I will use it later.
-        I have not customized this function yet so do not use loadForcefieldFromFile function in simulation.
+        I have not customized this function yet so do not use :code:`loadForcefieldFromFile()` function in simulation.
         Just keep here for prototype and customize later...
 
         Parameters
@@ -1139,7 +1146,7 @@ class system:
         ----------
         term : dict
             Dictionary object containing the set of degrees of freedom
-            (DOF) to set up attributes to (e.g. bonds attribute)
+            (DOF) to set up attributes to (e.g. :code:`bonds` attribute)
 
         parameters : integer or float or list
             Value(s) for the specific forcefield parameters. If integer
