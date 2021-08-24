@@ -362,7 +362,7 @@ class system:
             self.bondedTo[bond[0]].append(bond[1])
             self.bondedTo[bond[1]].append(bond[0])
 
-    ## Functions for setting force specific parameters ##
+    """ Functions for setting force specific parameters """
 
     def setBondParameters(self, bond_parameters):
         """
@@ -454,7 +454,7 @@ class system:
 
         self.particles_hps = particles_hps
 
-    ## Functions for creating force objects with defined parameters ##
+    """ Functions for creating force objects with defined parameters """
 
     def addHarmonicBondForces(self):
         """
@@ -625,9 +625,9 @@ class system:
         check_large_forces : boolean (False)
             Whether to print force summary of force groups
         force_threshold : float (10.0)
-            Treshold to check for large forces.
+            Threshold to check for large forces.
         bond_threshold : float (0.39)
-            Treshold to check for large bond distances.
+            Threshold to check for large bond distances.
 
         Returns
         -------
@@ -727,7 +727,7 @@ class system:
         print('')
 
         if minimize:
-            # Find if there is an acting force larger than thresshold
+            # Find if there is an acting force larger than threshold
             # minimize the system until forces have converged
             forces = [np.linalg.norm([f[0]._value, f[1]._value, f[2]._value]) for f in state.getForces()]
             prev_force = None
@@ -959,7 +959,7 @@ class system:
             print('Reading Forcefield parameters from file ' + forcefield_file + ':')
             print('________________________________________' + '_' * len(forcefield_file))
 
-            # Initilise ff-file section booleans to 0
+            # Initialize ff-file section booleans to 0
             atoms = False
             bonds = False
 
