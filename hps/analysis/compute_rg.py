@@ -1,8 +1,8 @@
- 
 import mdtraj as md
 import numpy as np
 from matplotlib import pyplot as plt
-traj=md.load('asyn_equil.dcd', top='asyn.psf')
+
+traj = md.load('asyn_equil.dcd', top='asyn.psf')
 
 aa_masses = {'ALA': 71.08, 'ARG': 156.20, 'ASN': 114.10,
              'ASP': 115.10, 'CYS': 103.10, 'GLU': 129.10,
@@ -13,11 +13,11 @@ aa_masses = {'ALA': 71.08, 'ARG': 156.20, 'ASN': 114.10,
              'TYR': 163.20, 'VAL': 99.07}
 
 masses = np.zeros(len(list(traj.topology.residues)))
-for i,r in enumerate(traj.topology.residues):
-#     print(i,r.name)
+for i, r in enumerate(traj.topology.residues):
+    #     print(i,r.name)
     masses[i] = aa_masses[r.name]
 
 # unit in nm
-Rg=md.compute_rg(traj, masses)
+Rg = md.compute_rg(traj, masses)
 plt.hist(Rg, bins=50, density=True)
 Rg.mean()
