@@ -21,7 +21,7 @@ stage='equil'
 # which platform to run simulation: CPU/GPU
 device ='GPU'
 
-pdbname = 'asyn'
+pdbname = 'asyn2'
 protein_code = 'asyn'
 pdb_file = f'{pdbname}.pdb'
 

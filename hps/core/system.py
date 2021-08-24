@@ -80,7 +80,7 @@ class system:
     getCAlphaOnly()
         Filter in only alpha carbon atoms from the input structure and updates
         the topology object to add new bonds between them. Used specially for
-        creating alpha-carbon (CA) corse-grained models.
+        creating alpha-carbon (CA) coarse-grained models.
     getAtoms()
         Reads atoms from topology, adds them to the main class and sorts them
         into a dictionary to store their forcefield properties.
