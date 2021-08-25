@@ -13,19 +13,16 @@ import numpy as np
 import pandas as pd
 
 # from numba import njit
-
-
-# In[2]:
-
-
+"""
+TODO: instead of using pandas, switch form-factor to numpy array (size of N-particles) to use numba to speed up 
+the calculations. (Numba does not support for pandas. Dask support pandas but Dask is overhead in small calculation
+like this. 
+"""
 u = mda.Universe('asyn.psf', 'asyn_equil.dcd')
 # u=mda.Universe('asyn.psf', 'asyn_equil_final.pdb')
 protein = u.select_atoms('protein')
 n_atoms = len(protein)
 resnames = protein.resnames
-
-# In[3]:
-
 
 n_frames = u.trajectory.n_frames
 print(n_frames)
@@ -42,9 +39,6 @@ form_factor = pd.DataFrame(form_factor_data, columns=aa_order)
 
 
 # Note that the form-factor are given with the wavelength in unit of A^-1
-
-
-# In[5]:
 
 
 # @njit(fastmath=True)

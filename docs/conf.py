@@ -96,6 +96,7 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_logo = "_static/logo.svg"
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
