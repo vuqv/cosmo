@@ -45,6 +45,8 @@ where, :math:`\sigma_{i,j}=\frac{\sigma_i+\sigma_j}{2}`: is the vdW radius inter
 
 In the current implementation, hydropathy scales are taken from Urry model, :math:`(\mu, \Delta) = (1, 0.08)`
 
+* Note that two atoms are in bonded interaction do not interact via pair-wise potential.
+
 The Debye-Huckle potential has following form:
 ++++++++++++++++++++++++++++++++++++++++++++++
 .. math::
