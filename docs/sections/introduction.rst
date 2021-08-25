@@ -1,10 +1,10 @@
 Hydropathy Scale-Urryl (hps-urry) are representations of protein systems based on simplifications made over classical Molecular Dynamics (MD) force fields. 
 
 The hps-urry model is a Python library that offers flexibility to set up coarse-grained simulation of IDP using the MD framework of OpenMM toolkit.
-The codebase is based on sbmOpenMM.
+The codebase is based on hps-urry.
 It automates the creation of openmm.system classes that contain the necessary force field parameters to run molecular dynamics simulations using a protein structure as the only necessary inputs.
 
-sbmOpenMM is divided in three main classes:
+hps-urry is divided in three main classes:
 
 1. geometry
 2. models

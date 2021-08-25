@@ -63,7 +63,7 @@ class models:
             If True the function will call the createSystemObject() method
             to create an OpenMM system object. If modifications to the default
             forcefield are necessary this option should be given False.
-        minimize : boolean (False)
+        minimize : boolean (True)
             If True the initial structure will undergo the energy minimization.
         residue_masses : boolean (True)
             Set each alpha carbon atom mass to its average amino acid residue mass.
