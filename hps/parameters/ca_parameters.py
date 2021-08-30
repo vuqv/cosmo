@@ -21,7 +21,7 @@ aa_radii = {'ALA': 0.504, 'ARG': 0.656, 'ASN': 0.568,
             'GLN': 0.602, 'GLY': 0.450, 'HIS': 0.608,
             'ILE': 0.618, 'LEU': 0.618, 'LYS': 0.636,
             'MET': 0.618, 'PHE': 0.636, 'PRO': 0.556,
-            'SER': 0.518, 'THR': 0.562, 'TRP': 0.667,
+            'SER': 0.518, 'THR': 0.562, 'TRP': 0.678,
             'TYR': 0.646, 'VAL': 0.586}
 """
 vdw radius of the coarse-grained beads. 

@@ -28,9 +28,9 @@ The Pairwise potential:
 .. math::
         \Phi_{i,j}^{vdw}(r) = step(2^{1/6}\sigma_{ij}-r) \times \left( 4\epsilon\left[\left(\frac{\sigma_{ij}}{r}\right)^{12}- \left(\frac{\sigma_{ij}}{r}\right)^{6}\right]+(1-\mu\times\lambda_{ij}^{0}+\Delta)\times\epsilon\right)
 
-        + \left[1-step(2^{1/6}\sigma_{ij}-r)\right]\times\left[(\mu \lambda_{ij}^{0}-\Delta)\times 4\pi \left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-\left(\frac{\sigma_{ij}}{r}\right)^6\right]\right]
+        + \left[1-step(2^{1/6}\sigma_{ij}-r)\right]\times\left[(\mu \lambda_{ij}^{0}-\Delta)\times 4\epsilon \left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-\left(\frac{\sigma_{ij}}{r}\right)^6\right]\right]
 
-Since the step function behaves like: :code:`step(x) = 0 if x < 0,and =1 otherwise`, we can separate in multiple case for short likes following:
+Since the step function behaves like: :code:`step(x) = 0 if x < 0,and =1 otherwise`, we can separate in multiple cases for short likes following:
 
 .. math::
         \Phi_{i,j}^{vdw}(r) =  4\epsilon \left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-\left(\frac{\sigma_{ij}}{r}\right)^{6}\right]+(1-\mu	\times\lambda_{ij}^{0}+\Delta)	\times\epsilon, r\le 2^{1/6}\sigma_{ij}
@@ -59,5 +59,5 @@ where, :math:`q_i, q_j` are charge of residues :math:`i, j`
 
 :math:`D`: dielectric constant, at 100mM monovalent salt (NaCl), it takes values of 80
 
-:math:`\kappa`: inverse Debye length, at 100mM NaCl has values of 1nm
+:math:`\kappa`: inverse Debye length, at 100mM NaCl has values of :math:`1 nm^{-1}`
 
