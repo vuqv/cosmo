@@ -133,7 +133,7 @@ class models:
         sbm.addYukawaForces()
         print('Added Yukawa Force')
 
-        sbm.addPairWiseForces()
+        sbm.addAshbaughHatchForces()
         print('Added PairWise Force')
         print('')
         print('_________________________________')

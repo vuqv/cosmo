@@ -65,12 +65,6 @@ class system:
     rf_sigma : :code:`float`
         Sigma parameter used in the pairwise force object.
         This is vdw Radius of beads
-    exclusion_NB : Matrix of size NxN
-        This is a pairwise interaction matrix.
-        initialize by :code:`np.ones((N, N))`, N is the number of beads in the system.
-        By default, all atoms interact via pairwise. but this is not true, we should
-        exclude atom pairs that covalently bonded by when adding Harmonic bonds, we set matrix element of :code:`(i,j)=
-        (j,i)=0`, where i and j are atom indices in bond.
 
     Methods
     -------
@@ -167,13 +161,12 @@ class system:
         self.bonds_indexes = []
         self.n_bonds = None
         self.bond_length = 0.382
+        self.bonded_exclusions_index = 1
 
         # Define force attributes
         self.harmonicBondForce = None
         self.rf_sigma = None
-        # self.rf_epsilon = None
         self.rf_cutoff = None
-        self.exclusion_NB = None
         self.particles_hps = None
 
         # self.exclusions = []
@@ -182,19 +175,20 @@ class system:
         self.muy = 1
         self.delta = 0.08
         self.epsilon = 0.8368
+        self.cutoff_Ashbaugh_Hatch = 2.0 * unit.nanometer
 
         # Define parameter for DH potential
         self.yukawaForce = None
         self.particles_charge = None
         self.lD = 1.0 * unit.nanometer
         self.electric_factor = 138.935458
-        self.yukawa_cutoff = 4.0 * self.lD
+        self.yukawa_cutoff = 3.5 * unit.nanometer
         self.epsilon_r = 80.0
 
         self.forceGroups = OrderedDict()
 
         # Initialise an OpenMM system class instance
-        self.system = openmm.System()
+        self.system = System()
 
     def removeHydrogens(self, except_chains=None):
         """
@@ -303,7 +297,7 @@ class system:
         nonbonded interactions (still present in electrostatic interactions)
         
         """
-        self.exclusion_NB = np.ones((self.n_atoms, self.n_atoms))
+        # self.exclusion_NB = np.ones((self.n_atoms, self.n_atoms))
 
     def getBonds(self, except_chains=None):
         """
@@ -480,15 +474,12 @@ class system:
         None
         """
 
-        self.harmonicBondForce = openmm.HarmonicBondForce()
+        self.harmonicBondForce = HarmonicBondForce()
         for bond in self.bonds:
             self.harmonicBondForce.addBond(bond[0].index,
                                            bond[1].index,
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
-            # two atoms in bond will have nonbonded interaction matrix is 0 - do not interactions via nonbonded
-            self.exclusion_NB[bond[0].index][bond[1].index] = 0.0
-            self.exclusion_NB[bond[1].index][bond[0].index] = 0.0
 
     def addYukawaForces(self):
         """
@@ -520,6 +511,8 @@ class system:
         self.yukawaForce.addGlobalParameter('epsilon_r', self.epsilon_r)
         self.yukawaForce.addGlobalParameter('lD', self.lD)
         self.yukawaForce.addPerParticleParameter('charge')
+        self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+        self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
         if isinstance(self.particles_charge, float):
             for atom in self.atoms:
@@ -530,13 +523,12 @@ class system:
             assert self.n_atoms == len(self.particles_charge)
             for i, atom in enumerate(self.atoms):
                 self.yukawaForce.addParticle((self.particles_charge[i],))
-        """
-        set cut off for nonbonded interaction
-        Need to specify NonbondedMethod first. See synthesis code for example
-        """
-        # self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
-    def addPairWiseForces(self):
+        # set exclusions rule
+        bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
+        self.yukawaForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+
+    def addAshbaughHatchForces(self):
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -576,23 +568,20 @@ class system:
         -------
         None
         """
-        nbMatrix_LST = self.exclusion_NB.ravel().tolist()
-
-        energy_function = 'nb*(step(2^(1/6)*sigma - r) *'
+        energy_function = 'step(2^(1/6)*sigma - r) *'
         energy_function += '(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-muy*hps+delta)*epsilon )'
-        energy_function += '+(1-step(2^(1/6)*sigma-r)) * ((muy*hps-delta)*4*epsilon*((sigma/r)^12-(sigma/r)^6)));'
-        energy_function += 'nb=nb_matrix(idx1, idx2);'
+        energy_function += '+(1-step(2^(1/6)*sigma-r)) * ((muy*hps-delta)*4*epsilon*((sigma/r)^12-(sigma/r)^6));'
+        # energy_function += 'nb=nb_matrix(idx1, idx2);'
         energy_function += 'sigma=0.5*(sigma1+sigma2);'
         energy_function += 'hps=0.5*(hps1+hps2)'
         self.pairWiseForce = CustomNonbondedForce(energy_function)
-        self.pairWiseForce.addTabulatedFunction('nb_matrix',
-                                                Discrete2DFunction(self.n_atoms, self.n_atoms, nbMatrix_LST))
         self.pairWiseForce.addGlobalParameter('muy', self.muy)
         self.pairWiseForce.addGlobalParameter('delta', self.delta)
         self.pairWiseForce.addGlobalParameter('epsilon', self.epsilon)
-        self.pairWiseForce.addPerParticleParameter('idx')
         self.pairWiseForce.addPerParticleParameter('sigma')
         self.pairWiseForce.addPerParticleParameter('hps')
+        self.pairWiseForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+        self.pairWiseForce.setCutoffDistance(self.cutoff_Ashbaugh_Hatch)
 
         if isinstance(self.rf_sigma, float):
             for atom in self.atoms:
@@ -602,17 +591,13 @@ class system:
         elif isinstance(self.rf_sigma, list):
             assert self.n_atoms == len(self.rf_sigma) and self.n_atoms == len(self.particles_hps)
             for i, atom in enumerate(self.atoms):
-                self.pairWiseForce.addParticle((atom.index, self.rf_sigma[i], self.particles_hps[i],))
-                """Or can be add as follow"""
-                # self.pairWiseForce.addParticle([atom.index, self.rf_sigma[i], self.particles_hps[i]])
-        """
-        set cut off for nonbonded interaction
-        Need to specify NonbondedMethod first. See synthesis code for example
-        """
-        # self.pairWiseForce.setCutoffDistance(self.rf_cutoff)
+                self.pairWiseForce.addParticle((self.rf_sigma[i], self.particles_hps[i],))
+
+        # set exclusions rule
+        bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
+        self.pairWiseForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
     """ Functions for creating OpenMM system object """
-
     def createSystemObject(self, check_bond_distances=True, minimize=False, check_large_forces=True,
                            force_threshold=10.0, bond_threshold=0.39):
         """
