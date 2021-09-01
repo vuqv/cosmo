@@ -530,7 +530,10 @@ class system:
             assert self.n_atoms == len(self.particles_charge)
             for i, atom in enumerate(self.atoms):
                 self.yukawaForce.addParticle((self.particles_charge[i],))
-
+        """
+        set cut off for nonbonded interaction
+        Need to specify NonbondedMethod first. See synthesis code for example
+        """
         # self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
     def addPairWiseForces(self):
@@ -602,7 +605,10 @@ class system:
                 self.pairWiseForce.addParticle((atom.index, self.rf_sigma[i], self.particles_hps[i],))
                 """Or can be add as follow"""
                 # self.pairWiseForce.addParticle([atom.index, self.rf_sigma[i], self.particles_hps[i]])
-        """set cut off for nonbonded interaction"""
+        """
+        set cut off for nonbonded interaction
+        Need to specify NonbondedMethod first. See synthesis code for example
+        """
         # self.pairWiseForce.setCutoffDistance(self.rf_cutoff)
 
     """ Functions for creating OpenMM system object """

@@ -6,7 +6,7 @@
 
 from simtk.openmm.app.statedatareporter import StateDataReporter
 from simtk import unit
-from sbmOpenMM.core import system
+from hps.core import system
 
 
 # In[ ]:
