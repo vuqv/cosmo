@@ -1015,7 +1015,7 @@ class system:
                         self.bonds = OrderedDict()
                         bonds = True
 
-        print('Done reading Forcefield paramters')
+        print('Done reading Forcefield parameters')
         print('')
 
     def setCAMassPerResidueType(self):
