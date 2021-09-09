@@ -172,8 +172,8 @@ class system:
         # self.exclusions = []
         # PairWise potential
         self.pairWiseForce = None
-        self.muy = 1
-        self.delta = 0.08
+        # self.muy = 1
+        # self.delta = 0.08
         self.epsilon = 0.8368
         self.cutoff_Ashbaugh_Hatch = 2.0 * unit.nanometer
 
@@ -1097,7 +1097,7 @@ class system:
 
         self.setParticlesCharge(charge)
 
-    def setCAHPSPerResidueType(self):
+    def setCAHPSUrryPerResidueType(self):
         """
         Sets the HPS of the alpha carbon atoms.
         The current implementation is using Urry scale.
@@ -1112,7 +1112,7 @@ class system:
         """
 
         # Load hydropathy scale from parameters package
-        aa_hps = ca_parameters.aa_hps
+        aa_hps = ca_parameters.aa_hps_urry
 
         hps = []
 
@@ -1124,6 +1124,32 @@ class system:
 
         self.setParticlesHPS(hps)
 
+    def setCAHPSKRPerResidueType(self):
+        """
+        Sets the HPS of the alpha carbon atoms.
+        The current implementation is using Urry scale.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        None
+        """
+
+        # Load hydropathy scale from parameters package
+        aa_hps = ca_parameters.aa_hps_kr
+
+        hps = []
+
+        for r in self.topology.residues():
+            if r.name in aa_hps:
+                hps.append(aa_hps[r.name])
+            else:
+                raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
+
+        self.setParticlesHPS(hps)
     ## User-hidden functions ##
 
     def _setParameters(term, parameters):

@@ -13,9 +13,9 @@ import hps
 
 # MD parameter
 # let's decide here now long we want to run the simulation and the file writing period
-mdsteps = 100000
-dcdperiod = 1000
-logperiod = 1000
+mdsteps = 10
+dcdperiod = 1
+logperiod = 1
 # stage of simulation equil, prod
 stage='equil'
 # which platform to run simulation: CPU/GPU
@@ -26,7 +26,7 @@ protein_code = 'asyn'
 pdb_file = f'{pdbname}.pdb'
 
 # Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
-cgModel = hps.models.getCAModel(pdb_file)
+cgModel = hps.models.getCAModel(pdb_file, hps_scale)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

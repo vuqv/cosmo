@@ -27,6 +27,7 @@ class models:
                    residue_radii=True,
                    residue_charge=True,
                    residue_hps=True,
+                   hps_scale='urry',
                    forcefield_file=None):
         """
         Initialises a coarse-grained, carbon alpha (CA), sbmOpenMM system class
@@ -73,6 +74,10 @@ class models:
             set charge for atoms in the system
         residue_hps : boolean (True)
             set HPS scale for atoms in the system
+        hps_scale : string ('urry')
+            HPS scale. There are two options correspond to two scale:
+            'urry': using Urry scale
+            'kr': using Kapcha-Rossy scale.
         forcefield_file : string
             Path to the input forcefield file.
 
@@ -110,8 +115,13 @@ class models:
                 sbm.setCAChargePerResidueType()
 
             if residue_hps:
-                print("Setting Urry hydropathy scale to their residue.")
-                sbm.setCAHPSPerResidueType()
+                print("Setting hydropathy scale to their residue.")
+                if hps_scale == 'urry':
+                    print("Using Urry scale.")
+                    sbm.setCAHPSUrryPerResidueType()
+                if hps_scale == 'kr':
+                    print("Using Kapcha-Rossy scale.")
+                    sbm.setCAHPSKRPerResidueType()
 
             sbm.getBonds()
             print('Added ' + str(sbm.n_bonds) + ' bonds')
