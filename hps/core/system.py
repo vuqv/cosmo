@@ -569,14 +569,11 @@ class system:
         None
         """
         energy_function = 'step(2^(1/6)*sigma - r) *'
-        energy_function += '(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-muy*hps+delta)*epsilon )'
-        energy_function += '+(1-step(2^(1/6)*sigma-r)) * ((muy*hps-delta)*4*epsilon*((sigma/r)^12-(sigma/r)^6));'
-        # energy_function += 'nb=nb_matrix(idx1, idx2);'
+        energy_function += '(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-hps)*epsilon )'
+        energy_function += '+(1-step(2^(1/6)*sigma-r)) * (hps*4*epsilon*((sigma/r)^12-(sigma/r)^6));'
         energy_function += 'sigma=0.5*(sigma1+sigma2);'
         energy_function += 'hps=0.5*(hps1+hps2)'
         self.pairWiseForce = CustomNonbondedForce(energy_function)
-        self.pairWiseForce.addGlobalParameter('muy', self.muy)
-        self.pairWiseForce.addGlobalParameter('delta', self.delta)
         self.pairWiseForce.addGlobalParameter('epsilon', self.epsilon)
         self.pairWiseForce.addPerParticleParameter('sigma')
         self.pairWiseForce.addPerParticleParameter('hps')
