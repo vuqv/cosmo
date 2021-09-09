@@ -42,13 +42,6 @@ aa_hps_kr = {'ALA': 0.730, 'ARG': 0.000, 'ASN': 0.432,
              'MET': 0.838, 'PHE': 1.000, 'PRO': 1.000,
              'SER': 0.595, 'THR': 0.676, 'TRP': 0.946,
              'TYR': 0.865, 'VAL': 0.892}
-# aa_hps = {'ALA': 0.602942, 'ARG': 0.558824, 'ASN': 0.588236,
-#           'ASP': 0.294119, 'CYS': 0.64706, 'GLU': 0.,
-#           'GLN': 0.558824, 'GLY': 0.57353, 'HIS': 0.764707,
-#           'ILE': 0.705883, 'LEU': 0.720589, 'LYS': 0.382354,
-#           'MET': 0.676471, 'PHE': 0.82353, 'PRO': 0.758824,
-#           'SER': 0.588236, 'THR': 0.588236, 'TRP': 1.0,
-#           'TYR': 0.897059, 'VAL': 0.664707}
 """
 Hydropathy scale (Urry scale)
 Here we use muy=1 and delta = 0.08. Directly scale the hps.
