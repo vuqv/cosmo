@@ -196,7 +196,7 @@ class system:
 
         Parameters
         ----------
-        None
+        except_chains:String
 
         Returns
         -------
@@ -305,7 +305,7 @@ class system:
 
         Parameters
         ----------
-        None
+        except_chains: String
 
         Returns
         -------
@@ -541,15 +541,15 @@ class system:
         .. math::
             \\Phi_{i,j}^{vdw}(r) = step(2^{1/6}\\sigma_{ij}-r) \\times
             \\left( 4\\epsilon\\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-
-            \\left(\\frac{\\sigma_{ij}}{r}\\right)^{6}\\right]+(1-\\mu\\times\\lambda_{ij}^{0}+\\Delta)\\epsilon\\right)
+            \\left(\\frac{\\sigma_{ij}}{r}\\right)^{6}\\right]+(1-\\lambda_{ij})\\epsilon\\right)
 
-            + \\left[1-step(2^{1/6}\\sigma_{ij}-r)\\right]\\times\\left[(\\mu \\lambda_{ij}^{0}-\\Delta)\\times 4\\pi
+            + \\left[1-step(2^{1/6}\\sigma_{ij}-r)\\right]\\times\\left[(\\lambda_{ij})\\times 4\\pi
             \\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-\\left(\\frac{\\sigma_{ij}}{r}\\right)^6\\right]\\right]
 
 
 
         Here, :math:`\\sigma= \\frac{(\\sigma_1+\\sigma_2)}{2}; \\lambda_{ij}^{0}=\\frac{(\\lambda_i+\\lambda_j)}{2};
-        \\mu= 1;\\Delta= 0.08; \\epsilon = 0.8368 kj/mol`
+        \\epsilon = 0.8368 kj/mol`
 
         The
         The force object is stored at the :code:`pairWiseForce` attribute.
