@@ -26,7 +26,7 @@ protein_code = 'asyn'
 pdb_file = f'{pdbname}.pdb'
 
 # Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
-cgModel = hps.models.getCAModel(pdb_file, hps_scale)
+cgModel = hps.models.getCAModel(pdb_file, hps_scale='urry')
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

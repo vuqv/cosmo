@@ -112,7 +112,7 @@ class models:
 
             if residue_charge:
                 print("Setting alpha-carbon charge to their residue charge.")
-                sbm.setCAChargePerResidueType()
+                sbm.setCAChargePerResidueType(hps_scale)
 
             if residue_hps:
                 print("Setting hydropathy scale to their residue.")

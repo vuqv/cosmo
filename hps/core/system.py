@@ -1069,7 +1069,7 @@ class system:
 
         self.setParticlesRadii(radii)
 
-    def setCAChargePerResidueType(self):
+    def setCAChargePerResidueType(self, hps_scale):
         """
         Sets the charge of the alpha carbon atoms
         to characteristic charge of their corresponding amino acid
@@ -1077,7 +1077,7 @@ class system:
 
         Parameters
         ----------
-        None
+        hps_scale : String
 
         Returns
         -------
@@ -1086,6 +1086,8 @@ class system:
 
         # Load charge from parameters package
         aa_charge = ca_parameters.aa_charge
+        if hps_scale == 'kr':
+            aa_charge['HIS'] = 0.5
 
         charge = []
 
