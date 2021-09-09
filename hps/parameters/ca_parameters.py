@@ -43,6 +43,7 @@ aa_hps = {'ALA': 0.522942, 'ARG': 0.478824, 'ASN': 0.508236,
 #           'TYR': 0.897059, 'VAL': 0.664707}
 """
 Hydropathy scale (Urry scale)
+Here we use muy=1 and delta = 0.08. Directly scale the hps.
 Regy, R. M., Thompson, J., Kim, Y. C., & Mittal, J. (2021). 
 Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins. 
 Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
