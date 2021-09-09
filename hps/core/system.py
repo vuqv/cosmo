@@ -1078,6 +1078,8 @@ class system:
         Parameters
         ----------
         hps_scale : String
+            'kr': Kapcha-Rossy scale
+            'urry': Urry scale
 
         Returns
         -------
