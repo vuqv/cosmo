@@ -17,14 +17,15 @@ from sphinx.util.inspect import safe_getattr
 import os
 import sys
 import sphinx
+import sphinx_rtd_theme
 sys.path.insert(0, os.path.abspath('..'))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'HPS-Urry'
-copyright = '2021, Quyen Vu'
-author = 'Quyen Vu'
+project = u'HPS-Urry'
+copyright = u'2021, Quyen Vu'
+author = u'Quyen Vu'
 
 # The short X.Y version
 version = '2021.0'
@@ -46,18 +47,25 @@ extensions = [
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'numpydoc'
+    'numpydoc',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.doctest',
+    'sphinx.ext.coverage'
 ]
+
+autosummary_generate = True
+#numpydoc_show_class_members = False
+autodoc_default_flags = ['members', 'inherited-members']
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 # If true, the current module name will be prepended to all description unit titles.
 add_module_names = False
 
-# html_sidebars = {
-#    '**': ['localtoc.html', 'searchbox.html'],
-# }
-
+html_sidebars = {
+        '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html'],
+}
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

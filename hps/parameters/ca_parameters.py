@@ -43,8 +43,10 @@ aa_hps_kr = {'ALA': 0.730, 'ARG': 0.000, 'ASN': 0.432,
              'SER': 0.595, 'THR': 0.676, 'TRP': 0.946,
              'TYR': 0.865, 'VAL': 0.892}
 """
-Hydropathy scale (Urry scale)
-Here we use muy=1 and delta = 0.08. Directly scale the hps.
+Hydropathy scale.
+There are two options to select when running simulation by specify hps_scale='kr'/'urry'
+In the case of Urry, we implicitly use muy=1 and delta = 0.08 to move equation in two scales to be the same.
+
 Regy, R. M., Thompson, J., Kim, Y. C., & Mittal, J. (2021). 
 Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins. 
 Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
@@ -58,6 +60,8 @@ aa_charge = {'ALA': 0.0, 'ARG': 1.0, 'ASN': 0.0,
              'SER': 0.0, 'THR': 0.0, 'TRP': 0.0,
              'TYR': 0.0, 'VAL': 0.0}
 """
+* Kapcha-Rossy and Urry model different in charge of HIS, in Urry, HIS has charge of 0, while in KR, HIS=0.5
+We switch in set CA Charge function.
 Charge of the coarse-grain beads, assigns to it alpha-carbon atoms.
 Charges are determined at neutral pH (pH=7).
 Setting to the values from, where ARG, LYS =1 and ASP, GLU = -1,

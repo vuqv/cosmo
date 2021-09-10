@@ -53,7 +53,7 @@ class system:
     yukawaForce : :code:`openmm.CustomNonbondedForce`
         Stores the OpenMM :code:`CustomNonbondedForce` initialized-class.
         Implements the Debye-Huckle potential.
-    pairWiseForce : :code:`openmm.CustomNonbondedForce`
+    ashbaughHatchForces : :code:`openmm.CustomNonbondedForce`
         Stores the OpenMM :code:`CustomNonbondedForce` initialized-class. Implements the pairwise short-range
         potential.
     forceGroups : :code:`collections.OrderedDict`
@@ -92,7 +92,7 @@ class system:
         class using their defined forcefield parameters.
     addYukawaForces()
         Creates a nonbonded force term for electrostatic interaction DH potential.
-    addPairWiseForces()
+    addAshbaughHatchForces()
         Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).
     createSystemObject()
         Creates OpenMM system object adding particles, masses and forces.
@@ -171,7 +171,7 @@ class system:
 
         # self.exclusions = []
         # PairWise potential
-        self.pairWiseForce = None
+        self.ashbaugh_HatchForce = None
         # self.muy = 1
         # self.delta = 0.08
         self.epsilon = 0.8368
@@ -552,7 +552,7 @@ class system:
         \\epsilon = 0.8368 kj/mol`
 
         The
-        The force object is stored at the :code:`pairWiseForce` attribute.
+        The force object is stored at the :code:`ashbaugh_HatchForce` attribute.
 
         Parameters
         ----------
@@ -573,26 +573,26 @@ class system:
         energy_function += '+(1-step(2^(1/6)*sigma-r)) * (hps*4*epsilon*((sigma/r)^12-(sigma/r)^6));'
         energy_function += 'sigma=0.5*(sigma1+sigma2);'
         energy_function += 'hps=0.5*(hps1+hps2)'
-        self.pairWiseForce = CustomNonbondedForce(energy_function)
-        self.pairWiseForce.addGlobalParameter('epsilon', self.epsilon)
-        self.pairWiseForce.addPerParticleParameter('sigma')
-        self.pairWiseForce.addPerParticleParameter('hps')
-        self.pairWiseForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
-        self.pairWiseForce.setCutoffDistance(self.cutoff_Ashbaugh_Hatch)
+        self.ashbaugh_HatchForce = CustomNonbondedForce(energy_function)
+        self.ashbaugh_HatchForce.addGlobalParameter('epsilon', self.epsilon)
+        self.ashbaugh_HatchForce.addPerParticleParameter('sigma')
+        self.ashbaugh_HatchForce.addPerParticleParameter('hps')
+        self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+        self.ashbaugh_HatchForce.setCutoffDistance(self.cutoff_Ashbaugh_Hatch)
 
         if isinstance(self.rf_sigma, float):
             for atom in self.atoms:
-                self.pairWiseForce.addParticle((self.rf_sigma,))
+                self.ashbaugh_HatchForce.addParticle((self.rf_sigma,))
 
         # in the case each atoms have different sigma para.
         elif isinstance(self.rf_sigma, list):
             assert self.n_atoms == len(self.rf_sigma) and self.n_atoms == len(self.particles_hps)
             for i, atom in enumerate(self.atoms):
-                self.pairWiseForce.addParticle((self.rf_sigma[i], self.particles_hps[i],))
+                self.ashbaugh_HatchForce.addParticle((self.rf_sigma[i], self.particles_hps[i],))
 
         # set exclusions rule
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
-        self.pairWiseForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+        self.ashbaugh_HatchForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
     """ Functions for creating OpenMM system object """
     def createSystemObject(self, check_bond_distances=True, minimize=False, check_large_forces=True,
@@ -809,9 +809,9 @@ class system:
             self.system.addForce(self.yukawaForce)
             self.forceGroups['Yukawa Energy'] = self.yukawaForce
 
-        if self.pairWiseForce is not None:
-            self.system.addForce(self.pairWiseForce)
-            self.forceGroups['PairWise Energy'] = self.pairWiseForce
+        if self.ashbaugh_HatchForce is not None:
+            self.system.addForce(self.ashbaugh_HatchForce)
+            self.forceGroups['PairWise Energy'] = self.ashbaugh_HatchForce
 
     def dumpStructure(self, output_file):
         """
