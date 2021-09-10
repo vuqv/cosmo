@@ -23,14 +23,14 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = u'HPS-Urry'
+project = u'HPS'
 copyright = u'2021, Quyen Vu'
 author = u'Quyen Vu'
 
 # The short X.Y version
 version = '2021.0'
 # The full version, including alpha/beta/rc tags
-release = 'alpha'
+release = 'v1.0'
 
 # -- General configuration ---------------------------------------------------
 

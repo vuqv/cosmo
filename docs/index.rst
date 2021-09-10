@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to HPS-Urry's documentation!
+Welcome to HPS's documentation!
 ====================================
 
 .. toctree::
@@ -12,7 +12,7 @@ Welcome to HPS-Urry's documentation!
 
    modules
 
-HPS-Urry Documentation
+HPS Documentation
 #######################
 
 Introduction
@@ -20,7 +20,7 @@ Introduction
 
 .. include:: sections/introduction.rst
 
-HPS-Urry Models
+HPS Models
 **********
 
 .. include:: sections/models.rst

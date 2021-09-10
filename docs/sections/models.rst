@@ -1,4 +1,5 @@
-The models class of sbmOpenMM contains three methods for automatic setting up predefined SBM potentials. It works by initializing a system class with the necessary force field parameters, derived from the input files, to set up one of the possible models which are detailed next:
+The models class contains three methods for automatic setting up predefined potentials.
+It works by initializing a system class with the necessary force field parameters.
 
 Coarse grained, alpha-carbon (CA), model
 ++++++++++++++++++++++++++++++++++++++++
@@ -6,9 +7,10 @@ Coarse grained, alpha-carbon (CA), model
 The coarse grained method represents the protein system as beads centered at the alpha carbons of each residue in the protein. It uses harmonic potentials to hold the covalent connectivity and geometry of the beads. Torsional geometries are modeled with a periodic torsion potential. Native contacts are represented through the use of Lennard-Jones potentials that allow to form and break non-bonded interactions, permitting complete and local unfolding of the structures.
 
 To create a CA model, call:
-:code:`hps.models.getCAModel(pdb_file)`
+:code:`hps.models.getCAModel(pdb_file, hps_scale)`
 
 Here, pdb_file is the path to the PDB format structure of the protein.
+hps_scale is hydropathy scale that are going to be used. :code:`urry` or :code:`kr`
 
 The force field equations are:
 
@@ -20,7 +22,7 @@ The Bonded potential:
 .. math::
         V_{bond} = \frac{k_b}{2}(r-r_0)^2
 
-Here the default values are :math:`k_b=20 kCal/(mol \times A^2), r_0=3.82 A^2`
+Here the default values are :math:`k_b= 8368 kJ/(mol \times nm^2), r_0=0.382 nm`
 
 The Pairwise potential:
 +++++++++++++++++++++++
@@ -45,7 +47,8 @@ where, :math:`\sigma_{i,j}=\frac{\sigma_i+\sigma_j}{2}`: is the vdW radius inter
 
 In the current implementation, hydropathy scales are taken from Urry model, :math:`(\mu, \Delta) = (1, 0.08)`
 
-* Note that two atoms are in bonded interaction do not interact via pair-wise potential.
+Nonbonded exclusion rule is :code:`1-2`.
+Cutoff distance for Electrostatics interactions: :math:`3.5 nm`, for Lennard-Jone potential: :math:`2.0 nm`
 
 The Debye-Huckle potential has following form:
 ++++++++++++++++++++++++++++++++++++++++++++++
@@ -57,7 +60,9 @@ where, :math:`q_i, q_j` are charge of residues :math:`i, j`
 :math:`\epsilon_0`: Vacuum permitivity. For convenient, we precalculated the electric conversion factor
 :math:`\frac{1}{4\pi\epsilon_0}= 138.935 485(9) kJ \times mol^{−1} \times nm \times e^{−2}`.
 
-:math:`D`: dielectric constant, at 100mM monovalent salt (NaCl), it takes values of 80
+:math:`D`: dielectric constant, at 100mM mono-valence salt (NaCl), it takes values of 80.
+The dielectric constant here is fixed, but it can be temperature dependent as the function:
+:math:`\frac{5321}{T}+233.76-0.9297T+0.1417\times 10^{-2}\times T^2 - 0.8292\times 10^{-6}\times T^3`
 
 :math:`\kappa`: inverse Debye length, at 100mM NaCl has values of :math:`1 nm^{-1}`
 

@@ -31,9 +31,6 @@ class system:
     particles_mass : :code:`float or list`
         Mass of each particle. If float then uniform masses are given to all
         particles. If list per-particle masses are assigned.
-    model_type : :code:`string`
-        String representing the model type: All-atom (AA), alpha-carbon (CA)
-        or multi-basin variants (AA-MB, CA-MB).
     atoms : :code:`list`
         A list of the current atoms in the model. The items are :code:`simtk.openmm.app.topology.Atom`
         initialised classes.
@@ -123,7 +120,7 @@ class system:
         modifying alpha-carbon (CA) coarse-grained models.
     """
 
-    def __init__(self, structure_path, particles_mass=1.0):
+    def __init__(self, structure_path):
         """
         Initialises the SBM OpenMM system class.
 
@@ -131,8 +128,6 @@ class system:
         ----------
         structure_path : string
             Name of the input PDB or CIF file
-        particles_mass : float or list
-            mass of all the particles in the system.
 
         Returns
         -------
@@ -151,8 +146,7 @@ class system:
                 'Structure file extension not recognized. It must end with .pdb or .cif accordingly.')
         self.topology = self.structure.topology
         self.positions = self.structure.positions
-        self.particles_mass = particles_mass
-        self.model_type = None
+        self.particles_mass = None
 
         # Define geometric attributes
         self.atoms = []
@@ -169,11 +163,8 @@ class system:
         self.rf_cutoff = None
         self.particles_hps = None
 
-        # self.exclusions = []
         # PairWise potential
         self.ashbaugh_HatchForce = None
-        # self.muy = 1
-        # self.delta = 0.08
         self.epsilon = 0.8368
         self.cutoff_Ashbaugh_Hatch = 2.0 * unit.nanometer
 
@@ -262,8 +253,6 @@ class system:
             if current_chain == previous_chain:
                 self.topology.addBond(atoms[i - 1], atoms[i])
             previous_chain = current_chain
-
-        self.model_type = 'CA'
 
     def getAtoms(self):
         """
