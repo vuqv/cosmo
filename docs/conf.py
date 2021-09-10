@@ -61,8 +61,8 @@ autodoc_default_flags = ['members', 'inherited-members']
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 # If true, the current module name will be prepended to all description unit titles.
-add_module_names = False
-
+add_module_names = True
+master_doc = 'index'
 html_sidebars = {
         '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html'],
 }
@@ -95,8 +95,7 @@ html_theme_options = {
     'sticky_navigation': True,
     'navigation_depth': 4,
     'includehidden': True,
-    'titles_only': True,
-    
+    'titles_only': True
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -109,6 +108,7 @@ html_logo = "_static/logo.svg"
 
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {'https://docs.python.org/': None}
+
 
 class AutoAutoSummary(Autosummary):
 
@@ -150,5 +150,84 @@ class AutoAutoSummary(Autosummary):
         finally:
             return super(AutoAutoSummary, self).run()
 
+
 def setup(app):
     app.add_directive('autoautosummary', AutoAutoSummary)
+
+
+############################
+# SETUP THE RTD LOWER-LEFT #
+############################
+try:
+    html_context
+except NameError:
+    html_context = dict()
+html_context['display_lower_left'] = True
+
+templates_path = ['_templates']
+
+if 'REPO_NAME' in os.environ:
+    REPO_NAME = os.environ['REPO_NAME']
+else:
+    REPO_NAME = 'hpsOpenMM'
+
+# SET CURRENT_LANGUAGE
+if 'current_language' in os.environ:
+    # get the current_language env var set by buildDocs.sh
+    current_language = os.environ['current_language']
+else:
+    # the user is probably doing `make html`
+    # set this build's current language to english
+    current_language = 'en'
+
+# tell the theme which language to we're currently building
+html_context['current_language'] = current_language
+
+# SET CURRENT_VERSION
+from git import Repo
+
+repo = Repo(search_parent_directories=True)
+
+if 'current_version' in os.environ:
+    # get the current_version env var set by buildDocs.sh
+    current_version = os.environ['current_version']
+else:
+    # the user is probably doing `make html`
+    # set this build's current version by looking at the branch
+    current_version = repo.active_branch.name
+
+# tell the theme which version we're currently on ('current_version' affects
+# the lower-left rtd menu and 'version' affects the logo-area version)
+html_context['current_version'] = current_version
+html_context['version'] = current_version
+
+# POPULATE LINKS TO OTHER LANGUAGES
+html_context['languages'] = [('en', '/' + REPO_NAME + '/en/' + current_version + '/')]
+
+
+# POPULATE LINKS TO OTHER VERSIONS
+html_context['versions'] = list()
+
+versions = [branch.name for branch in repo.branches]
+for version in versions:
+    html_context['versions'].append((version, '/' + REPO_NAME + '/' + current_language + '/' + version + '/'))
+
+# POPULATE LINKS TO OTHER FORMATS/DOWNLOADS
+
+# settings for creating PDF with rinoh
+rinoh_documents = [(
+    master_doc,
+    'target',
+    project + ' Documentation',
+    '© ' + copyright,
+)]
+today_fmt = "%B %d, %Y"
+
+##########################
+# "EDIT ON GITHUB" LINKS #
+##########################
+
+html_context['display_github'] = True
+html_context['github_user'] = 'qvv5013'
+html_context['github_repo'] = 'rtd-github-pages'
+html_context['github_version'] = 'main/docs/'
