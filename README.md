@@ -7,11 +7,13 @@ This is a repository contains the source code of hps-urry model.
  ```hps: hydropathy scale. ```
  ```urry: Hydropathy according to Urry scale.```
 ## requirements:
-- **OpenMM 7.x** ( Please update your OpenMM to the lastest version for good performance and bugfixs) 
+- **OpenMM 7.x** (Note that OpenMM 7.6 currently breaks compatible with other plugins like Parmed, use OpenMM 7.5.x) 
 - **Parmed** 
 
-
-
+## How to use hpsOpenMM:  
+- Download folder and place in target location, for example: `/home/qvuvan/work3/code/hpsOpenMM/`
+- Add folder in Python path (in .bashrc file): `export PYTHONPATH=$PYTHONPATH:/home/qvuvan/work3/code/hpsOpenMM/`  
+*Note that in cluster, when submit job, the environment may not load `.bashrc` so need to add export command in job file* 
 
 ## Bugs
 - If you encounter any bugs, please report the issue to Quyen Vu (vuqv.phys@gmail.com)

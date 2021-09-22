@@ -50,7 +50,7 @@ elif device == 'CPU':
 # Set initial positions
 simulation.context.setPositions(cgModel.positions)
 # set velocity by temperature
-# simulation.context.setVelocitiesToTemperature(298 * kelvin)
+simulation.context.setVelocitiesToTemperature(298 * kelvin)
 
 # Add a DCD reporter that writes coordinates every 100 steps.
 simulation.reporters.append(DCDReporter(f'{protein_code}_{stage}.dcd', dcdperiod))
