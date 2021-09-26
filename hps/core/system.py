@@ -154,7 +154,7 @@ class system:
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
-        self.bond_length = 0.382
+        self.bond_length = 0.38
         self.bonded_exclusions_index = 1
 
         # Define force attributes

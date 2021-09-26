@@ -27,7 +27,7 @@ class models:
                    residue_radii=True,
                    residue_charge=True,
                    residue_hps=True,
-                   hps_scale='urry',
+                   hps_scale='kr',
                    forcefield_file=None):
         """
         Initialises a coarse-grained, carbon alpha (CA), sbmOpenMM system class
@@ -74,10 +74,10 @@ class models:
             set charge for atoms in the system
         residue_hps : boolean (True)
             set HPS scale for atoms in the system
-        hps_scale : string ('urry')
+        hps_scale : string ('kr')
             HPS scale. There are two options correspond to two scale:
             'urry': using Urry scale
-            'kr': using Kapcha-Rossy scale.
+            'kr': using Kapcha-Rossy scale (default).
         forcefield_file : string
             Path to the input forcefield file.
 
