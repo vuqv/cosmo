@@ -155,6 +155,7 @@ class system:
         self.bonds_indexes = []
         self.n_bonds = None
         self.bond_length = 0.38
+        self.bondedTo = None
         self.bonded_exclusions_index = 1
 
         # Define force attributes
@@ -326,9 +327,6 @@ class system:
         # Add bonds to sbm object
         self.n_bonds = 0
         for bond in bonds:
-            p1 = self.positions[bond[0].index]
-            p2 = self.positions[bond[1].index]
-            # bond_length = geometry.bond(p1, p2)
             bond_length = self.bond_length * unit.nanometer
             self.bonds[bond] = (bond_length, None)
             self.n_bonds += 1
