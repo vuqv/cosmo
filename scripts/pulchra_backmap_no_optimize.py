@@ -30,11 +30,13 @@ if args.end == -1:
 else:
     frame_end = args.end
 
+# save template to get number of atoms in backmap structure
 t[0].save('frame.pdb')
 os.system('pulchra frame.pdb')
 traj_0 = md.load('frame.rebuilt.pdb')
 
 traj_coor = np.empty((0, traj_0.n_atoms, 3))
+
 for i in range(frame_start, frame_end):
     print(f'backmapping frame: {i}')
     t[i].save('frame.pdb')
