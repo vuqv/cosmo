@@ -37,15 +37,15 @@ if device == 'GPU':
     # Run simulation on CUDA
     platform = Platform.getPlatformByName('CUDA')
     properties = {'CudaPrecision': 'mixed'}
-    ## incase many GPUs present, we can select which one to use
+    # in case of many GPUs present, we can select which one to use
     # properties["DeviceIndex"] = "0"
 
-    integrator = LangevinIntegrator(298 * kelvin, 5 / picosecond, 10 * femtoseconds)
-    simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
-
 elif device == 'CPU':
-    integrator = LangevinIntegrator(298 * kelvin, 5 / picosecond, 10 * femtoseconds)
-    simulation = Simulation(cgModel.topology, cgModel.system, integrator)
+    platform = Platform.getPlatformByName('CPU')
+    properties = {'Threads': str(8)}
+
+integrator = LangevinIntegrator(298 * kelvin, 0.01 / picosecond, 10 * femtoseconds)
+simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
 
 # Set initial positions
 simulation.context.setPositions(cgModel.positions)
