@@ -1,11 +1,12 @@
-# HPS-Urry
+# hpsOpenMM
 
- OpenMM codebase for IDP which uses HPS-Urry force field
+ OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
 
-This is a repository contains the source code of hps-urry model.
+This is a repository contains the source code of hps-urry/kr model.
 
  ```hps: hydropathy scale. ```
  ```urry: Hydropathy according to Urry scale.```
+```kr: Kapcha-Rossy scale```
 ## requirements:
 - **OpenMM 7.x** (Note that OpenMM 7.6 currently breaks compatible with other plugins like Parmed, use OpenMM 7.5.x) 
 - **Parmed** 
@@ -13,10 +14,12 @@ This is a repository contains the source code of hps-urry model.
 ## How to use hpsOpenMM:  
 - Download folder and place in target location, for example: `/home/qvuvan/work3/code/hpsOpenMM/`
 - Add folder in Python path (in .bashrc file): `export PYTHONPATH=$PYTHONPATH:/home/qvuvan/work3/code/hpsOpenMM/`  
-*Note that in cluster, when submit job, the environment may not load `.bashrc` so need to add export command in job file* 
+- The standard example can be found at ```example/standard_example```
+
+- *Note that in cluster, when submit job, the environment may not load `.bashrc` so need to add export command in job file* 
 
 ## Bugs
-- If you encounter any bugs, please report the issue to Quyen Vu (vuqv.phys@gmail.com)
+- If you encounter any bugs, please report the issue to Quyen Vu (```vuqv.phys@gmail.com```)
 
 ## Acknowledgments
 
