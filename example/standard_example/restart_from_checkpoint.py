@@ -1,5 +1,7 @@
 # Import OpenMM library
 # Import sbmOpenMM library
+import os
+import sys
 import time
 from sys import stdout
 
@@ -7,30 +9,26 @@ from simtk.openmm import *
 from simtk.openmm.app import *
 from simtk.unit import *
 
-import hps
+import sbmOpenMM
 
 # MD parameter
-# let's decide here now as long as we want to run the simulation and the file writing period
-mdsteps = 500000000
-dcdperiod = 10000
-logperiod = 10000
-# stage of simulation equil, prod
-stage = 'equil'
-# which platform to run simulation: CPU/GPU
-device = 'GPU'
+# let's decide here now long we want to run the simulation and the file writing period
+mdsteps = 10000  # 5 ns at 2 fs timestep
+dcdperiod = 1000  # 10 ps at 2 fs timestep
+logperiod = 100  # 10 ps at 2 fs timestep
 
-pdbname = 'asyn2'
-protein_code = f'{pdbname}'
+# stage of simulation equil, prod
+prev_stage = 'equil'
+stage = 'prod'
+# which platform to run simulation: CPU/GPU
+device = 'CPU'
+
+pdbname = 'asyn_ext_pymol'
+protein_code = 'asyn'
 pdb_file = f'{pdbname}.pdb'
 
 # Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
-cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr')
-
-# dump Forcefield File
-cgModel.dumpForceFieldData('forcefield.dat')
-# dump Structure into PDB file for visualize
-cgModel.dumpStructure(f'{protein_code}_{stage}_init.pdb')
-cgModel.dumpTopology(f'{protein_code}.psf')
+cgModel = sbmOpenMM.models.getCGModel(pdb_file)
 
 if device == 'GPU':
     # Run simulation on CUDA
@@ -49,7 +47,7 @@ simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, 
 # Set initial positions
 simulation.context.setPositions(cgModel.positions)
 # set velocity by temperature
-simulation.context.setVelocitiesToTemperature(298 * kelvin)
+# simulation.context.setVelocitiesToTemperature(298 * kelvin)
 
 # Add a DCD reporter that writes coordinates every 100 steps.
 simulation.reporters.append(DCDReporter(f'{protein_code}_{stage}.dcd', dcdperiod))
@@ -65,8 +63,13 @@ simulation.reporters.append(
                       totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
                       totalSteps=mdsteps, separator='\t'))
 
+# load binary checkpoint from previous stage (equilibrium)
+with open(f'checkpoint_{prev_stage}.chk', 'rb') as f:
+    simulation.context.loadCheckpoint(f.read())
+
 print('Simulation started')
 start_time = time.time()
+# for i in range(1000):
 simulation.step(mdsteps)
 
 # write the last frame
