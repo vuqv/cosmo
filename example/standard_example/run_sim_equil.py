@@ -11,7 +11,7 @@ import hps
 
 # MD parameter
 # let's decide here now as long as we want to run the simulation and the file writing period
-mdsteps = 500000000
+mdsteps = 500_000_000
 dcdperiod = 10000
 logperiod = 10000
 # stage of simulation equil, prod
