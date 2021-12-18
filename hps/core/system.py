@@ -6,9 +6,8 @@ from collections import OrderedDict
 
 import numpy as np
 import parmed as pmd
-from simtk import unit
-from simtk.openmm import *
-from simtk.openmm.app import *
+from openmm import *
+from openmm.app import *
 
 from ..parameters import ca_parameters
 

@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from simtk.openmm import *
-from simtk.openmm.app import *
+from openmm import *
+from openmm.app import *
 
 from .system import system
 

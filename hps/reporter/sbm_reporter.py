@@ -4,7 +4,7 @@
 # In[1]:
 
 
-from simtk.openmm.app.statedatareporter import StateDataReporter
+from openmm.app.statedatareporter import StateDataReporter
 from simtk import unit
 from hps.core import system
 

@@ -3,12 +3,14 @@
 import time
 from sys import stdout
 
-from simtk.openmm import *
-from simtk.openmm.app import *
-from simtk.unit import *
+from openmm import *
+from openmm.app import *
+from openmm.unit import *
 
 import hps
-
+import warnings
+from parmed.exceptions import OpenMMWarning
+warnings.filterwarnings("ignore", category=OpenMMWarning)
 # MD parameter
 # let's decide here now as long as we want to run the simulation and the file writing period
 mdsteps = 500_000_000
@@ -19,7 +21,7 @@ stage = 'equil'
 # which platform to run simulation: CPU/GPU
 device = 'GPU'
 
-pdbname = 'asyn2'
+pdbname = 'asyn'
 protein_code = f'{pdbname}'
 pdb_file = f'{pdbname}.pdb'
 
