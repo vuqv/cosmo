@@ -8,7 +8,7 @@ This is a repository contains the source code of hps-urry/kr model.
  ```urry: Hydropathy according to Urry scale.```
 ```kr: Kapcha-Rossy scale```
 ## requirements:
-- **OpenMM 7.x** (Note that OpenMM 7.6 currently breaks compatible with other plugins like Parmed, use OpenMM 7.5.x) 
+- **OpenMM 7.x**  
 - **Parmed** 
 
 ## How to use hpsOpenMM:  
