@@ -1,21 +1,18 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from openmm import *
-from openmm.app import *
-
 from .system import system
 
 
 class models:
     """
-    A class to hold functions for the automated generation of default SBM models.
+    A class to hold functions for the automated generation of default hps models.
 
     Methods
     -------
 
     getCAModel(structure_file, kwarg**)
-        Creates an alpha-carbon only sbmOpenMM system class object with default
+        Creates an alpha-carbon only hpsOpenMM system class object with default
         initialized parameters.
 
     """
@@ -28,11 +25,10 @@ class models:
                    residue_charge=True,
                    residue_hps=True,
                    hps_scale='kr',
-                   usePeriodicBoudaryCondition=True,
-                   box_dim=None,
+                   box_dimension=None,
                    forcefield_file=None):
         """
-        Initialises a coarse-grained, carbon alpha (CA), sbmOpenMM system class
+        Initialises a coarse-grained, carbon alpha (CA), hpsOpenMM system class
         from a structure and a contact file defining the native contacts for the
         coarse grained model.
 
@@ -43,7 +39,7 @@ class models:
         3) Create the default force objects.
         4) Create the OpenMM system class.
 
-        The method can be used to generate an initialized sbmOpenMM system class, that only
+        The method can be used to generate an initialized hpsOpenMM system class, that only
         contains the geometrical parameters, by passing the option default_parameters as False.
         This is useful to store the geometrical values of bonds, angles, dihedrals, etc. in
         order to add custom parameters and forces.
@@ -80,53 +76,57 @@ class models:
             HPS scale. There are two options correspond to two scale:
             'urry': using Urry scale
             'kr': using Kapcha-Rossy scale (default).
+        box_dimension : float or array
+            if float is given, then use cubic box
+            if an array of (3,1) is given, then use rectangular box with the given dimension
+            if not specify: do not use PBC
         forcefield_file : string
             Path to the input forcefield file.
 
         Returns
         -------
-        sbm : sbmOpenMM.system
-            Initialized sbmOpenMM.system class with default options for defining
+        hps : hpsOpenMM.system
+            Initialized hpsOpenMM.system class with default options for defining
             a coarse-grained CA force field.
         """
 
-        print('Generating CA SBM for structure file ' + structure_file)
+        print('Generating CA hps for structure file ' + structure_file)
         print('')
         # Set up geometric parameters of the model
         print('Setting up geometrical parameters:')
         print('_________________________________')
-        sbm = system(structure_file)
+        hps = system(structure_file)
         print('Keeping only alpha carbon atoms in topology')
-        sbm.getCAlphaOnly()
-        sbm.getAtoms()
-        print('Added ' + str(sbm.n_atoms) + ' CA atoms')
+        hps.getCAlphaOnly()
+        hps.getAtoms()
+        print('Added ' + str(hps.n_atoms) + ' CA atoms')
         if forcefield_file is None:
             if residue_masses:
                 print("Setting alpha-carbon masses to their average residue mass.")
-                sbm.setCAMassPerResidueType()
+                hps.setCAMassPerResidueType()
 
             if residue_radii:
                 print("Setting alpha-carbon atoms radii to their statistical residue radius.")
-                sbm.setCARadiusPerResidueType()
+                hps.setCARadiusPerResidueType()
             else:
                 print('Setting default vdw radii (0.4 nm) for all atoms in the system')
-                sbm.setParticlesRadii(0.4)
+                hps.setParticlesRadii(0.4)
 
             if residue_charge:
                 print("Setting alpha-carbon charge to their residue charge.")
-                sbm.setCAChargePerResidueType(hps_scale)
+                hps.setCAChargePerResidueType(hps_scale)
 
             if residue_hps:
                 print("Setting hydropathy scale to their residue.")
                 if hps_scale == 'urry':
                     print("Using Urry scale.")
-                    sbm.setCAHPSUrryPerResidueType()
+                    hps.setCAHPSUrryPerResidueType()
                 if hps_scale == 'kr':
                     print("Using Kapcha-Rossy scale.")
-                    sbm.setCAHPSKRPerResidueType()
+                    hps.setCAHPSKRPerResidueType()
 
-            sbm.getBonds()
-            print('Added ' + str(sbm.n_bonds) + ' bonds')
+            hps.getBonds()
+            print('Added ' + str(hps.n_bonds) + ' bonds')
 
         elif forcefield_file is not None:
             print(
@@ -134,29 +134,37 @@ class models:
 
         # print('')
         print('Adding default bond force constant...')
-        sbm.setBondParameters(8368.0)
+        hps.setBondParameters(8368.0)
         print('')
         print('_________________________________')
 
         print('Adding Forces:')
-        sbm.addHarmonicBondForces()
+        hps.addHarmonicBondForces()
         print('Added Harmonic Bond Forces')
 
-        if usePeriodicBoudaryCondition:
-            if isinstance(box_dim, list):
-                # rectangular box, given parameter is array of three number
-                sbm.topology.setPeriodicBoxVectors(((box_dim[0], 0, 0), (0, box_dim[1], 0), (0, 0, box_dim[2])))
+        if box_dimension:
+            use_pbc = True
+            if isinstance(box_dimension, list):
+                """
+                OpenMM use this to write dimension in PDB and dcd file. Require one-argument, so zip box dimension into 
+                one variable.
+                Rectangular box, given parameter is array of three number
+                """
+                hps.topology.setPeriodicBoxVectors(((box_dimension[0], 0, 0), (0, box_dimension[1], 0), (0, 0, box_dimension[2])))
             else:
                 # cubic box, given parameter is single float
-                sbm.topology.setPeriodicBoxVectors(((box_dim, 0, 0), (0, box_dim, 0), (0, 0, box_dim)))
+                hps.topology.setPeriodicBoxVectors(((box_dimension, 0, 0), (0, box_dimension, 0), (0, 0, box_dimension)))
 
-            unitCell = sbm.topology.getPeriodicBoxVectors()
-            sbm.system.setDefaultPeriodicBoxVectors(*unitCell)
+            unit_cell = hps.topology.getPeriodicBoxVectors()
+            # use this to write coordinate in PBC box. requires 3 numbers, unzip to 3
+            hps.system.setDefaultPeriodicBoxVectors(*unit_cell)
+        else:
+            use_pbc = False
 
-        sbm.addYukawaForces(usePeriodicBoudaryCondition)
+        hps.addYukawaForces(use_pbc)
         print('Added Yukawa Force')
 
-        sbm.addAshbaughHatchForces(usePeriodicBoudaryCondition)
+        hps.addAshbaughHatchForces(use_pbc)
         print('Added PairWise Force')
         print('')
         print('_________________________________')
@@ -165,8 +173,8 @@ class models:
 
         print('Creating System Object:')
         # print('______________________')
-        sbm.createSystemObject(minimize=minimize, check_bond_distances=True)
+        hps.createSystemObject(minimize=minimize, check_bond_distances=True)
         print('OpenMM system Object created')
         print('')
 
-        return sbm
+        return hps

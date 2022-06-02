@@ -467,7 +467,7 @@ class system:
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
 
-    def addYukawaForces(self, PBC):
+    def addYukawaForces(self, use_pbc):
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -484,7 +484,7 @@ class system:
 
         Parameters
         ----------
-        None
+        use_pbc: (bool) whether use PBC, cutoff periodic boundary condition
 
         Returns
         -------
@@ -497,7 +497,7 @@ class system:
         self.yukawaForce.addGlobalParameter('epsilon_r', self.epsilon_r)
         self.yukawaForce.addGlobalParameter('lD', self.lD)
         self.yukawaForce.addPerParticleParameter('charge')
-        if PBC:
+        if use_pbc:
             self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
         else:
             self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
@@ -517,7 +517,7 @@ class system:
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.yukawaForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
-    def addAshbaughHatchForces(self, PBC):
+    def addAshbaughHatchForces(self, use_pbc):
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -540,11 +540,8 @@ class system:
         Here, :math:`\\sigma= \\frac{(\\sigma_1+\\sigma_2)}{2}; \\lambda_{ij}^{0}=\\frac{(\\lambda_i+\\lambda_j)}{2};
         \\epsilon = 0.8368 kj/mol`
 
-        The
         The force object is stored at the :code:`ashbaugh_HatchForce` attribute.
 
-        Parameters
-        ----------
         epsilon : float
             Value of the epsilon constant in the energy function.
         sigma : float or list
@@ -552,7 +549,12 @@ class system:
             same sigma value is used for every particle. If list a unique
             parameter is given for each particle.
         cutoff : float
-            The cutoff distance (in nm) being used for the nonbonded interactions.
+            The cutoff distance (in nm) being used for the non-bonded interactions.
+        Parameters
+        ----------
+
+        use_pbc : bool. Whether use PBC, cutoff periodic boundary condition
+
         Returns
         -------
         None
@@ -567,7 +569,7 @@ class system:
         self.ashbaugh_HatchForce.addPerParticleParameter('sigma')
         self.ashbaugh_HatchForce.addPerParticleParameter('hps')
         #
-        if PBC:
+        if use_pbc:
             self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
         else:
             self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
@@ -578,7 +580,7 @@ class system:
             for atom in self.atoms:
                 self.ashbaugh_HatchForce.addParticle((self.rf_sigma,))
 
-        # in the case each atoms have different sigma para.
+        # in the case each atom has different sigma para.
         elif isinstance(self.rf_sigma, list):
             assert self.n_atoms == len(self.rf_sigma) and self.n_atoms == len(self.particles_hps)
             for i, atom in enumerate(self.atoms):
@@ -589,8 +591,9 @@ class system:
         self.ashbaugh_HatchForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
     """ Functions for creating OpenMM system object """
+
     def createSystemObject(self, check_bond_distances=True, minimize=False, check_large_forces=True,
-                           force_threshold=10.0, bond_threshold=0.39):
+                           force_threshold=10.0, bond_threshold=0.5):
         """
         Creates an :code:`openmm.System()` object using the force field parameters
         given to the 'system' class. It adds particles, forces and
@@ -608,7 +611,7 @@ class system:
             Whether to print force summary of force groups
         force_threshold : float (10.0)
             Threshold to check for large forces.
-        bond_threshold : float (0.39)
+        bond_threshold : float (0.5)
             Threshold to check for large bond distances.
 
         Returns
@@ -637,7 +640,7 @@ class system:
             # Check for high forces in atoms and minimize the system if necessary
             self.checkLargeForces(minimize=minimize, threshold=force_threshold)
 
-    def checkBondDistances(self, threshold=0.39):
+    def checkBondDistances(self, threshold=0.5):
         """
         Searches for large bond distances for the atom pairs defined in
         the 'bonds' attribute. It raises an error when large bonds are found.
@@ -1148,6 +1151,7 @@ class system:
                 raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
 
         self.setParticlesHPS(hps)
+
     ## User-hidden functions ##
 
     def _setParameters(term, parameters):
