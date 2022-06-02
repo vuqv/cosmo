@@ -467,7 +467,7 @@ class system:
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
 
-    def addYukawaForces(self):
+    def addYukawaForces(self, PBC):
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -497,7 +497,10 @@ class system:
         self.yukawaForce.addGlobalParameter('epsilon_r', self.epsilon_r)
         self.yukawaForce.addGlobalParameter('lD', self.lD)
         self.yukawaForce.addPerParticleParameter('charge')
-        self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+        if PBC:
+            self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
+        else:
+            self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
         self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
         if isinstance(self.particles_charge, float):
@@ -514,7 +517,7 @@ class system:
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.yukawaForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
-    def addAshbaughHatchForces(self):
+    def addAshbaughHatchForces(self, PBC):
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -563,7 +566,12 @@ class system:
         self.ashbaugh_HatchForce.addGlobalParameter('epsilon', self.epsilon)
         self.ashbaugh_HatchForce.addPerParticleParameter('sigma')
         self.ashbaugh_HatchForce.addPerParticleParameter('hps')
-        self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+        #
+        if PBC:
+            self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
+        else:
+            self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+
         self.ashbaugh_HatchForce.setCutoffDistance(self.cutoff_Ashbaugh_Hatch)
 
         if isinstance(self.rf_sigma, float):

@@ -28,6 +28,8 @@ class models:
                    residue_charge=True,
                    residue_hps=True,
                    hps_scale='kr',
+                   usePeriodicBoudaryCondition=True,
+                   box_dim=None,
                    forcefield_file=None):
         """
         Initialises a coarse-grained, carbon alpha (CA), sbmOpenMM system class
@@ -140,10 +142,21 @@ class models:
         sbm.addHarmonicBondForces()
         print('Added Harmonic Bond Forces')
 
-        sbm.addYukawaForces()
+        if usePeriodicBoudaryCondition:
+            if isinstance(box_dim, list):
+                # rectangular box, given parameter is array of three number
+                sbm.topology.setPeriodicBoxVectors(((box_dim[0], 0, 0), (0, box_dim[1], 0), (0, 0, box_dim[2])))
+            else:
+                # cubic box, given parameter is single float
+                sbm.topology.setPeriodicBoxVectors(((box_dim, 0, 0), (0, box_dim, 0), (0, 0, box_dim)))
+
+            unitCell = sbm.topology.getPeriodicBoxVectors()
+            sbm.system.setDefaultPeriodicBoxVectors(*unitCell)
+
+        sbm.addYukawaForces(usePeriodicBoudaryCondition)
         print('Added Yukawa Force')
 
-        sbm.addAshbaughHatchForces()
+        sbm.addAshbaughHatchForces(usePeriodicBoudaryCondition)
         print('Added PairWise Force')
         print('')
         print('_________________________________')
