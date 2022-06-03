@@ -63,9 +63,6 @@ class system:
 
     Methods
     -------
-    removeHydrogens()
-        Remove hydrogens from the input structure by using a regexpression pattern.
-        Used specially for creating all atom (AA) models.
     getCAlphaOnly()
         Filter in only alpha carbon atoms from the input structure and updates
         the topology object to add new bonds between them. Used specially for
