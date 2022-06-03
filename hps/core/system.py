@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-import re
 from collections import OrderedDict
 
 import numpy as np
@@ -57,7 +56,7 @@ class system:
         as values.
     system : :code:`openmm.System`
         Stores the OpenMM System initialised class. It stores all the forcefield
-        information for the SBM model.
+        information for the hps model.
     rf_sigma : :code:`float`
         Sigma parameter used in the pairwise force object.
         This is vdw Radius of beads
@@ -92,7 +91,7 @@ class system:
         Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).
     createSystemObject()
         Creates OpenMM system object adding particles, masses and forces.
-        It also groups the added forces into Force-Groups for the sbmReporter
+        It also groups the added forces into Force-Groups for the hpsReporter
         class.
     addParticles()
         Add particles to the system OpenMM class instance.
@@ -121,7 +120,7 @@ class system:
 
     def __init__(self, structure_path):
         """
-        Initialises the SBM OpenMM system class.
+        Initialises the hps OpenMM system class.
 
         Parameters
         ----------
@@ -181,42 +180,9 @@ class system:
         # Initialise an OpenMM system class instance
         self.system = System()
 
-    def removeHydrogens(self, except_chains=None):
-        """
-        Removes all hydrogen atoms in the topology from the SBM system.
-
-        Parameters
-        ----------
-        except_chains:String
-
-        Returns
-        -------
-        None
-        """
-        if isinstance(except_chains, str):
-            except_chains = list(except_chains)
-
-        # save all hydrogen atoms
-        atomsToRemove = []
-        _hydrogen = re.compile("[123 ]*H.*")
-        for a in self.topology.atoms():
-            if except_chains is not None:
-                if a.residue.chain.id not in except_chains:
-                    if _hydrogen.match(a.name):
-                        atomsToRemove.append(a)
-            else:
-                if _hydrogen.match(a.name):
-                    atomsToRemove.append(a)
-
-        # Remove all hydrogen atoms
-        modeller_topology = modeller.Modeller(self.topology, self.positions)
-        modeller_topology.delete(atomsToRemove)
-        self.topology = modeller_topology.getTopology()
-        self.positions = modeller_topology.getPositions()
-
     def getCAlphaOnly(self):
         """
-        Keeps in the SBM system only the alpha carbon atoms from the OpenMM topology.
+        Keeps in the hps system only the alpha carbon atoms from the OpenMM topology.
 
         Parameters
         ----------
@@ -228,35 +194,29 @@ class system:
         """
 
         # save all non C-alpha atoms
-        atomsToRemove = []
-        oldIndex = []
+        atoms_to_remove = []
+        # oldIndex = []
         for a in self.topology.atoms():
             if a.name != 'CA':
-                atomsToRemove.append(a)
+                atoms_to_remove.append(a)
 
         # Remove all non C-alpha atoms
         modeller_topology = modeller.Modeller(self.topology, self.positions)
-        modeller_topology.delete(atomsToRemove)
+        modeller_topology.delete(atoms_to_remove)
         self.topology = modeller_topology.getTopology()
         self.positions = modeller_topology.getPositions()
 
-        # Update system atoms
+        """
+            Update system atoms, then add bonds between C-alpha atoms of the same chain.
+        """
         atoms = list(self.topology.atoms())
-
-        # Add bonds between C-alpha atoms of the same chain
         for i in range(1, len(atoms)):
-            current_chain = atoms[i].residue.chain
-            if i == 1:
-                previous_chain = current_chain
-
-            # Add bond only when atoms belong to the same chain
-            if current_chain == previous_chain:
+            if atoms[i].residue.chain == atoms[i - 1].residue.chain:
                 self.topology.addBond(atoms[i - 1], atoms[i])
-            previous_chain = current_chain
 
     def getAtoms(self):
         """
-        Adds atoms in the OpenMM topology instance to the sbmOpenMM system class.
+        Adds atoms in the OpenMM topology instance to the hpsOpenMM system class.
 
         Parameters
         ----------
@@ -275,22 +235,15 @@ class system:
         # Sort atoms by index
         atoms = sorted(atoms, key=lambda x: x.index)
 
-        # Add atoms to sbm object
+        # Add atoms to hps object
         self.n_atoms = 0
         for atom in atoms:
             self.atoms.append(atom)
             self.n_atoms += 1
 
-        """
-        Prepare for pair-wire excluded interaction. If two atoms covalently bonded then is not appears in pair-wire
-        nonbonded interactions (still present in electrostatic interactions)
-        
-        """
-        # self.exclusion_NB = np.ones((self.n_atoms, self.n_atoms))
-
     def getBonds(self, except_chains=None):
         """
-        Adds bonds in the OpenMM topology instance to the sbmOpenMM system class.
+        Adds bonds in the OpenMM topology instance to the hpsOpenMM system class.
 
         Parameters
         ----------
@@ -323,7 +276,7 @@ class system:
         # Sort bonds by index of first atom
         bonds = sorted(bonds, key=lambda x: x[0].index)
 
-        # Add bonds to sbm object
+        # Add bonds to hps object
         self.n_bonds = 0
         for bond in bonds:
             bond_length = self.bond_length * unit.nanometer
@@ -371,7 +324,7 @@ class system:
         Parameters
         ----------
         particles_mass : float or list
-            Mass(es) values to add for the particles in the sbmOpenMM system class.
+            Mass(es) values to add for the particles in the hpsOpenMM system class.
 
         Returns
         -------
@@ -389,7 +342,7 @@ class system:
         Parameters
         ----------
         particles_radii : float or list
-            Radii values to add for the particles in the sbmOpenMM system class.
+            Radii values to add for the particles in the hpsOpenMM system class.
 
         Returns
         -------
@@ -407,7 +360,7 @@ class system:
         Parameters
         ----------
         particles_charge : float or list
-            Charge values to add for the particles in the sbmOpenMM system class.
+            Charge values to add for the particles in the hpsOpenMM system class.
 
         Returns
         -------
@@ -425,7 +378,7 @@ class system:
         Parameters
         ----------
         particles_hps : float or list
-            HPS scale values to add for the particles in the sbmOpenMM system class.
+            HPS scale values to add for the particles in the hpsOpenMM system class.
 
         Returns
         -------
@@ -507,7 +460,7 @@ class system:
             for atom in self.atoms:
                 self.yukawaForce.addParticle((self.particles_charge,))
 
-        # in the case each atoms have different sigma para.
+        # in the case each atom has different sigma para.
         elif isinstance(self.particles_charge, list):
             assert self.n_atoms == len(self.particles_charge)
             for i, atom in enumerate(self.atoms):
@@ -675,9 +628,9 @@ class system:
 
     def checkLargeForces(self, threshold=1, minimize=False):
         """
-        Prints the SBM system energies of the input configuration of the
+        Prints the hps system energies of the input configuration of the
         system. It optionally checks for large forces acting upon all
-        particles in the SBM system and iteratively minimizes the system
+        particles in the hps system and iteratively minimizes the system
         configuration until no forces larger than a threshold are found.
 
         Parameters
@@ -829,7 +782,7 @@ class system:
     def dumpTopology(self, output_file):
         """
         Writes a file containing the current topology in the
-        sbmOpenMM system. This file contains topology of system, used in visualization and analysis.
+        hpsOpenMM system. This file contains topology of system, used in visualization and analysis.
 
         Here, we used :code:`parmed` to load openMM topology, openMM system to create Structure object in parmed.
         Because parmed automatically recognizes charge, mass of atoms by their name.
@@ -923,7 +876,7 @@ class system:
     def loadForcefieldFromFile(self, forcefield_file):
         """
         Loads force field parameters from a force field file written by the
-        :code:`dumpForceFieldData()` method into the sbmOpenMM system.
+        :code:`dumpForceFieldData()` method into the hpsOpenMM system.
 
         NOTE: I still keep this function since I think I will use it later.
         I have not customized this function yet so do not use :code:`loadForcefieldFromFile()` function in simulation.
