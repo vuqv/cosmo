@@ -43,12 +43,12 @@ class system:
         Total number of bonds in the model.
     harmonicBondForce : :code:`openmm.HarmonicBondForce`
         Stores the OpenMM :code:`HarmonicBondForce` initialised-class. Implements
-        an harmonic bond potential between pairs of particles, that depends
+        a harmonic bond potential between pairs of particles, that depends
         quadratically on their distance.
     yukawaForce : :code:`openmm.CustomNonbondedForce`
         Stores the OpenMM :code:`CustomNonbondedForce` initialized-class.
         Implements the Debye-Huckle potential.
-    ashbaughHatchForces : :code:`openmm.CustomNonbondedForce`
+    ashbaugh_HatchForce : :code:`openmm.CustomNonbondedForce`
         Stores the OpenMM :code:`CustomNonbondedForce` initialized-class. Implements the pairwise short-range
         potential.
     forceGroups : :code:`collections.OrderedDict`
@@ -80,7 +80,7 @@ class system:
     setParticlesRadii()
         Change the excluded volume radius parameter for each atom in the system.
     addHarmonicBondForces()
-        Creates an harmonic bonded force term for each bond in the main
+        Creates a harmonic bonded force term for each bond in the main
         class using their defined forcefield parameters.
     addYukawaForces()
         Creates a nonbonded force term for electrostatic interaction DH potential.
@@ -156,7 +156,7 @@ class system:
         # Define force attributes
         self.harmonicBondForce = None
         self.rf_sigma = None
-        self.rf_cutoff = None
+        # self.rf_cutoff = None
         self.particles_hps = None
 
         # PairWise potential
@@ -183,7 +183,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -217,7 +217,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -403,7 +403,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -454,7 +454,7 @@ class system:
         self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
         if isinstance(self.particles_charge, float):
-            for atom in self.atoms:
+            for i in range(len(self.atoms)):
                 self.yukawaForce.addParticle((self.particles_charge,))
 
         # in the case each atom has different sigma para.
@@ -475,7 +475,7 @@ class system:
 
         Unlike :code:`BondForce` class, where we specify index for atoms pair to add bond, it means
         that number of bondForces may differ from number of particle.
-        :code:`NonBondedForce` is add to all particles, hence we don't need to pass the :code:`atom index`.
+        :code:`NonBondedForce` is added to all particles, hence we don't need to pass the :code:`atom index`.
 
         .. math::
             \\Phi_{i,j}^{vdw}(r) = step(2^{1/6}\\sigma_{ij}-r) \\times
@@ -527,7 +527,7 @@ class system:
         self.ashbaugh_HatchForce.setCutoffDistance(self.cutoff_Ashbaugh_Hatch)
 
         if isinstance(self.rf_sigma, float):
-            for atom in self.atoms:
+            for i in range(len(self.atoms)):
                 self.ashbaugh_HatchForce.addParticle((self.rf_sigma,))
 
         # in the case each atom has different sigma para.
@@ -649,14 +649,14 @@ class system:
 
         # Define test simulation to extract forces
         integrator = LangevinIntegrator(1 * unit.kelvin, 1 / unit.picosecond, 0.0005 * unit.picoseconds)
-        simulation = Simulation(self.topology, self.system, integrator)
-        simulation.context.setPositions(self.positions)
-        state = simulation.context.getState(getForces=True, getEnergy=True)
+        sim = Simulation(self.topology, self.system, integrator)
+        sim.context.setPositions(self.positions)
+        state = sim.context.getState(getForces=True, getEnergy=True)
 
         # Print initial state of the system
         print('The Potential Energy of the system is : %s' % state.getPotentialEnergy())
         for i, n in enumerate(self.forceGroups):
-            energy = simulation.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
+            energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                 unit.kilojoules_per_mole)
             print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
         print('')
@@ -670,7 +670,7 @@ class system:
 
             while np.max(forces) > threshold:
 
-                # Write atom with largest force if not reported before
+                # Write atom with the largest force if not reported before
                 if np.max(forces) != prev_force:
                     atom = self.atoms[np.argmax(forces)]
                     residue = atom.residue
@@ -680,9 +680,9 @@ class system:
                     print('Minimising system with energy tolerance of %.1f kj/mol' % tolerance)
                     print('')
 
-                simulation.minimizeEnergy(tolerance=tolerance * unit.kilojoule / unit.mole)
+                sim.minimizeEnergy(tolerance=tolerance * unit.kilojoule / unit.mole)
                 # minimized = True
-                state = simulation.context.getState(getForces=True)
+                state = sim.context.getState(getForces=True)
                 prev_force = np.max(forces)
                 forces = [np.linalg.norm([f.x, f.y, f.z]) for f in state.getForces()]
                 if tolerance > 1:
@@ -694,11 +694,11 @@ class system:
                                      'Try to increase the force threshold value to achieve convergence.')
 
             print('______________________')
-            state = simulation.context.getState(getPositions=True, getEnergy=True)
+            state = sim.context.getState(getPositions=True, getEnergy=True)
             print('After minimisation:')
-            print('The Potential Energy of the system is : %s' % state.getPotentialEnergy())
+            print('The Potential Energy of the system (after minimized) is : %s' % state.getPotentialEnergy())
             for i, n in enumerate(self.forceGroups):
-                energy = simulation.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
+                energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                     unit.kilojoules_per_mole)
                 print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
             print('All forces are less than %.2f kj/mol/nm' % threshold)
@@ -716,7 +716,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -725,7 +725,7 @@ class system:
 
         # Set same mass for each atom
         if isinstance(self.particles_mass, float):
-            for atom in self.atoms:
+            for i in range(len(self.atoms)):
                 self.system.addParticle(self.particles_mass)
 
         # Set unique masses for each atom
@@ -741,7 +741,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -949,7 +949,7 @@ class system:
                             k = float(ls[3])
                             self.bonds[(at1, at2)] = (bond_length, k)
 
-                    # Select which section is being reading by changing its boolean to 1
+                    # Select which section is being reading by changing it's boolean to 1
                     if line.startswith('[atoms]'):
                         print('Reading atom parameters')
                         self.bonds = OrderedDict()
@@ -969,7 +969,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -996,7 +996,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -1050,12 +1050,11 @@ class system:
 
     def setCAHPSUrryPerResidueType(self):
         """
-        Sets the HPS of the alpha carbon atoms.
-        The current implementation is using Urry scale.
+        Sets the HPS-Urry model of the alpha carbon atoms.
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -1077,12 +1076,11 @@ class system:
 
     def setCAHPSKRPerResidueType(self):
         """
-        Sets the HPS of the alpha carbon atoms.
-        The current implementation is using Urry scale.
+        use of HPS-KR scale of the alpha carbon atoms.
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -1102,7 +1100,7 @@ class system:
 
         self.setParticlesHPS(hps)
 
-    ## User-hidden functions ##
+    # User-hidden functions #
 
     def _setParameters(term, parameters):
         """
@@ -1116,8 +1114,8 @@ class system:
 
         parameters : integer or float or list
             Value(s) for the specific forcefield parameters. If integer
-            or float, sets up the same value for all the DOF in terms. If
-            list, sets a unique parameter for each DOF.
+            or float, sets up the same value for all the DOF in terms.
+            If a list is given, sets a unique parameter for each DOF.
 
         Returns
         -------
