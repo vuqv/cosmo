@@ -13,9 +13,9 @@ from parmed.exceptions import OpenMMWarning
 warnings.filterwarnings("ignore", category=OpenMMWarning)
 # MD parameter
 # let's decide here now as long as we want to run the simulation and the file writing period
-mdsteps = 200_000
-dcdperiod = 100
-logperiod = 100
+mdsteps = 2000000
+dcdperiod = 1000
+logperiod = 1000
 # stage of simulation equil, prod
 stage = 'equil'
 # which platform to run simulation: CPU/GPU
@@ -29,13 +29,12 @@ pdb_file = f'{pdbname}.pdb'
 # No PBC
 # cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr')
 # With PBC, or can call: box_dimension= [Lx, Ly, Lz]
-cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr', box_dimension= 100)
+cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr',  minimize=True)
 if device == 'GPU':
     # Run simulation on CUDA
-    platform = Platform.getPlatformByName('CUDA')
     properties = {'CudaPrecision': 'mixed'}
-    # in case of many GPUs present, we can select which one to use
-    # properties["DeviceIndex"] = "0"
+    properties["DeviceIndex"] = "0";
+    platform = Platform.getPlatformByName('CUDA')
 
 elif device == 'CPU':
     platform = Platform.getPlatformByName('CPU')
@@ -44,11 +43,13 @@ elif device == 'CPU':
 integrator = LangevinIntegrator(500 * kelvin, 0.01 / picosecond, 10 * femtoseconds)
 simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
 
+
 # Set initial positions
 xyz = np.array(cgModel.positions/nanometer)
 xyz[:,0] -= np.amin(xyz[:,0])
 xyz[:,1] -= np.amin(xyz[:,1])
 xyz[:,2] -= np.amin(xyz[:,2])
+xyz += 300/2
 cgModel.positions = xyz*nanometer
 simulation.context.setPositions(cgModel.positions)
 # set velocity by temperature

@@ -1,8 +1,8 @@
 # Import OpenMM library
 # Import sbmOpenMM library
-import time
 import argparse
 import configparser
+import time
 import warnings
 from distutils.util import strtobool
 from sys import stdout
@@ -47,8 +47,7 @@ restart = strtobool(params['restart'])
 """
 End of reading parameters
 """
-
-# Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
+# @TODO: check if use pbc then initialize hps model with pbc
 cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr')
 
 # dump Forcefield File
@@ -70,7 +69,6 @@ elif device == 'CPU':
     platform = Platform.getPlatformByName('CPU')
     properties = {'Threads': str(ppn)}
 
-
 print('Simulation started')
 start_time = time.time()
 
@@ -88,12 +86,12 @@ if restart:
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
     simulation.reporters.append(
         StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                          totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
                           totalSteps=md_steps, separator='\t'))
     simulation.reporters.append(
         StateDataReporter(f'{protein_code}_prod.log', nstlog, step=True, time=True, potentialEnergy=True,
                           kineticEnergy=True,
-                          totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
                           totalSteps=md_steps, separator='\t', append=True))
     simulation.step(nsteps_remain)
 else:
@@ -113,18 +111,14 @@ else:
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
     simulation.reporters.append(
         StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                          totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
                           totalSteps=md_steps, separator='\t'))
     simulation.reporters.append(
-        StateDataReporter(f'{protein_code}_prod.log', nstlog, step=True, time=True, potentialEnergy=True,
+        StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                           kineticEnergy=True,
-                          totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
                           totalSteps=md_steps, separator='\t', append=False))
     simulation.step(md_steps)
-
-# If we don't need too details, we can use the default reporter from OpenMM
-
-
 
 
 # write the last frame

@@ -1,4 +1,4 @@
-*.dcd
-*.log
-*.chk
+*/*.dcd
+*/*.log
+*/*.chk
 docs/_build
