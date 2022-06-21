@@ -2,4 +2,5 @@
 */*.log
 */*.chk
 */__pycache__/*
+*/*/__pycache__/*
 docs/_build
