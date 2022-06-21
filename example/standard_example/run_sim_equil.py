@@ -18,7 +18,7 @@ import hps
 warnings.filterwarnings("ignore", category=OpenMMWarning)
 
 # Parse config file:
-parser = argparse.ArgumentParser(description="\n Usage: python run_simulation.py -f config.ini ")
+parser = argparse.ArgumentParser(description="\n Usage: python run_simulation.py -f md.ini ")
 parser.add_argument('-input', '-f', type=str, help='simulation config file')
 args = parser.parse_args()
 # Reading parameters
@@ -37,8 +37,8 @@ tau_t = float(params['tau_t']) / picosecond
 pbc = strtobool(params['pbc'])
 
 protein_code = params['protein_code']
-checkpoint_file = protein_code + '.chk'
-checkpoint_file_equil = protein_code + '_equil.chk'
+checkpoint = params['checkpoint']
+
 pdb_file = params['pdb_file']
 device = params['device']
 ppn = params['ppn']
@@ -76,13 +76,13 @@ if restart:
     # simulation reporter
     integrator = LangevinIntegrator(ref_t, tau_t, dt)
     simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
-    simulation.loadCheckpoint(checkpoint_file)
+    simulation.loadCheckpoint(checkpoint)
     print(
         f"Restart from checkpoint, Time = {simulation.context.getState().getTime()}, Step= {simulation.context.getState().getStepCount()}")
     # number of steps remain to run
     nsteps_remain = md_steps - simulation.context.getState().getStepCount()
     simulation.reporters = []
-    simulation.reporters.append(CheckpointReporter(checkpoint_file, nstxout))
+    simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
     simulation.reporters.append(
         StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
@@ -107,7 +107,7 @@ else:
     simulation.context.setPositions(cgModel.positions)
     simulation.context.setVelocitiesToTemperature(ref_t)
     simulation.reporters = []
-    simulation.reporters.append(CheckpointReporter(checkpoint_file, nstxout))
+    simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
     simulation.reporters.append(
         StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
@@ -124,6 +124,6 @@ else:
 # write the last frame
 lastframe = simulation.context.getState(getPositions=True).getPositions()
 PDBFile.writeFile(cgModel.topology, lastframe, open(f'{protein_code}_final.pdb', 'w'))
-simulation.saveCheckpoint(checkpoint_file)
+simulation.saveCheckpoint(checkpoint)
 
 print("--- Finished in %s seconds ---" % (time.time() - start_time))
