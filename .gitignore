@@ -1,6 +1,6 @@
-*/*.dcd
-*/*.log
-*/*.chk
+*.dcd
+*.log
+*.chk
 */__pycache__/*
 */*/__pycache__/*
 docs/_build
