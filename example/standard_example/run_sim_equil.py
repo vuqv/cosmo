@@ -89,7 +89,7 @@ if restart:
                           totalEnergy=True, temperature=True, remainingTime=True, speed=True,
                           totalSteps=md_steps, separator='\t'))
     simulation.reporters.append(
-        StateDataReporter(f'{protein_code}_prod.log', nstlog, step=True, time=True, potentialEnergy=True,
+        StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                           kineticEnergy=True,
                           totalEnergy=True, temperature=True, remainingTime=True, speed=True,
                           totalSteps=md_steps, separator='\t', append=True))
