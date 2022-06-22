@@ -5,12 +5,12 @@ import configparser
 import time
 import warnings
 from distutils.util import strtobool
+from json import loads
 from sys import stdout
 
 import numpy as np
 from openmm import *
 from openmm.app import *
-from openmm.unit import *
 from parmed.exceptions import OpenMMWarning
 
 import hps
@@ -27,14 +27,17 @@ config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
 config.read(args.input)
 params = config['DEFAULT']
 md_steps = int(params['md_steps'])
-equil_steps = int(params['equil_steps'])
-dt = float(params['dt']) * picosecond
+dt = float(params['dt']) * unit.picoseconds
 nstxout = int(params['nstxout'])
 nstlog = int(params['nstlog'])
 
-ref_t = float(params['ref_t']) * kelvin
-tau_t = float(params['tau_t']) / picosecond
+ref_t = float(params['ref_t']) * unit.kelvin
+tau_t = float(params['tau_t']) / unit.picoseconds
 pbc = strtobool(params['pbc'])
+if pbc:
+    box_dimension = loads(params['box_dimension'])
+else:
+    box_dimension = None
 
 protein_code = params['protein_code']
 checkpoint = params['checkpoint']
@@ -42,13 +45,12 @@ checkpoint = params['checkpoint']
 pdb_file = params['pdb_file']
 device = params['device']
 ppn = params['ppn']
-gen_vel = strtobool(params['gen_vel'])
 restart = strtobool(params['restart'])
 """
 End of reading parameters
 """
 # @TODO: check if use pbc then initialize hps model with pbc
-cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr')
+cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr', box_dimension=box_dimension)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')
@@ -98,12 +100,12 @@ else:
     # Production phase, create new integrator and simulation context to reset number of steps
     integrator = LangevinIntegrator(ref_t, tau_t, dt)
     simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
-    # Set initial positions: translate input coordinate
-    xyz = np.array(cgModel.positions / nanometer)
+    # Set initial positions: translate input coordinate, the coordinate is >=0
+    xyz = np.array(cgModel.positions / unit.nanometer)
     xyz[:, 0] -= np.amin(xyz[:, 0])
     xyz[:, 1] -= np.amin(xyz[:, 1])
     xyz[:, 2] -= np.amin(xyz[:, 2])
-    cgModel.positions = xyz * nanometer
+    cgModel.positions = xyz * unit.nanometer
     simulation.context.setPositions(cgModel.positions)
     simulation.context.setVelocitiesToTemperature(ref_t)
     simulation.reporters = []
@@ -119,7 +121,6 @@ else:
                           totalEnergy=True, temperature=True, remainingTime=True, speed=True,
                           totalSteps=md_steps, separator='\t', append=False))
     simulation.step(md_steps)
-
 
 # write the last frame
 lastframe = simulation.context.getState(getPositions=True).getPositions()

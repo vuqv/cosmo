@@ -158,6 +158,7 @@ class models:
             unit_cell = hps.topology.getPeriodicBoxVectors()
             # use this to write coordinate in PBC box. requires 3 numbers, unzip to 3
             hps.system.setDefaultPeriodicBoxVectors(*unit_cell)
+
         else:
             use_pbc = False
 
