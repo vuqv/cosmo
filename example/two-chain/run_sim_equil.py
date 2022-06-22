@@ -1,90 +1,130 @@
 # Import OpenMM library
-from os import system
+# Import sbmOpenMM library
+import argparse
+import configparser
 import time
+import warnings
+from distutils.util import strtobool
+from json import loads
 from sys import stdout
+
 import numpy as np
 from openmm import *
 from openmm.app import *
-from openmm.unit import *
+from parmed.exceptions import OpenMMWarning
 
 import hps
-import warnings
-from parmed.exceptions import OpenMMWarning
+
 warnings.filterwarnings("ignore", category=OpenMMWarning)
-# MD parameter
-# let's decide here now as long as we want to run the simulation and the file writing period
-mdsteps = 2000000
-dcdperiod = 1000
-logperiod = 1000
-# stage of simulation equil, prod
-stage = 'equil'
-# which platform to run simulation: CPU/GPU
-device = 'GPU'
 
-pdbname = 'asyn'
-protein_code = f'{pdbname}'
-pdb_file = f'{pdbname}.pdb'
+# Parse config file:
+parser = argparse.ArgumentParser(description="\n Usage: python run_simulation.py -f md.ini ")
+parser.add_argument('-input', '-f', type=str, help='simulation config file')
+args = parser.parse_args()
+# Reading parameters
 
-# Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
-# No PBC
-# cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr')
-# With PBC, or can call: box_dimension= [Lx, Ly, Lz]
-cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr',  minimize=True)
-if device == 'GPU':
-    # Run simulation on CUDA
-    properties = {'CudaPrecision': 'mixed'}
-    properties["DeviceIndex"] = "0";
-    platform = Platform.getPlatformByName('CUDA')
+config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
+config.read(args.input)
+params = config['DEFAULT']
+md_steps = int(params['md_steps'])
+dt = float(params['dt']) * unit.picoseconds
+nstxout = int(params['nstxout'])
+nstlog = int(params['nstlog'])
 
-elif device == 'CPU':
-    platform = Platform.getPlatformByName('CPU')
-    properties = {'Threads': str(8)}
+ref_t = float(params['ref_t']) * unit.kelvin
+tau_t = float(params['tau_t']) / unit.picoseconds
+pbc = strtobool(params['pbc'])
+if pbc:
+    box_dimension = loads(params['box_dimension'])
+else:
+    box_dimension = None
 
-integrator = LangevinIntegrator(500 * kelvin, 0.01 / picosecond, 10 * femtoseconds)
-simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
+protein_code = params['protein_code']
+checkpoint = params['checkpoint']
 
+pdb_file = params['pdb_file']
+device = params['device']
+ppn = params['ppn']
+restart = strtobool(params['restart'])
+"""
+End of reading parameters
+"""
 
-# Set initial positions
-xyz = np.array(cgModel.positions/nanometer)
-xyz[:,0] -= np.amin(xyz[:,0])
-xyz[:,1] -= np.amin(xyz[:,1])
-xyz[:,2] -= np.amin(xyz[:,2])
-xyz += 300/2
-cgModel.positions = xyz*nanometer
-simulation.context.setPositions(cgModel.positions)
-# set velocity by temperature
-simulation.context.setVelocitiesToTemperature(298 * kelvin)
+cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr', box_dimension=box_dimension)
 
-
-# # dump Forcefield File
+# dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')
 # dump Structure into PDB file for visualize
-cgModel.dumpStructure(f'{protein_code}_{stage}_init.pdb')
+cgModel.dumpStructure(f'{protein_code}_init.pdb')
 cgModel.dumpTopology(f'{protein_code}.psf')
 
+if device == 'GPU':
+    # Run simulation on CUDA
+    print(f"Running simulation on GPU CUDA")
+    platform = Platform.getPlatformByName('CUDA')
+    properties = {'CudaPrecision': 'mixed', "DeviceIndex": "0"}
+    # in case of many GPUs present, we can select which one to use
 
-# Add a DCD reporter that writes coordinates every 100 steps.
-# simulation.reporters.append(DCDReporter(f'{protein_code}_{stage}.dcd', dcdperiod, enforcePeriodicBox=True))
-simulation.reporters.append(DCDReporter(f'{protein_code}_{stage}.dcd', dcdperiod))
 
-# If we don't need too details, we can use the default reporter from OpenMM
-simulation.reporters.append(
-    StateDataReporter(stdout, logperiod, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                      totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
-                      totalSteps=mdsteps, separator='\t'))
-simulation.reporters.append(
-    StateDataReporter(f'{protein_code}_{stage}.log', logperiod, step=True, time=True, potentialEnergy=True,
-                      kineticEnergy=True,
-                      totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
-                      totalSteps=mdsteps, separator='\t'))
+elif device == 'CPU':
+    print(f"Running simulation on CPU using {ppn} cores")
+    platform = Platform.getPlatformByName('CPU')
+    properties = {'Threads': str(ppn)}
 
 print('Simulation started')
 start_time = time.time()
-simulation.step(mdsteps)
+
+if restart:
+    # simulation reporter
+    integrator = LangevinIntegrator(ref_t, tau_t, dt)
+    simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
+    simulation.loadCheckpoint(checkpoint)
+    print(
+        f"Restart from checkpoint, Time = {simulation.context.getState().getTime()}, Step= {simulation.context.getState().getStepCount()}")
+    # number of steps remain to run
+    nsteps_remain = md_steps - simulation.context.getState().getStepCount()
+    simulation.reporters = []
+    simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
+    simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
+    simulation.reporters.append(
+        StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
+                          totalSteps=md_steps, separator='\t'))
+    simulation.reporters.append(
+        StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
+                          kineticEnergy=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
+                          totalSteps=md_steps, separator='\t', append=True))
+    simulation.step(nsteps_remain)
+else:
+    # Production phase, create new integrator and simulation context to reset number of steps
+    integrator = LangevinIntegrator(ref_t, tau_t, dt)
+    simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
+    # Set initial positions: translate input coordinate, the coordinate is >=0
+    xyz = np.array(cgModel.positions / unit.nanometer)
+    xyz[:, 0] -= np.amin(xyz[:, 0])
+    xyz[:, 1] -= np.amin(xyz[:, 1])
+    xyz[:, 2] -= np.amin(xyz[:, 2])
+    cgModel.positions = xyz * unit.nanometer
+    simulation.context.setPositions(cgModel.positions)
+    simulation.context.setVelocitiesToTemperature(ref_t)
+    simulation.reporters = []
+    simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
+    simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
+    simulation.reporters.append(
+        StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
+                          totalSteps=md_steps, separator='\t'))
+    simulation.reporters.append(
+        StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
+                          kineticEnergy=True,
+                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
+                          totalSteps=md_steps, separator='\t', append=False))
+    simulation.step(md_steps)
 
 # write the last frame
 lastframe = simulation.context.getState(getPositions=True).getPositions()
-PDBFile.writeFile(cgModel.topology, lastframe, open(f'{protein_code}_{stage}_final.pdb', 'w'))
-simulation.saveCheckpoint(f'checkpoint_{stage}.chk')
+PDBFile.writeFile(cgModel.topology, lastframe, open(f'{protein_code}_final.pdb', 'w'))
+simulation.saveCheckpoint(checkpoint)
 
 print("--- Finished in %s seconds ---" % (time.time() - start_time))
