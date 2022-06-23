@@ -207,6 +207,10 @@ class system:
             Update system atoms, then add bonds between C-alpha atoms of the same chain.
             openMM load input PDB file and separate chain if encounter TER instruction. It doesn't matter if two chains
             have the same chain name.
+            This may have a vulnerable is that if two CA atom on the same chain not not consecutive, like residue
+            8 and 10 are listed consecutively on PDB input file but residue 9 was missing. The code will add bond between
+            residue 8 and 10 which cause large bond. The better solution is check the input file carefully and the logic
+            condition in code has nothing to do.
         """
         atoms = list(self.topology.atoms())
         for i in range(1, len(atoms)):
