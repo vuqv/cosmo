@@ -61,6 +61,7 @@ aa_charge = {'ALA': 0.0, 'ARG': 1.0, 'ASN': 0.0,
              'TYR': 0.0, 'VAL': 0.0}
 """
 * Kapcha-Rossy and Urry model different in charge of HIS, in Urry, HIS has charge of 0, while in KR, HIS=0.5
+
 We switch in set CA Charge function.
 Charge of the coarse-grain beads, assigns to it alpha-carbon atoms.
 Charges are determined at neutral pH (pH=7).

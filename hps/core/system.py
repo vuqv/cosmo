@@ -485,7 +485,7 @@ class system:
             \\left( 4\\epsilon\\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-
             \\left(\\frac{\\sigma_{ij}}{r}\\right)^{6}\\right]+(1-\\lambda_{ij})\\epsilon\\right)
 
-            + \\left[1-step(2^{1/6}\\sigma_{ij}-r)\\right]\\times\\left[(\\lambda_{ij})\\times 4\\pi
+            + \\left[1-step(2^{1/6}\\sigma_{ij}-r)\\right]\\times\\left[(\\lambda_{ij})\\times 4\\epsilon
             \\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-\\left(\\frac{\\sigma_{ij}}{r}\\right)^6\\right]\\right]
 
 
