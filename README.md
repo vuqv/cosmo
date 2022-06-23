@@ -4,28 +4,42 @@
 
 This is a repository contains the source code of hps-urry/kr model.
 
- ```hps: hydropathy scale. ```
- ```urry: Hydropathy according to Urry scale.```
-```kr: Kapcha-Rossy scale```
-## requirements:
-- **OpenMM 7.x**  
+ `hps:` hydropathy scale. Currently, there are two models are supported: 
+
+ 1) `urry:` Hydropathy according to Urry scale.
+ 2) `kr:`  Kapcha-Rossy scale (default). This model has parameters for nucleic acids but not implemented here yet,
+they are currently in the different repository (translation code)
+-------------------------------------
+## Requirements:
+- **OpenMM 7.7**  
 - **Parmed** 
 
 ## How to use hpsOpenMM:  
-- Download folder and place in target location, for example: `/home/qvuvan/work3/code/hpsOpenMM/`
-- Add folder in Python path (in .bashrc file): `export PYTHONPATH=$PYTHONPATH:/home/qvuvan/work3/code/hpsOpenMM/`  
-- The standard example can be found at ```example/standard_example```
+#### Linux:
+- Download folder and place in target location, for example: `PATH_TO_CODE/hpsOpenMM/`
+- Add folder in Python path (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`  
+- The standard example can be found at `example/standard_example`
 
-- *Note that in cluster, when submit job, the environment may not load `.bashrc` so need to add export command in job file* 
+#### Windows:
+- No idea (no time to test) !!!
 
+#### MacOS:
+- No money to test !!!
+
+## Notes:
+- *Note that in cluster, when submit job, the environment may not load `.bashrc`, so need to add export command in job file:* 
+`example on job file`
+
+-------------------------------------
 ## Bugs
-- If you encounter any bugs, please report the issue to Quyen Vu (```vuqv.phys@gmail.com```)
+- If you encounter any bugs, please report the issue to Quyen Vu (`vuqv.phys@gmail.com`)
 
 ## Acknowledgments
-
-- We would like to thank the OpenMM team for developing an excellent and open source engine. 
-- We would like to thank the SBMOpenMM's developer team for developing an excellent model and open sourcing the software. 
-- We also would like to thank Sugita's group to make a clear tutorial to introduce many features of OpenMM
+We would like to thank:
+- OpenMM team for developing an excellent and open source engine. 
+- SBMOpenMM's developer team for developing an excellent model and open sourcing the software. 
+- Sugita's group to make a clear tutorial to introduce many features of OpenMM
+- OpenMM Github community for many useful discussions
 
 ## Do you want to cite this work?
 - We will make this source code open to everyone to use.

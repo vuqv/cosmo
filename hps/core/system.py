@@ -112,7 +112,7 @@ class system:
         Sets alpha carbon atoms to their average residue mass. Used specially for
         modifying alpha-carbon (CA) coarse-grained models.
     setCAHPSPerResidueType()
-        Sets alpha carbon atoms to their residue Urry Hydropathy scale. Used specially for
+        Sets alpha carbon atoms to their residue hydropathy scale. Used specially for
         modifying alpha-carbon (CA) coarse-grained models.
     """
 
@@ -124,7 +124,8 @@ class system:
         ----------
         structure_path : string
             Name of the input PDB or CIF file
-
+        hps_scale: 'kr','urry'
+            Hydropathy scale. Currently, there are two models are supported.
         Returns
         -------
         None
@@ -653,7 +654,7 @@ class system:
 
         # minimized = False
         print('_________________________________')
-        print('Energy minimization:')
+        print('Energy from initial structure (input structure):')
 
         # Define test simulation to extract forces
         integrator = LangevinIntegrator(1 * unit.kelvin, 1 / unit.picosecond, 0.0005 * unit.picoseconds)
@@ -670,6 +671,8 @@ class system:
         print('')
 
         if minimize:
+            print('      ___________________      ')
+            print('Perform energy minimization ...:')
             # Find if there is an acting force larger than threshold
             # minimize the system until forces have converged
             forces = [np.linalg.norm([f[0]._value, f[1]._value, f[2]._value]) for f in state.getForces()]
@@ -698,7 +701,7 @@ class system:
                 elif tolerance > 0.1:
                     tolerance -= 0.1
                 elif tolerance == 0.1:
-                    raise ValueError('The system could no be minimized at the requested convergence\n' +
+                    raise ValueError('The system could not be minimized at the requested convergence\n' +
                                      'Try to increase the force threshold value to achieve convergence.')
 
             print('______________________')
@@ -878,98 +881,6 @@ class system:
                                                                   atom2.name + '_' + res2.name + '_' + str(
                                                                       res2.index + 1)))
 
-    def loadForcefieldFromFile(self, forcefield_file):
-        """
-        Loads force field parameters from a force field file written by the
-        :code:`dumpForceFieldData()` method into the hpsOpenMM system.
-
-        NOTE: I still keep this function since I think I will use it later.
-        I have not customized this function yet so do not use :code:`loadForcefieldFromFile()` function in simulation.
-        Just keep here for prototype and customize later...
-
-        Parameters
-        ----------
-        forcefield_file : string
-            path to the force field file.
-
-        Returns
-        -------
-        None
-        """
-
-        # Open forcefield file
-        with open(forcefield_file, 'r') as ff:
-            print('Reading Forcefield parameters from file ' + forcefield_file + ':')
-            print('________________________________________' + '_' * len(forcefield_file))
-
-            # Initialize ff-file section booleans to 0
-            atoms = False
-            bonds = False
-
-            # Iterate for all lines in forcefield file
-            for i, line in enumerate(ff):
-
-                # Ignore comment and empty lines.
-                if not line.startswith('#') and line.split() != []:
-
-                    # Turn off all sections when a new is being reading.
-                    if line.startswith('['):
-                        atoms = False
-                        bonds = False
-
-                    else:
-
-                        # Remove comments at the end of line
-                        line = line[:line.find('#')]
-                        ls = line.split()
-
-                        # Reading [atoms] section
-                        if atoms:
-                            if not isinstance(self.particles_mass, list):
-                                self.particles_mass = [1.0 for m in range(self.n_atoms)]
-                            if not isinstance(self.rf_sigma, list):
-                                self.rf_sigma = [0 for s in range(self.n_atoms)]
-                            if len(ls) > 3:
-                                raise ValueError('More than three parameters given in [atoms] section at line ' + str(
-                                    i) + ':\n' + line)
-                            if len(ls) < 3:
-                                raise ValueError('Less than three parameters given in [atoms] section at line ' + str(
-                                    i) + ':\n' + line)
-
-                            # Check if ff atom index is the same as openmm atom index
-                            assert int(ls[0]) - 1 == self.atoms[int(ls[0]) - 1].index
-
-                            # Save mass and sigma values into list
-                            self.particles_mass[int(ls[0]) - 1] = float(ls[1])
-                            self.rf_sigma[int(ls[0]) - 1] = float(ls[2])
-
-                        # Reading [bonds] section
-                        if bonds:
-                            if len(ls) > 4:
-                                raise ValueError('More than four parameters given in [bonds] section at line ' + str(
-                                    i) + ':\n' + line)
-                            if len(ls) < 4:
-                                raise ValueError('Less than four parameters given in [bonds] section at line ' + str(
-                                    i) + ':\n' + line)
-                            at1 = self.atoms[int(ls[0]) - 1]
-                            at2 = self.atoms[int(ls[1]) - 1]
-                            bond_length = float(ls[2]) * unit.nanometer
-                            k = float(ls[3])
-                            self.bonds[(at1, at2)] = (bond_length, k)
-
-                    # Select which section is being reading by changing it's boolean to 1
-                    if line.startswith('[atoms]'):
-                        print('Reading atom parameters')
-                        self.bonds = OrderedDict()
-                        atoms = True
-                    elif line.startswith('[bonds]'):
-                        print('Reading bond parameters')
-                        self.bonds = OrderedDict()
-                        bonds = True
-
-        print('Done reading Forcefield parameters')
-        print('')
-
     def setCAMassPerResidueType(self):
         """
         Sets the masses of the alpha carbon atoms to the average mass
@@ -1030,9 +941,7 @@ class system:
 
         Parameters
         ----------
-        hps_scale : String
-            'kr': Kapcha-Rossy scale
-            'urry': Urry scale
+
 
         Returns
         -------
@@ -1082,6 +991,7 @@ class system:
     def _setParameters(term, parameters):
         """
         General function to set up or change force field parameters.
+        protected method, can be called only inside class system.
 
         Parameters
         ----------
@@ -1112,3 +1022,8 @@ class system:
             assert len(parameters) == len(list(term.keys()))
             for i, item in enumerate(term):
                 term[item] = term[item][:-1] + (parameters[i],)
+
+
+"""
+End of class system. Happy simulating ...
+"""

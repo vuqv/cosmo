@@ -1,5 +1,5 @@
 # Import OpenMM library
-# Import sbmOpenMM library
+# Import hpsOpenMM library
 import argparse
 import configparser
 import time
@@ -21,11 +21,11 @@ warnings.filterwarnings("ignore", category=OpenMMWarning)
 parser = argparse.ArgumentParser(description="\n Usage: python run_simulation.py -f md.ini ")
 parser.add_argument('-input', '-f', type=str, help='simulation config file')
 args = parser.parse_args()
-# Reading parameters
 
 config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
 config.read(args.input)
 params = config['DEFAULT']
+# Reading parameters
 md_steps = int(params['md_steps'])
 dt = float(params['dt']) * unit.picoseconds
 nstxout = int(params['nstxout'])
