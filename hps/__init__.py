@@ -25,5 +25,5 @@ The library is open-source and offers flexibility.
 from .core import geometry
 from .core import models
 from .core import system
-from .parameters import ca_parameters
+from .parameters import model_parameters
 from .reporter import sbmReporter

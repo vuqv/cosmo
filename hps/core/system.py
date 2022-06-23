@@ -8,8 +8,9 @@ import parmed as pmd
 from openmm import *
 from openmm.app import *
 
-from ..parameters import ca_parameters
-from ..parameters import simple_parameters
+# from ..parameters import ca_parameters
+from ..parameters import model_parameters
+
 
 class system:
     """
@@ -149,7 +150,7 @@ class system:
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
-        self.bond_length = simple_parameters.bond_length[hps_scale]
+        self.bond_length = model_parameters.bond_length[hps_scale]
         self.bondedTo = None
         self.bonded_exclusions_index = 1
 
@@ -374,9 +375,9 @@ class system:
 
     def setParticlesHPS(self, particles_hps):
         """
-        Set the charge of the particles in the system. The input can be a
-        float, to set the same charge for all particles, or a list, to define
-        a unique charge for each particle.
+        Set the hydropathy scale of the particles in the system. The input can be a
+        float, to set the same hydropathy for all particles, or a list, to define
+        a unique hydropathy for each particle.
 
         Parameters
         ----------
@@ -457,6 +458,7 @@ class system:
             self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
         else:
             self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+
         self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
         if isinstance(self.particles_charge, float):
@@ -981,10 +983,8 @@ class system:
         -------
         None
         """
-        params = simple_parameters.parameters[self.hps_scale]
         # Load mass parameters from parameters package
-        # aa_masses = ca_parameters.aa_masses
-
+        params = model_parameters.parameters[self.hps_scale]
         masses = []
         for r in self.topology.residues():
             if r.name in params:
@@ -1010,7 +1010,7 @@ class system:
         """
 
         # Load radii from parameters package
-        params = simple_parameters.parameters[self.hps_scale]
+        params = model_parameters.parameters[self.hps_scale]
 
         radii = []
 
@@ -1040,15 +1040,14 @@ class system:
         """
 
         # Load charge from parameters package
-        params = simple_parameters.parameters[self.hps_scale]
+        params = model_parameters.parameters[self.hps_scale]
         charge = []
 
         for r in self.topology.residues():
             if r.name in params:
                 charge.append(params[r.name]['charge'])
-                print(f"{r.name}: {params[r.name]['charge']}")
             else:
-                raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
+                raise ValueError('Residue ' + r.name + ' not found in charge dictionary.')
 
         self.setParticlesCharge(charge)
 
@@ -1066,7 +1065,7 @@ class system:
         """
 
         # Load hydropathy scale from parameters package
-        params = simple_parameters.parameters[self.hps_scale]
+        params = model_parameters.parameters[self.hps_scale]
 
         hps = []
 
@@ -1074,7 +1073,7 @@ class system:
             if r.name in params:
                 hps.append(params[r.name]['hps'])
             else:
-                raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
+                raise ValueError('Residue ' + r.name + ' not found in hps dictionary.')
 
         self.setParticlesHPS(hps)
 
