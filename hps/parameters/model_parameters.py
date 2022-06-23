@@ -1,3 +1,9 @@
+"""
+Dictionary contains parameters for hps model.
+First level is the model name
+
+"""
+
 parameters = {
     "kr": {
         "ALA": {
@@ -72,6 +78,12 @@ parameters = {
             "charge": 1.0,
             "hps": 0.514
         },
+        "ALY": {
+            "mass": 170.20,
+            "radii": 0.681,
+            "charge": 0.0,
+            "hps": 0.7567
+        },  # N-epsilon acetyllysine
         "MET": {
             "mass": 131.20,
             "radii": 0.618,
@@ -96,12 +108,24 @@ parameters = {
             "charge": 0.0,
             "hps": 0.595
         },
+        "SEP": {
+            "mass": 165.03,
+            "radii": 0.636,
+            "charge": -2.0,
+            "hps": 0.162
+        },  # phosposerine: phosphorylation of serine
         "THR": {
             "mass": 101.10,
             "radii": 0.562,
             "charge": 0.0,
             "hps": 0.676
         },
+        "TPO": {
+            "mass": 179.05,
+            "radii": 0.662,
+            "charge": -2.0,
+            "hps": 0.0081
+        },  # Phosphothreonine:  phosphorylation of Threonine
         "TRP": {
             "mass": 186.20,
             "radii": 0.678,
@@ -114,6 +138,12 @@ parameters = {
             "charge": 0.0,
             "hps": 0.865
         },
+        "PTR": {
+            "mass": 241.15,
+            "radii": 0.738,
+            "charge": -2.0,
+            "hps": 0.189
+        },  # phosphotyrosine
         "VAL": {
             "mass": 99.07,
             "radii": 0.586,
@@ -248,14 +278,34 @@ parameters = {
 bond_length = dict(kr=0.38, urry=0.382)
 
 """
+* HPS-Kr scale was taken from:
+Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018). 
+Sequence determinants of protein phase behavior from a coarse-grained model. 
+PLoS Computational Biology, 1–23. 
+https://doi.org/10.1101/238170
+
+* Parameter for Nucleic acids (KR scale):
+Regy, R. M., Dignon, G. L., Zheng, W., Kim, Y. C., Mittal, J. (2020). 
+Sequence dependent phase separation of protein-polynucleotide mixtures elucidated using molecular simulations. 
+Nucleic Acids Research, 48(22), 12593–12603. 
+https://doi.org/10.1093/nar/gkaa1099
+
+* Phosphorylation version of some residues for KR scale are taken from:
+Perdikari, T. M., Jovic, N., Dignon, G. L., Kim, Y. C., Fawzi, N. L.,  Mittal, J. (2021). 
+A predictive coarse-grained model for position-specific effects of post-translational modifications. <i>Biophysical Journal</i>, <i>120</i>(7), 1187–1197. 
+https://doi.org/10.1016/j.bpj.2021.01.034
+
+
+-----------------------------------------------
 Note on hps (lambda) in urry scale:
 
 # These parameters were shifted by 0.08 from original parameters directly.
 
 in the original paper: 
-Regy, R. M., Thompson, J., Kim, Y. C., &#38; Mittal, J. (2021). 
+Regy, R. M., Thompson, J., Kim, Y. C., ; Mittal, J. (2021). 
 Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins.
 Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
+
 lambda_ij = muy*lambda0_ij -delta
 where muy=1, delta= 0.08 is the optimal set for the set of 42 proteins they studied.
 lambda_ij = lambda0_ij - 0.08 = 0.5*(lambda_i+lambda_j) - 0.08 = 0.5(lambda_i -0.08 + lambda_j-0.08)
