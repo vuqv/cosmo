@@ -95,7 +95,7 @@ class models:
         # Set up geometric parameters of the model
         print('Setting up geometrical parameters:')
         print('_________________________________')
-        hps = system(structure_file)
+        hps = system(structure_file, hps_scale)
         print('Keeping only alpha carbon atoms in topology')
         hps.getCAlphaOnly()
         hps.getAtoms()
@@ -114,16 +114,11 @@ class models:
 
             if residue_charge:
                 print("Setting alpha-carbon charge to their residue charge.")
-                hps.setCAChargePerResidueType(hps_scale)
+                hps.setCAChargePerResidueType()
 
             if residue_hps:
-                print("Setting hydropathy scale to their residue.")
-                if hps_scale == 'urry':
-                    print("Using Urry scale.")
-                    hps.setCAHPSUrryPerResidueType()
-                if hps_scale == 'kr':
-                    print("Using Kapcha-Rossy scale.")
-                    hps.setCAHPSKRPerResidueType()
+                print(f"Setting hydropathy scale to their residue, Using {hps_scale} scale.")
+                hps.setCAHPSPerResidueType()
 
             hps.getBonds()
             print('Added ' + str(hps.n_bonds) + ' bonds')

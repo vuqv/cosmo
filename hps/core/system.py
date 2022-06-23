@@ -2,14 +2,14 @@
 # coding: utf-8
 
 from collections import OrderedDict
-
+import json
 import numpy as np
 import parmed as pmd
 from openmm import *
 from openmm.app import *
 
 from ..parameters import ca_parameters
-
+from ..parameters import simple_parameters
 
 class system:
     """
@@ -115,7 +115,7 @@ class system:
         modifying alpha-carbon (CA) coarse-grained models.
     """
 
-    def __init__(self, structure_path):
+    def __init__(self, structure_path, hps_scale):
         """
         Initialises the hps OpenMM system class.
 
@@ -142,14 +142,14 @@ class system:
         self.topology = self.structure.topology
         self.positions = self.structure.positions
         self.particles_mass = None
-
+        self.hps_scale = hps_scale
         # Define geometric attributes
         self.atoms = []
         self.n_atoms = None
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
-        self.bond_length = 0.38
+        self.bond_length = simple_parameters.bond_length[hps_scale]
         self.bondedTo = None
         self.bonded_exclusions_index = 1
 
@@ -981,14 +981,14 @@ class system:
         -------
         None
         """
+        params = simple_parameters.parameters[self.hps_scale]
         # Load mass parameters from parameters package
-        aa_masses = ca_parameters.aa_masses
+        # aa_masses = ca_parameters.aa_masses
 
         masses = []
-
         for r in self.topology.residues():
-            if r.name in aa_masses:
-                masses.append(aa_masses[r.name])
+            if r.name in params:
+                masses.append(params[r.name]['mass'])
             else:
                 raise ValueError('Residue ' + r.name + ' not found in masses dictionary.')
 
@@ -1010,19 +1010,19 @@ class system:
         """
 
         # Load radii from parameters package
-        aa_radii = ca_parameters.aa_radii
+        params = simple_parameters.parameters[self.hps_scale]
 
         radii = []
 
         for r in self.topology.residues():
-            if r.name in aa_radii:
-                radii.append(aa_radii[r.name])
+            if r.name in params:
+                radii.append(params[r.name]['radii'])
             else:
                 raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
 
         self.setParticlesRadii(radii)
 
-    def setCAChargePerResidueType(self, hps_scale):
+    def setCAChargePerResidueType(self):
         """
         Sets the charge of the alpha carbon atoms
         to characteristic charge of their corresponding amino acid
@@ -1040,23 +1040,21 @@ class system:
         """
 
         # Load charge from parameters package
-        aa_charge = ca_parameters.aa_charge
-        if hps_scale == 'kr':
-            aa_charge['HIS'] = 0.5
-
+        params = simple_parameters.parameters[self.hps_scale]
         charge = []
 
         for r in self.topology.residues():
-            if r.name in aa_charge:
-                charge.append(aa_charge[r.name])
+            if r.name in params:
+                charge.append(params[r.name]['charge'])
+                print(f"{r.name}: {params[r.name]['charge']}")
             else:
                 raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
 
         self.setParticlesCharge(charge)
 
-    def setCAHPSUrryPerResidueType(self):
+    def setCAHPSPerResidueType(self):
         """
-        Sets the HPS-Urry model of the alpha carbon atoms.
+        Sets the HPS model of the alpha carbon atoms using corresponding scale.
 
         Parameters
         ----------
@@ -1068,39 +1066,13 @@ class system:
         """
 
         # Load hydropathy scale from parameters package
-        aa_hps = ca_parameters.aa_hps_urry
+        params = simple_parameters.parameters[self.hps_scale]
 
         hps = []
 
         for r in self.topology.residues():
-            if r.name in aa_hps:
-                hps.append(aa_hps[r.name])
-            else:
-                raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
-
-        self.setParticlesHPS(hps)
-
-    def setCAHPSKRPerResidueType(self):
-        """
-        use of HPS-KR scale of the alpha carbon atoms.
-
-        Parameters
-        ----------
-
-
-        Returns
-        -------
-        None
-        """
-
-        # Load hydropathy scale from parameters package
-        aa_hps = ca_parameters.aa_hps_kr
-
-        hps = []
-
-        for r in self.topology.residues():
-            if r.name in aa_hps:
-                hps.append(aa_hps[r.name])
+            if r.name in params:
+                hps.append(params[r.name]['hps'])
             else:
                 raise ValueError('Residue ' + r.name + ' not found in radii dictionary.')
 
