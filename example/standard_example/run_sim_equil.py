@@ -46,11 +46,15 @@ pdb_file = params['pdb_file']
 device = params['device']
 ppn = params['ppn']
 restart = strtobool(params['restart'])
+if not restart:
+    minimize = strtobool(params['minimize'])
+else:
+    minimize = False
 """
 End of reading parameters
 """
 
-cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr', box_dimension=box_dimension)
+cgModel = hps.models.getCAModel(pdb_file, minimize=minimize, hps_scale='kr', box_dimension=box_dimension)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

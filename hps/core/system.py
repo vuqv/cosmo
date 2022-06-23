@@ -210,7 +210,6 @@ class system:
         """
         atoms = list(self.topology.atoms())
         for i in range(1, len(atoms)):
-            print(atoms[i].residue, atoms[i].residue.chain)
             if atoms[i].residue.chain == atoms[i - 1].residue.chain:
                 self.topology.addBond(atoms[i - 1], atoms[i])
 
