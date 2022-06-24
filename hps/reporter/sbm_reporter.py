@@ -59,8 +59,8 @@ class sbmReporter(StateDataReporter):
 
         headers = super()._constructHeaders()
         if isinstance(self._sbmObject, system):
-            for i,n in enumerate(self._sbmObject.forceGroups):
-                 headers.append(n+' (kJ/mol)')
+            for i, n in enumerate(self._sbmObject.forceGroups):
+                headers.append(n + ' (kJ/mol)')
 
         return headers
 
@@ -81,10 +81,13 @@ class sbmReporter(StateDataReporter):
         values = super()._constructReportValues(simulation, state)
 
         if isinstance(self._sbmObject, system):
-            for i,n in enumerate(self._sbmObject.forceGroups):
-                values.append(simulation.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole))
+            for i, n in enumerate(self._sbmObject.forceGroups):
+                values.append(
+                    simulation.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
+                        unit.kilojoules_per_mole))
 
         return values
+
 
 def readOpenMMReporterFile(reporter_file):
     """
@@ -100,8 +103,8 @@ def readOpenMMReporterFile(reporter_file):
         lines = ef.readlines()
         data = {}
         for r in lines[0].split(','):
-            data[r.replace('#','').replace('"','').strip()] = []
-        for i,r in enumerate(data):
+            data[r.replace('#', '').replace('"', '').strip()] = []
+        for i, r in enumerate(data):
             for line in lines[1:]:
                 data[r].append(float(line.strip().split(',')[i]))
     return data

@@ -1,2 +1,8 @@
+#TODO: refactor buildHPSModel function in model class to __init__()
+    when calling model:hps.models.buildHPSModel(pdb_file, minimize=minimize, hps_scale='kr', box_dimension=box_dimension)
+    will be change to: hps.models(pdb_file, minimize=minimize, hps_scale='kr', box_dimension=box_dimension)
+
 #TODO: implement temperature-dependent of hydropathy scale (lambda) for KR model
+    using set of equations (7)-which known as HPS-T
+
 #TODO: check temperature of screening length in electrostatic interactions
