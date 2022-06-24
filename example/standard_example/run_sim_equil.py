@@ -41,11 +41,8 @@ else:
 
 protein_code = params['protein_code']
 checkpoint = params['checkpoint']
-
 pdb_file = params['pdb_file']
-
 machine = params['machine']
-
 device = params['device']
 ppn = params['ppn']
 restart = strtobool(params['restart'])
