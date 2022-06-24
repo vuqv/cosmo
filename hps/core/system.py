@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from collections import OrderedDict
-import json
+
 import numpy as np
 import parmed as pmd
 from openmm import *
@@ -613,7 +613,7 @@ class system:
         -------
         None
         """
-        print('checking large bonds ...')
+        print('Checking large bonds ...')
         if isinstance(threshold, float):
             threshold = threshold * unit.nanometer
 
@@ -632,7 +632,7 @@ class system:
         print(f'All bonds seem to be OK (less than threshold: {threshold})')
         print('')
 
-    def checkLargeForces(self, threshold=1, minimize=False):
+    def checkLargeForces(self, minimize=False, threshold=10):
         """
         Prints the hps system energies of the input configuration of the
         system. It optionally checks for large forces acting upon all
@@ -641,7 +641,7 @@ class system:
 
         Parameters
         ----------
-        threshold : float
+        threshold : float (10)
             Threshold to check for large forces.
         minimize : float
             Whether to iteratively minimize the system until all forces are lower or equal to
@@ -671,8 +671,8 @@ class system:
         print('')
 
         if minimize:
-            print('      ___________________      ')
-            print('Perform energy minimization ...:')
+            print('_________________________________')
+            print('Perform energy minimization ...')
             # Find if there is an acting force larger than threshold
             # minimize the system until forces have converged
             forces = [np.linalg.norm([f[0]._value, f[1]._value, f[2]._value]) for f in state.getForces()]
@@ -704,6 +704,7 @@ class system:
                     raise ValueError('The system could not be minimized at the requested convergence\n' +
                                      'Try to increase the force threshold value to achieve convergence.')
 
+            print('All forces are less than %.2f kj/mol/nm' % threshold)
             print('______________________')
             state = sim.context.getState(getPositions=True, getEnergy=True)
             print('After minimisation:')
@@ -712,12 +713,12 @@ class system:
                 energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                     unit.kilojoules_per_mole)
                 print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
-            print('All forces are less than %.2f kj/mol/nm' % threshold)
-            print('')
-            print('______________________')
-            print('Saving minimized positions')
+
             print('')
             self.positions = state.getPositions()
+            print('Saving minimized positions')
+            print('______________________')
+            print('')
 
     def addParticles(self):
         """
@@ -809,6 +810,14 @@ class system:
         top = pmd.openmm.load_topology(self.topology, self.system)
         for i, a in enumerate(top.atoms):
             a.mass, a.charge = self.particles_mass[i], self.particles_charge[i]
+
+        """
+        Parmed know exactly what chain is but it doesn't use to write psf. Instead, it writes segid (1-letter)
+        to distinguish between segment, and PSF file does not has chain identifier.
+        What we will do here is copy chain ID to segID so that Parmed can write a meaningful psf.
+        """
+        for r in top.residues:
+            r.segid = r.chain
         top.save(f'{output_file}', overwrite=True)
 
     def dumpForceFieldData(self, output_file):
