@@ -27,8 +27,10 @@ they are currently in the different repository (translation code)
 - No money to test !!!
 
 ## Notes:
-- *Note that in cluster, when submit job, the environment may not load `.bashrc`, so need to add export command in job file:* 
-`example on job file`
+- *Note that in cluster, when submit job, the environment may not load `.bashrc`, so need to 
+load conda environment in job file:* 
+`source PATH_TO_ANNACONDA/anaconda3/etc/profile.d/conda.sh`
+- Activate environment (e.g py310): `conda activate py310`
 
 -------------------------------------
 ## Bugs
