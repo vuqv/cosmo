@@ -26,13 +26,13 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = u'HPS'
-copyright = u'2021, Quyen Vu'
+copyright = u'2022, Quyen Vu'
 author = u'Quyen Vu'
 
 # The short X.Y version
-version = '2021.0'
+version = '2022.0'
 # The full version, including alpha/beta/rc tags
-release = 'v1.0'
+release = 'v1.2'
 
 # -- General configuration ---------------------------------------------------
 
@@ -235,9 +235,3 @@ html_context['github_repo'] = 'rtd-github-pages'
 html_context['github_version'] = 'main/docs/'
 
 
-from pprint import pformat
-def object_description(object) -> str:
-    return pformat(object, indent=4)
-
-from sphinx.util import inspect
-inspect.object_description = object_description
