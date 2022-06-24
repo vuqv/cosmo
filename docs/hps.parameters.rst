@@ -7,7 +7,7 @@ Submodules
 hps.parameters.ca\_parameters module
 ------------------------------------
 
-.. automodule:: hps.parameters.ca_parameters
+.. automodule:: hps.parameters.model_parameters
    :members:
    :undoc-members:
    :show-inheritance:

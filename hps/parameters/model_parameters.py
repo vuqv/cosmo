@@ -149,6 +149,31 @@ parameters = {
             "radii": 0.586,
             "charge": 0.0,
             "hps": 0.892
+        },
+        # Parameters for RNA (KR scale from OPLS-AA forcefield)
+        "A": {
+            "mass": 329.20,
+            "radii": 0.844,
+            "charge": -1.0,
+            "hps": -0.054
+        },
+        "C": {
+            "mass": 305.2,
+            "radii": 0.822,
+            "charge": -1.0,
+            "hps": -0.027
+        },
+        "G": {
+            "mass": 345.2,
+            "radii": 0.851,
+            "charge": -1.0,
+            "hps": -0.189,
+        },
+        "U": {
+            "mass": 306.2,
+            "radii": 0.817,
+            "charge": -1.0,
+            "hps": -0.027
         }
     },
     "urry": {
@@ -275,7 +300,7 @@ parameters = {
     }
 }
 
-bond_length = dict(kr=0.38, urry=0.382)
+bond_length = dict(kr=0.38, urry=0.382, nucleic=0.5)
 
 """
 * HPS-Kr scale was taken from:
