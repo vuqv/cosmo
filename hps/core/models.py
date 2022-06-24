@@ -11,22 +11,22 @@ class models:
     Methods
     -------
 
-    getCAModel(structure_file, kwarg**)
-        Creates an alpha-carbon only hpsOpenMM system class object with default
+    buildHPSModel(structure_file, kwarg**)
+        Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
         initialized parameters.
 
     """
 
-    def getCAModel(structure_file,
-                   create_system=True,
-                   minimize=False,
-                   residue_masses=True,
-                   residue_radii=True,
-                   residue_charge=True,
-                   residue_hps=True,
-                   hps_scale='kr',
-                   box_dimension=None,
-                   forcefield_file=None):
+    def buildHPSModel(structure_file,
+                      create_system=True,
+                      minimize=False,
+                      residue_masses=True,
+                      residue_radii=True,
+                      residue_charge=True,
+                      residue_hps=True,
+                      hps_scale='kr',
+                      box_dimension=None,
+                      forcefield_file=None):
         """
         Initialises a coarse-grained, carbon alpha (CA), hpsOpenMM system class
         from a structure and a contact file defining the native contacts for the
@@ -86,7 +86,7 @@ class models:
 
         Returns
         -------
-        hps : hpsOpenMM.system
+        hps : :code:`hpsOpenMM.system`
             Initialized hpsOpenMM.system class with default options for defining
             a coarse-grained CA force field.
         """

@@ -54,7 +54,7 @@ else:
 End of reading parameters
 """
 
-cgModel = hps.models.getCAModel(pdb_file, minimize=minimize, hps_scale='kr', box_dimension=box_dimension)
+cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, hps_scale='kr', box_dimension=box_dimension)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

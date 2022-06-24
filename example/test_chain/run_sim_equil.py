@@ -27,9 +27,9 @@ pdb_file = f'{pdbname}.pdb'
 
 # Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
 # No PBC
-# cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr')
+# cgModel = hps.models.buildHPSModel(pdb_file, hps_scale='kr')
 # With PBC, or can call: box_dimension= [Lx, Ly, Lz]
-cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr', box_dimension= 30)
+cgModel = hps.models.buildHPSModel(pdb_file, hps_scale='kr', box_dimension= 30)
 if device == 'GPU':
     # Run simulation on CUDA
     platform = Platform.getPlatformByName('CUDA')

@@ -50,7 +50,7 @@ restart = strtobool(params['restart'])
 End of reading parameters
 """
 
-cgModel = hps.models.getCAModel(pdb_file, hps_scale='kr', box_dimension=box_dimension)
+cgModel = hps.models.buildHPSModel(pdb_file, hps_scale='kr', box_dimension=box_dimension)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

@@ -187,7 +187,7 @@ class system:
 
     def getCAlphaOnly(self):
         """
-        Keeps in the hps system only the alpha carbon atoms from the OpenMM topology.
+        Keeps in the :code:`hps system` only the alpha carbon atoms from the :code:`OpenMM topology`.
 
         Parameters
         ----------
@@ -227,11 +227,11 @@ class system:
 
     def getAtoms(self):
         """
-        Adds atoms in the OpenMM topology instance to the hpsOpenMM system class.
+        Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
 
         Parameters
         ----------
-
+        None
 
         Returns
         -------
@@ -254,11 +254,11 @@ class system:
 
     def getBonds(self, except_chains=None):
         """
-        Adds bonds in the OpenMM topology instance to the hpsOpenMM system class.
+        Adds :code:`bonds` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
 
         Parameters
         ----------
-        except_chains: String
+        except_chains: String [optional]
 
         Returns
         -------
@@ -799,13 +799,14 @@ class system:
         Writes a file containing the current topology in the
         hpsOpenMM system. This file contains topology of system, used in visualization and analysis.
 
-        Here, we used :code:`parmed` to load openMM topology, openMM system to create Structure object in parmed.
-        Because parmed automatically recognizes charge, mass of atoms by their name.
-        We need to set charge, mass back to residues properties.
+        Here, we used :code:`parmed` to load :code:`openMM topology` and :code:`openMM system` to create
+        :code:`Structure` object in :code:`parmed`.
+        Because parmed doesn't automatically recognize :code:`charge`, :code:`mass` of atoms by their name.
+        We need to set :code:`charge`, :code:`mass` back to residues properties.
 
         Parameters
         ----------
-        output_file : string
+        output_file : string [requires]
             name of the output PSF file.
 
         Returns
@@ -833,7 +834,7 @@ class system:
 
         Parameters
         ----------
-        output_file : string
+        output_file : string [requires]
             name of the output file.
 
         Returns
@@ -903,7 +904,7 @@ class system:
 
         Parameters
         ----------
-
+        None
 
         Returns
         -------
@@ -928,6 +929,7 @@ class system:
 
         Parameters
         ----------
+        None
 
 
         Returns
@@ -956,7 +958,7 @@ class system:
 
         Parameters
         ----------
-
+        None
 
         Returns
         -------
@@ -981,7 +983,7 @@ class system:
 
         Parameters
         ----------
-
+        None
 
         Returns
         -------
