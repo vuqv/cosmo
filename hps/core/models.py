@@ -56,7 +56,7 @@ class models:
 
         Parameters
         ----------
-        structure_file : string
+        structure_file : string [requires]
             Path to the input structure file.
         create_system : boolean (True)
             If True the function will call the createSystemObject() method
@@ -76,11 +76,12 @@ class models:
             HPS scale. There are two options correspond to two scale:
             'urry': using Urry scale
             'kr': using Kapcha-Rossy scale (default).
-        box_dimension : float or array
+        box_dimension : float or array (None)
+            If box_dimension is supplied, then will use PBC.
             if float is given, then use cubic box
             if an array of (3,1) is given, then use rectangular box with the given dimension
             if not specify: do not use PBC
-        forcefield_file : string
+        forcefield_file : string (None)
             Path to the input forcefield file.
 
         Returns

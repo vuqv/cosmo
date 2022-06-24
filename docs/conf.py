@@ -18,6 +18,8 @@ import os
 import sys
 import sphinx
 import sphinx_rtd_theme
+
+
 sys.path.insert(0, os.path.abspath('..'))
 
 
@@ -231,3 +233,11 @@ html_context['display_github'] = True
 html_context['github_user'] = 'qvv5013'
 html_context['github_repo'] = 'rtd-github-pages'
 html_context['github_version'] = 'main/docs/'
+
+
+from pprint import pformat
+def object_description(object) -> str:
+    return pformat(object, indent=4)
+
+from sphinx.util import inspect
+inspect.object_description = object_description

@@ -17,10 +17,16 @@ class system:
     A class containing methods and parameters for generating CG systems to be simulated using the OpenMM interface.
     It offers flexibility to create default and custom CG systems and to easily modify their parameters.
 
+    Parameters
+    ----------
+        structure_path : string [requires]
+            Name of the input PDB or CIF file
+        hps_scale: 'kr','urry' [optional, default='kr']
+            Hydropathy scale. Currently, there are two models are supported.
+
     Attributes
     ----------
-    structure_path : :code:`string`
-        Path to the pdb or cif input file.
+
     structure : :code:`openmm.app.pdbfile.PDBFile or openmm.app.pdbxfile.PDBxFile`
         Object that holds the information of OpenMM PDB or CIF parsing methods.
     topology : :code:`openmm.app.topology.Topology`
@@ -122,9 +128,9 @@ class system:
 
         Parameters
         ----------
-        structure_path : string
+        structure_path : string [requires]
             Name of the input PDB or CIF file
-        hps_scale: 'kr','urry'
+        hps_scale: 'kr','urry' [optional, default='kr']
             Hydropathy scale. Currently, there are two models are supported.
         Returns
         -------

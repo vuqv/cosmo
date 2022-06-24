@@ -1,7 +1,11 @@
 """
 Dictionary contains parameters for hps model.
 First level is the model name
+"""
 
+bond_length = dict(kr=0.38, urry=0.382, nucleic=0.5)
+"""
+Bond length for various models. nucleic acids is only worked on KR scale
 """
 
 parameters = {
@@ -299,9 +303,6 @@ parameters = {
         }
     }
 }
-
-bond_length = dict(kr=0.38, urry=0.382, nucleic=0.5)
-
 """
 * HPS-Kr scale was taken from:
 Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018). 
@@ -317,9 +318,9 @@ https://doi.org/10.1093/nar/gkaa1099
 
 * Phosphorylation version of some residues for KR scale are taken from:
 Perdikari, T. M., Jovic, N., Dignon, G. L., Kim, Y. C., Fawzi, N. L.,  Mittal, J. (2021). 
-A predictive coarse-grained model for position-specific effects of post-translational modifications. <i>Biophysical Journal</i>, <i>120</i>(7), 1187–1197. 
+A predictive coarse-grained model for position-specific effects of post-translational modifications. 
+Biophysical Journal, 120(7), 1187–1197. 
 https://doi.org/10.1016/j.bpj.2021.01.034
-
 
 -----------------------------------------------
 Note on hps (lambda) in urry scale:

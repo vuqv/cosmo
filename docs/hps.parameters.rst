@@ -4,8 +4,8 @@ hps.parameters package
 Submodules
 ----------
 
-hps.parameters.ca\_parameters module
-------------------------------------
+hps.parameters.model\_parameters module
+----------------------------------------
 
 .. automodule:: hps.parameters.model_parameters
    :members:
