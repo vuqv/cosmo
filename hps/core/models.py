@@ -18,7 +18,6 @@ class models:
     """
 
     def buildHPSModel(structure_file,
-                      create_system=True,
                       minimize=False,
                       residue_masses=True,
                       residue_radii=True,
@@ -146,10 +145,12 @@ class models:
                 one variable.
                 Rectangular box, given parameter is array of three number
                 """
-                hps.topology.setPeriodicBoxVectors(((box_dimension[0], 0, 0), (0, box_dimension[1], 0), (0, 0, box_dimension[2])))
+                hps.topology.setPeriodicBoxVectors(
+                    ((box_dimension[0], 0, 0), (0, box_dimension[1], 0), (0, 0, box_dimension[2])))
             else:
                 # cubic box, given parameter is single float
-                hps.topology.setPeriodicBoxVectors(((box_dimension, 0, 0), (0, box_dimension, 0), (0, 0, box_dimension)))
+                hps.topology.setPeriodicBoxVectors(
+                    ((box_dimension, 0, 0), (0, box_dimension, 0), (0, 0, box_dimension)))
 
             unit_cell = hps.topology.getPeriodicBoxVectors()
             # use this to write coordinate in PBC box. requires 3 numbers, unzip to 3
