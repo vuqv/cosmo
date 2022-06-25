@@ -19,11 +19,7 @@ class models:
 
     def buildHPSModel(structure_file,
                       minimize=False,
-                      residue_masses=True,
-                      residue_radii=True,
-                      residue_charge=True,
-                      residue_hps=True,
-                      hps_scale='kr',
+                      hps_scale='hps_kr',
                       box_dimension=None,
                       forcefield_file=None):
         """
@@ -38,43 +34,22 @@ class models:
         3) Create the default force objects.
         4) Create the OpenMM system class.
 
-        The method can be used to generate an initialized hpsOpenMM system class, that only
+        The method can be used to generate an initialised hpsOpenMM system class, that only
         contains the geometrical parameters, by passing the option default_parameters as False.
-        This is useful to store the geometrical values of bonds, angles, dihedrals, etc. in
-        order to add custom parameters and forces.
 
-        The method can also be created without the initialisation of the forces classes by
-        setting default_forces to False. This allows to load the default forcefield parameters
-        and to modified them before creating the OpenMM force objects.
-
-        The method can also be stopped before creating the OpenMM system class using create_system=False.
-
-        Finally, a forcefield file can be given in order to read the forcefield parameters from it. You can give
-        None to the contact file argument if you provide a forcefield file. Contacts definitions will be extracted from this
-        file even if you give a path to a contact file.
+        Finally, a forcefield file can be given in order to read the forcefield parameters from it.
 
         Parameters
         ----------
         structure_file : string [requires]
             Path to the input structure file.
-        create_system : boolean (True)
-            If True the function will call the createSystemObject() method
-            to create an OpenMM system object. If modifications to the default
-            forcefield are necessary this option should be given False.
         minimize : boolean (False)
             If True the initial structure will undergo the energy minimization.
-        residue_masses : boolean (True)
-            Set each alpha carbon atom mass to its average amino acid residue mass.
-        residue_radii : boolean (True)
-            Set each alpha carbon atom radius to its statistical amino acid residue radius.
-        residue_charge : boolean (True)
-            set charge for atoms in the system
-        residue_hps : boolean (True)
-            set HPS scale for atoms in the system
         hps_scale : string ('kr')
             HPS scale. There are two options correspond to two scale:
-            'urry': using Urry scale
-            'kr': using Kapcha-Rossy scale (default).
+            'hps_urry': using Urry scale
+            'hps_kr': using Kapcha-Rossy scale (default).
+            In the future will add more scale like, Tesei scale, HPS-T which hps is temperature dependent.
         box_dimension : float or array (None)
             If box_dimension is supplied, then will use PBC.
             if float is given, then use cubic box
@@ -101,24 +76,18 @@ class models:
         hps.getAtoms()
         print('Added ' + str(hps.n_atoms) + ' CA atoms')
         if forcefield_file is None:
-            if residue_masses:
-                print("Setting alpha-carbon masses to their average residue mass.")
-                hps.setCAMassPerResidueType()
 
-            if residue_radii:
-                print("Setting alpha-carbon atoms radii to their statistical residue radius.")
-                hps.setCARadiusPerResidueType()
-            else:
-                print('Setting default vdw radii (0.4 nm) for all atoms in the system')
-                hps.setParticlesRadii(0.4)
+            print("Setting alpha-carbon masses to their average residue mass.")
+            hps.setCAMassPerResidueType()
 
-            if residue_charge:
-                print("Setting alpha-carbon charge to their residue charge.")
-                hps.setCAChargePerResidueType()
+            print("Setting alpha-carbon atoms radii to their statistical residue radius.")
+            hps.setCARadiusPerResidueType()
 
-            if residue_hps:
-                print(f"Setting hydropathy scale to their residue, Using {hps_scale} scale.")
-                hps.setCAHPSPerResidueType()
+            print("Setting alpha-carbon charge to their residue charge.")
+            hps.setCAChargePerResidueType()
+
+            print(f"Setting hydropathy scale to their residue, Using {hps_scale} scale.")
+            hps.setCAHPSPerResidueType()
 
             hps.getBonds()
             print('Added ' + str(hps.n_bonds) + ' bonds')
