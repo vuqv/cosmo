@@ -169,14 +169,14 @@ class system:
 
         # PairWise potential
         self.ashbaugh_HatchForce = None
-        self.epsilon = 0.8368
+        self.epsilon = 0.8368 * unit.kilojoule_per_mole
         self.cutoff_Ashbaugh_Hatch = 2.0 * unit.nanometer
 
         # Define parameter for DH potential
         self.yukawaForce = None
         self.particles_charge = None
         self.lD = 1.0 * unit.nanometer
-        self.electric_factor = 138.935458
+        self.electric_factor = 138.935458 * unit.kilojoule_per_mole * unit.nanometer / unit.elementary_charge ** 2
         self.yukawa_cutoff = 3.5 * unit.nanometer
         self.epsilon_r = 80.0
 
@@ -443,6 +443,8 @@ class system:
 
         where :math:`f=\\frac{1}{4\\pi\\epsilon_0}=138.935458` is the factor for short to convert dimensionless
         in calculation to :math:`kj.nm/(mol\\times e^2)` unit.
+
+        :math:`\\epsilon_r=80`: Dielectric constant of water at 100mM mono-valent ion
 
         The force object is stored at the :code:`yukawaForce` attribute.
 
