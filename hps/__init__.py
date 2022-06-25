@@ -2,14 +2,14 @@
 Python library to run CG model simulations of IDPs using the OpenMM toolkit
 
 
-HPS-Urry is a Python library to run CG simulations using OpenMM toolkit.
+hpsOpenMM is a Python library to run CG simulations using OpenMM toolkit.
 The library offers flexibility for creating CG model that can be customised to implemented different potential model.
 
 Considering an input structure, the library automatizes the creation of forces to specify it.
 
 The library offers methods to tailor forcefield parameter for each force term.
 
-HPS-Urry is divided in three main classes:
+hpsOpenMM is divided in three main classes:
 
     1. geometry
 

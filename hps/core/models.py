@@ -61,7 +61,7 @@ class models:
         Returns
         -------
         hps : :code:`hpsOpenMM.system`
-            Initialized hpsOpenMM.system class with default options for defining
+            Initialised hpsOpenMM.system class with default options for defining
             a coarse-grained CA force field.
         """
 
