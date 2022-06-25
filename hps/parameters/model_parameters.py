@@ -3,13 +3,9 @@ Dictionary contains parameters for hps model.
 First level is the model name
 """
 
-bond_length = dict(kr=0.38, urry=0.382, nucleic=0.5)
-"""
-Bond length for various models. nucleic acids is only worked on KR scale
-"""
-
 parameters = {
-    "kr": {
+    "hps_kr": {
+        "bond_length": 0.38,
         "ALA": {
             "mass": 71.08,
             "radii": 0.504,
@@ -180,7 +176,8 @@ parameters = {
             "hps": -0.027
         }
     },
-    "urry": {
+    "hps_urry": {
+        "bond_length": 0.382,
         "ALA": {
             "mass": 71.08,
             "radii": 0.504,

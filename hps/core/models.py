@@ -129,7 +129,7 @@ class models:
 
         # print('')
         print('Adding default bond force constant...')
-        hps.setBondParameters(8368.0)
+        hps.setBondForceConstants(8368.0)
         print('')
         print('_________________________________')
 

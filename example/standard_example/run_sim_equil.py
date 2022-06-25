@@ -30,7 +30,7 @@ md_steps = int(params['md_steps'])
 dt = float(params['dt']) * unit.picoseconds
 nstxout = int(params['nstxout'])
 nstlog = int(params['nstlog'])
-
+model = params['model']
 ref_t = float(params['ref_t']) * unit.kelvin
 tau_t = float(params['tau_t']) / unit.picoseconds
 pbc = strtobool(params['pbc'])
@@ -54,7 +54,7 @@ else:
 End of reading parameters
 """
 
-cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, hps_scale='kr', box_dimension=box_dimension)
+cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, hps_scale=model, box_dimension=box_dimension)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

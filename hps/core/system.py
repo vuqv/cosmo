@@ -80,7 +80,7 @@ class system:
     getBonds()
         Reads bonds from topology, adds them to the main class and sorts them
         into a dictionary to store their forcefield properties.
-    setBondParameters()
+    setBondForceConstants()
         Change the forcefield parameters for bonded terms.
     setParticlesMasses()
         Change the mass parameter for each atom in the system.
@@ -130,7 +130,7 @@ class system:
         ----------
         structure_path : string [requires]
             Name of the input PDB or CIF file
-        hps_scale: 'kr','urry' [optional, default='kr']
+        hps_scale: 'hps_kr','hps_urry' [optional, default='hps_kr']
             Hydropathy scale. Currently, there are two models are supported.
         Returns
         -------
@@ -150,14 +150,14 @@ class system:
         self.topology = self.structure.topology
         self.positions = self.structure.positions
         self.particles_mass = None
-        self.hps_scale = hps_scale
         # Define geometric attributes
         self.atoms = []
         self.n_atoms = None
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
-        self.bond_length = model_parameters.bond_length[hps_scale]
+        self.hps_scale = hps_scale
+        self.bond_length = model_parameters.parameters[hps_scale]["bond_length"]
         self.bondedTo = None
         self.bonded_exclusions_index = 1
 
@@ -191,7 +191,7 @@ class system:
 
         Parameters
         ----------
-
+        None
 
         Returns
         -------
@@ -308,7 +308,7 @@ class system:
 
     """ Functions for setting force specific parameters """
 
-    def setBondParameters(self, bond_parameters):
+    def setBondForceConstants(self, bond_force_constant):
         """
         Set the harmonic bond constant force parameters. The input can be
         a float, to set the same parameter for all force interactions, or
@@ -316,7 +316,7 @@ class system:
 
         Parameters
         ----------
-        bond_parameters : float or list
+        bond_force_constant : float or list
             Parameter(s) to set up for the harmonic bond forces.
 
         Returns
@@ -324,7 +324,7 @@ class system:
         None
         """
 
-        system._setParameters(self.bonds, bond_parameters)
+        system._setParameters(self.bonds, bond_force_constant)
 
     def setParticlesMasses(self, particles_mass):
         """
@@ -1032,6 +1032,19 @@ class system:
         # Set constant parameter for each item in FF term
         if isinstance(parameters, float):
             for item in term:
+                """
+                For example, use in set bond force constant:
+                in the :code:`getBond()`, we set :code:`bond_length` to the first item of tuple, so lack of bond force constant.
+                In :code:`setBondForceConstants(8368.0)`: parameter passed is 8368.0, 
+                :code:`setBondForceConstants(param)` calls to this function. Term is self.bonds, item looks like: 
+                :code:`item: (<Atom 0 (CA) of chain 0 residue 0 (MET)>, <Atom 1 (CA) of chain 0 residue 1 (ASP)>)`
+                :code:`term[item]` (before calling this function): :code:`(Quantity(value=0.382, unit=nanometer), None)`
+                we take all values except the last (bond force constant which is currently :code:`None` = no parameters:
+                :code:`(Quantity(value=0.382, unit=nanometer),)`: a tuple
+                after calling this function:
+                :code:`term[item]: (Quantity(value=0.382, unit=nanometer), 8368.0)`
+                :code:`[tuple+tuple = tuple]`
+                """
                 term[item] = term[item][:-1] + (parameters,)
 
         # Set unique parameter for each item in FF term
