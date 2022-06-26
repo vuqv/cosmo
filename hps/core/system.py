@@ -406,6 +406,10 @@ class system:
         parameters set up in the "bonds" dictionary attribute. The force object
         is stored at the :code:`harmonicBondForce` attribute.
 
+        openMM uses harmonic bond that has energy term of form:
+        .. math::
+            E= 0.5*k*(r-r0)^2
+
         The force parameters must be contained in self.bonds as follows:
         self.bonds is a dictionary:
 
@@ -413,7 +417,7 @@ class system:
             - The values are a 2-tuple of parameters in the following order:
 
                 - first  -> bond0 (quantity)
-                - second -> k (float)
+                - second -> k (float) (measured in unit of kj/mol/nm^2)
 
         Parameters
         ----------

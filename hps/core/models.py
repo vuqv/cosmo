@@ -98,6 +98,7 @@ class models:
 
         # print('')
         print('Adding default bond force constant...')
+        # measured in unit of kj/mol/nm^2= 20kcal/mol/A^2
         hps.setBondForceConstants(8368.0)
         print('')
         print('_________________________________')
