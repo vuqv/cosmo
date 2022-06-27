@@ -12,7 +12,9 @@ hps is divided in three main classes:
    
 The first class, :code:`geometry`, contains methods to calculate the geometrical parameters from the input structures.
 It's not useful in current need of simulation method.
+
 The second class, :code:`models`, allows to easily set up CG models.
+
 The third class, :code:`system`, is the main class that holds all the methods to define, modify and create CG system to be simulated with OpenMM.
 
 The library is open-source and offers flexibility to simulate IDPs.

@@ -47,8 +47,9 @@ where, :math:`\sigma_{i,j}=\frac{\sigma_i+\sigma_j}{2}`: is the vdW radius inter
 
 In the current implementation, hydropathy scales are taken from Urry model, :math:`(\mu, \Delta) = (1, 0.08)`
 
-Nonbonded exclusion rule is :code:`1-2`.
-Cutoff distance for Electrostatics interactions: :math:`3.5 nm`, for Lennard-Jone potential: :math:`2.0 nm`
+Nonbonded exclusion rule is :code:`1-2`, which we only exclude pair of atoms in bonded.
+
+The cut-off distance for Lennard-Jone potential: :math:`2.0 nm`
 
 The Debye-Huckle potential has following form:
 ++++++++++++++++++++++++++++++++++++++++++++++
@@ -66,3 +67,4 @@ The dielectric constant here is fixed, but it can be temperature dependent as th
 
 :math:`\kappa`: inverse Debye length, at 100mM NaCl has values of :math:`1 nm^{-1}`
 
+The cut-off distance for Electrostatics interactions: :math:`3.5 nm`
