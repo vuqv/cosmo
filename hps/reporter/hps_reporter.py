@@ -12,7 +12,7 @@ from hps.core import system
 # In[ ]:
 
 
-class sbmReporter(StateDataReporter):
+class hpsReporter(StateDataReporter):
     """
     A special case of the StateDataReporter class that outputs information about a simulation,
     such as energy and temperature, etc. to a file. This special reporter outputs the sbmOpenMM
@@ -39,7 +39,7 @@ class sbmReporter(StateDataReporter):
         initialized StateDataReporter class.
 
         """
-        super(sbmReporter, self).__init__(file, reportInterval, **kwargs)
+        super(hpsReporter, self).__init__(file, reportInterval, **kwargs)
         self._sbmObject = sbmObject
 
     def _constructHeaders(self):

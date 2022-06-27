@@ -7,5 +7,5 @@ sbmReporter is a special class of the OpenMM StateDataReporter class, that addit
 accepts a sbmobject to print the SBM forcefield energies.
 """
 
-from .sbm_reporter import sbmReporter
-from .sbm_reporter import readOpenMMReporterFile
+from .hps_reporter import hpsReporter
+from .hps_reporter import readOpenMMReporterFile

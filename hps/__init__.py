@@ -26,4 +26,4 @@ from .core import geometry
 from .core import models
 from .core import system
 from .parameters import model_parameters
-from .reporter import sbmReporter
+from .reporter import hpsReporter
