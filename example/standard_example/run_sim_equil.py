@@ -6,7 +6,6 @@ import time
 import warnings
 from distutils.util import strtobool
 from json import loads
-from sys import stdout
 
 import numpy as np
 from openmm import *
@@ -90,11 +89,6 @@ if restart:
     simulation.reporters = []
     simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
-    if machine == 'local':
-        simulation.reporters.append(
-            StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                              totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-                              totalSteps=md_steps, separator='\t'))
     simulation.reporters.append(
         StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                           kineticEnergy=True,
@@ -116,11 +110,6 @@ else:
     simulation.reporters = []
     simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
-    if machine == 'local':
-        simulation.reporters.append(
-            StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                              totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-                              totalSteps=md_steps, separator='\t'))
     simulation.reporters.append(
         StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                           kineticEnergy=True,
