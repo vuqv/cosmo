@@ -43,7 +43,6 @@ else:
 protein_code = params['protein_code']
 checkpoint = params['checkpoint']
 pdb_file = params['pdb_file']
-machine = params['machine']
 device = params['device']
 ppn = params['ppn']
 restart = strtobool(params['restart'])
@@ -93,11 +92,6 @@ if restart:
     simulation.reporters = []
     simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
-    if machine == 'local':
-        simulation.reporters.append(
-            StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                              totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-                              totalSteps=md_steps, separator='\t'))
     simulation.reporters.append(
         StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                           kineticEnergy=True,
@@ -119,11 +113,6 @@ else:
     simulation.reporters = []
     simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
     simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
-    if machine == 'local':
-        simulation.reporters.append(
-            StateDataReporter(stdout, nstlog, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                              totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-                              totalSteps=md_steps, separator='\t'))
     simulation.reporters.append(
         StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                           kineticEnergy=True,
