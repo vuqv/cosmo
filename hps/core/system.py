@@ -407,20 +407,17 @@ class system:
         is stored at the :code:`harmonicBondForce` attribute.
 
         openMM uses harmonic bond that has energy term of form:
+
         .. math::
-            E= 0.5*k*(r-r0)^2
+            E= \\frac{1}{2}k(r-r_0)^2
 
         The force parameters must be contained in self.bonds as follows:
-        self.bonds is a dictionary:
 
+        self.bonds is a dictionary:
             - The keys are 2-tuples for two atom items in :code:`self.topology.atoms` attribute.
             - The values are a 2-tuple of parameters in the following order:
-
                 - first  -> bond0 (quantity)
                 - second -> k (float) (measured in unit of kj/mol/nm^2)
-
-        Parameters
-        ----------
 
 
         Returns
@@ -521,6 +518,7 @@ class system:
             parameter is given for each particle.
         cutoff : float
             The cutoff distance (in nm) being used for the non-bonded interactions.
+
         Parameters
         ----------
 
@@ -530,6 +528,7 @@ class system:
         -------
         None
         """
+
         energy_function = 'step(2^(1/6)*sigma - r) *'
         energy_function += '(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-hps)*epsilon )'
         energy_function += '+(1-step(2^(1/6)*sigma-r)) * (hps*4*epsilon*((sigma/r)^12-(sigma/r)^6));'

@@ -4,10 +4,10 @@ hps.reporter package
 Submodules
 ----------
 
-hps.reporter.sbm\_reporter module
+hps.reporter.hps\_reporter module
 ---------------------------------
 
-.. automodule:: hps.reporter.sbm_reporter
+.. automodule:: hps.reporter.hps_reporter
    :members:
    :undoc-members:
    :show-inheritance:

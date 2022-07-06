@@ -12,6 +12,17 @@ class geometry:
     """
     A class to hold methods for calculating geometrical values 
     given sets of atom coordinates.
+
+    Parameters
+    ----------
+    None
+
+    Methods
+    -------
+    position2Array:
+        convert position to array
+    bond:
+        get bond between two point
     """
 
     def position2Array(position, output_unit):

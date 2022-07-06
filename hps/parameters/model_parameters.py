@@ -302,18 +302,21 @@ parameters = {
 }
 """
 * HPS-Kr scale was taken from:
+
 Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018). 
 Sequence determinants of protein phase behavior from a coarse-grained model. 
 PLoS Computational Biology, 1–23. 
 https://doi.org/10.1101/238170
 
 * Parameter for Nucleic acids (KR scale):
+
 Regy, R. M., Dignon, G. L., Zheng, W., Kim, Y. C., Mittal, J. (2020). 
 Sequence dependent phase separation of protein-polynucleotide mixtures elucidated using molecular simulations. 
 Nucleic Acids Research, 48(22), 12593–12603. 
 https://doi.org/10.1093/nar/gkaa1099
 
 * Phosphorylation version of some residues for KR scale are taken from:
+
 Perdikari, T. M., Jovic, N., Dignon, G. L., Kim, Y. C., Fawzi, N. L.,  Mittal, J. (2021). 
 A predictive coarse-grained model for position-specific effects of post-translational modifications. 
 Biophysical Journal, 120(7), 1187–1197. 
