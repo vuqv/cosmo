@@ -1,6 +1,50 @@
 """
 Dictionary contains parameters for hps model.
 First level is the model name
+
+* HPS-Kr scale was taken from:
+
+Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018).
+Sequence determinants of protein phase behavior from a coarse-grained model.
+PLoS Computational Biology, 1–23.
+https://doi.org/10.1101/238170
+
+* Parameter for Nucleic acids (KR scale):
+
+Regy, R. M., Dignon, G. L., Zheng, W., Kim, Y. C., Mittal, J. (2020).
+Sequence dependent phase separation of protein-polynucleotide mixtures elucidated using molecular simulations.
+Nucleic Acids Research, 48(22), 12593–12603.
+https://doi.org/10.1093/nar/gkaa1099
+
+* Phosphorylation version of some residues for KR scale are taken from:
+
+Perdikari, T. M., Jovic, N., Dignon, G. L., Kim, Y. C., Fawzi, N. L.,  Mittal, J. (2021).
+A predictive coarse-grained model for position-specific effects of post-translational modifications.
+Biophysical Journal, 120(7), 1187–1197.
+https://doi.org/10.1016/j.bpj.2021.01.034
+
+Note on hps (lambda) in urry scale:
+-----------------------------------
+
+# These parameters were shifted by 0.08 from original parameters directly.
+
+in the original paper:
+Regy, R. M., Thompson, J., Kim, Y. C., ; Mittal, J. (2021).
+Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins.
+Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
+
+lambda_ij = muy*lambda0_ij -delta
+where muy=1, delta= 0.08 is the optimal set for the set of 42 proteins they studied.
+lambda_ij = lambda0_ij - 0.08 = 0.5*(lambda_i+lambda_j) - 0.08 = 0.5(lambda_i -0.08 + lambda_j-0.08)
+
+In both version, KR and Urry, we can tune directly lambda parameter in Urry by 0.08 so we can use only one equation for
+two model (choose parameter when passing hps_scale parameter)
+
+Attributes
+----------
+parameters:
+    dictionary contains model parameters.
+
 """
 
 parameters = {
@@ -300,42 +344,3 @@ parameters = {
         }
     }
 }
-"""
-* HPS-Kr scale was taken from:
-
-Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018). 
-Sequence determinants of protein phase behavior from a coarse-grained model. 
-PLoS Computational Biology, 1–23. 
-https://doi.org/10.1101/238170
-
-* Parameter for Nucleic acids (KR scale):
-
-Regy, R. M., Dignon, G. L., Zheng, W., Kim, Y. C., Mittal, J. (2020). 
-Sequence dependent phase separation of protein-polynucleotide mixtures elucidated using molecular simulations. 
-Nucleic Acids Research, 48(22), 12593–12603. 
-https://doi.org/10.1093/nar/gkaa1099
-
-* Phosphorylation version of some residues for KR scale are taken from:
-
-Perdikari, T. M., Jovic, N., Dignon, G. L., Kim, Y. C., Fawzi, N. L.,  Mittal, J. (2021). 
-A predictive coarse-grained model for position-specific effects of post-translational modifications. 
-Biophysical Journal, 120(7), 1187–1197. 
-https://doi.org/10.1016/j.bpj.2021.01.034
-
------------------------------------------------
-Note on hps (lambda) in urry scale:
-
-# These parameters were shifted by 0.08 from original parameters directly.
-
-in the original paper: 
-Regy, R. M., Thompson, J., Kim, Y. C., ; Mittal, J. (2021). 
-Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins.
-Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
-
-lambda_ij = muy*lambda0_ij -delta
-where muy=1, delta= 0.08 is the optimal set for the set of 42 proteins they studied.
-lambda_ij = lambda0_ij - 0.08 = 0.5*(lambda_i+lambda_j) - 0.08 = 0.5(lambda_i -0.08 + lambda_j-0.08)
-
-In both version, KR and Urry, we can tune directly lambda parameter in Urry by 0.08 so we can use only one equation for
-two model (choose parameter when passing hps_scale parameter)
-"""

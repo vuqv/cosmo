@@ -737,13 +737,6 @@ class system:
         of each particle is set up with the values in the :code:`particles_mass`
         attribute.
 
-        Parameters
-        ----------
-
-
-        Returns
-        -------
-        None
         """
 
         # Set same mass for each atom
@@ -762,13 +755,6 @@ class system:
         Adds generated forces to the system, also adding
         a force group to the :code:`forceGroups` attribute dictionary.
 
-        Parameters
-        ----------
-
-
-        Returns
-        -------
-        None
         """
 
         if self.harmonicBondForce is not None:
