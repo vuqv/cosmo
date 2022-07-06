@@ -1,21 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
-
-
 import numpy as np
-from simtk import unit
+from openmm import unit
 
 
 class geometry:
     """
     A class to hold methods for calculating geometrical values 
     given sets of atom coordinates.
-
-    Parameters
-    ----------
-    None
 
     Methods
     -------
@@ -30,7 +23,7 @@ class geometry:
 
         Parameters
         ----------
-        position : simtk.unit.quantity.Quantity
+        position : openmm.unit.quantity.Quantity
             Array containing quantity objects [e.g. (x,y,z) array returned
             from positions].
         output_unit : openmm.unit
@@ -39,7 +32,7 @@ class geometry:
         Returns
         -------
         numpy.ndarray
-            A numpy array containing the quantity values converted to floats.
+            A numpy array containing the quantity values converted to float.
         """
 
         return np.array([c.value_in_unit(output_unit) for c in position])
@@ -49,9 +42,9 @@ class geometry:
 
         Parameters
         ----------
-        coord1 : simtk.unit.quantity.Quantity array
+        coord1 : openmm.unit.quantity.Quantity array
             Vector for the first coordinate.
-        coord2 : simtk.unit.quantity.Quantity array
+        coord2 : openmm.unit.quantity.Quantity array
             Vector for the second coordinate.
 
         Returns
