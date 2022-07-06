@@ -33,7 +33,7 @@ class geometry:
         position : simtk.unit.quantity.Quantity
             Array containing quantity objects [e.g. (x,y,z) array returned
             from positions].
-        output_unit : simtk.unit.unit.Unit
+        output_unit : openmm.unit
             Unit in which to return the items of the array.
 
         Returns
