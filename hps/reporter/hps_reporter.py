@@ -15,11 +15,20 @@ from hps.core import system
 class hpsReporter(StateDataReporter):
     """
     A special case of the StateDataReporter class that outputs information about a simulation,
-    such as energy and temperature, etc. to a file. This special reporter outputs the sbmOpenMM
+    such as energy and temperature, etc. to a file. This special reporter outputs the hpsOpenMM
     force group energies inside the sbmOpenMM system object.
 
     It is used in the same way as the OpenMM StateDataReporter class, but it takes as additional
     input an instance of the sbmOpenMM object with the option 'sbmObject'.
+
+    Methods
+    -------
+    _constructHeaders:
+        Build headers for the StateDataReporter class
+    _constructReportValues:
+        Calculates the energies for the force groups in the hpsOpenMM system instance.
+    readOpenMMReporterFile:
+        Creates a dictionary containing all the entries in the reported data reporter_file
     """
 
     def __init__(self, file, reportInterval, sbmObject=None, **kwargs):
@@ -66,7 +75,7 @@ class hpsReporter(StateDataReporter):
 
     def _constructReportValues(self, simulation, state):
         """
-        Calculates the energies for the force groups in the sbmOpenMM system instance.
+        Calculates the energies for the force groups in the hpsOpenMM system instance.
 
         Parameters
         ----------

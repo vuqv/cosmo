@@ -40,7 +40,7 @@ release = 'v1.2'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    "sphinx_rtd_theme",
+    'sphinx_rtd_theme',
     'myst_parser',
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
@@ -53,10 +53,11 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.doctest',
     'sphinx.ext.coverage'
+
 ]
 
 autosummary_generate = True
-numpydoc_show_class_members = False
+numpydoc_show_class_members = True
 autodoc_default_flags = ['members', 'inherited-members']
 
 
@@ -92,12 +93,11 @@ html_theme_options = {
     'style_external_links': False,
     'vcs_pageview_mode': '',
     'style_nav_header_background': 'white',
-    # Toc options
+    'navigation_depth': 5,
     'collapse_navigation': False,
-    'sticky_navigation': True,
-    'navigation_depth': 4,
+    'sticky_navigation': False,
     'includehidden': True,
-    'titles_only': True
+    'titles_only': False
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
@@ -109,7 +109,10 @@ html_logo = "_static/logo.svg"
 
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {
+    'rtd': ('https://docs.readthedocs.io/en/stable/', None),
+    'sphinx': ('https://www.sphinx-doc.org/en/master/', None),
+}
 
 
 class AutoAutoSummary(Autosummary):
@@ -232,6 +235,6 @@ today_fmt = "%B %d, %Y"
 html_context['display_github'] = True
 html_context['github_user'] = 'qvv5013'
 html_context['github_repo'] = 'rtd-github-pages'
-html_context['github_version'] = 'main/docs/'
+html_context['github_version'] = 'main'
 
 
