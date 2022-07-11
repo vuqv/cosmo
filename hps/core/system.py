@@ -8,7 +8,6 @@ import parmed as pmd
 from openmm import *
 from openmm.app import *
 
-# from ..parameters import ca_parameters
 from ..parameters import model_parameters
 
 
@@ -21,7 +20,7 @@ class system:
     ----------
         structure_path : string [requires]
             Name of the input PDB or CIF file
-        hps_scale: 'kr','urry' [optional, default='kr']
+        hps_scale: 'hps_kr','hps_urry' [optional, default='hps_kr']
             Hydropathy scale. Currently, there are two models are supported.
 
     Attributes
