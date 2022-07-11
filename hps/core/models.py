@@ -16,7 +16,7 @@ class models:
         initialized parameters.
 
     """
-
+    @staticmethod
     def buildHPSModel(structure_file,
                       minimize=False,
                       hps_scale='hps_kr',
