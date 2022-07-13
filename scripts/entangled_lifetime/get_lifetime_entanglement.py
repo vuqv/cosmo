@@ -118,12 +118,12 @@ fig.savefig(raw_img_file, dpi=600)
 state_intermittency = correct_intermittency(states, intermittency=allow_lag)
 tau_frames, timeseries, timeseries_data = autocorrelation(state_intermittency, tau_max)
 
-print(f"Data with lag-frames (using intermittency= {allow_lag} frames)")
+print(f"Data with lag-frames (using intermittency= {allow_lag} frames)", file=f)
 params, fit_t, fit_ac = fit_biexponential(tau_frames, timeseries, initial_guess=params)
 A, tau1, B, tau2 = params
 # this is equivalent to integrate.
 time_constant = A * tau1 + B * tau2
-print(f"corrected_intermittency data: time_constant = {time_constant*timestep:.2f} (frames)",file=f)
+print(f"corrected_intermittency data: time_constant = {time_constant*timestep:.2f} (ps)",file=f)
 print(f"A = {params[0]:.2f}, tau1 = {params[1]*timestep:.2f} (ps), B = {params[2]:.2f}, tau2 = {params[3]*timestep:.2f} (ps)",file=f)
 
 # plot for data with intermittency
