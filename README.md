@@ -7,8 +7,8 @@ This is a repository contains the source code of hps-urry/kr model.
  `hps:` hydropathy scale. Currently, there are two models are supported: 
 
  1) `urry:` Hydropathy according to Urry scale.
- 2) `kr:`  Kapcha-Rossy scale (default). This model has parameters for nucleic acids but not implemented here yet,
-they are currently in the different repository (translation code)
+ 2) `kr:`  Kapcha-Rossy scale (default). 
+This model has parameters for nucleic acids and post-translational modification.
 -------------------------------------
 ## Requirements:
 - **OpenMM 7.7**  
