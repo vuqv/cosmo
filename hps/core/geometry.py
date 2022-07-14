@@ -17,7 +17,7 @@ class geometry:
     bond:
         get bond between two point
     """
-
+    @staticmethod
     def position2Array(position, output_unit):
         """Converts an OpenMM position object quantity into a numpy array.
 
@@ -37,6 +37,7 @@ class geometry:
 
         return np.array([c.value_in_unit(output_unit) for c in position])
 
+    @staticmethod
     def bond(coord1, coord2):
         """Calculate the distance length between two (x,y,z) quantity coordinates.
 
