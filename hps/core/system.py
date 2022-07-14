@@ -190,7 +190,7 @@ class system:
 
         Parameters
         ----------
-        None
+
 
         Returns
         -------
@@ -215,7 +215,7 @@ class system:
             openMM load input PDB file and separate chain if encounter TER instruction. It doesn't matter if two chains
             have the same chain name.
             This may have a vulnerable is that if two CA atom on the same chain not not consecutive, like residue
-            8 and 10 are listed consecutively on PDB input file but residue 9 was missing. The code will add bond between
+            8 and 10 are listed consecutively on input file but residue 9 was missing. The code will add bond between
             residue 8 and 10 which cause large bond. The better solution is check the input file carefully and the logic
             condition in code has nothing to do.
         """
@@ -226,7 +226,8 @@ class system:
 
     def getAtoms(self):
         """
-        After getCAlphaOnly, C-alpha atoms are stored on self.topology only. we need to add them to atoms attribute.
+        After getCAlphaOnly, C-alpha atoms are stored on :code:`self.topology only`.
+        We need to add them to atoms attribute and system also.
         Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
 
         Parameters
@@ -1019,7 +1020,8 @@ class system:
             for item in term:
                 """
                 For example, use in set bond force constant:
-                in the :code:`getBond()`, we set :code:`bond_length` to the first item of tuple, so lack of bond force constant.
+                in the :code:`getBond()`, we set :code:`bond_length` to the first item of tuple, 
+                so lack of bond force constant.
                 In :code:`setBondForceConstants(8368.0)`: parameter passed is 8368.0, 
                 :code:`setBondForceConstants(param)` calls to this function. Term is self.bonds, item looks like: 
                 :code:`item: (<Atom 0 (CA) of chain 0 residue 0 (MET)>, <Atom 1 (CA) of chain 0 residue 1 (ASP)>)`
