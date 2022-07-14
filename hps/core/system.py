@@ -226,11 +226,11 @@ class system:
 
     def getAtoms(self):
         """
+        After getCAlphaOnly, C-alpha atoms are stored on self.topology only. we need to add them to atoms attribute.
         Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
 
         Parameters
         ----------
-        None
 
         Returns
         -------
@@ -431,7 +431,7 @@ class system:
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
 
-    def addYukawaForces(self, use_pbc):
+    def addYukawaForces(self, use_pbc: bool):
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -484,7 +484,7 @@ class system:
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.yukawaForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
-    def addAshbaughHatchForces(self, use_pbc):
+    def addAshbaughHatchForces(self, use_pbc: bool):
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -894,7 +894,6 @@ class system:
 
         Parameters
         ----------
-        None
 
         Returns
         -------
@@ -919,8 +918,6 @@ class system:
 
         Parameters
         ----------
-        None
-
 
         Returns
         -------
@@ -948,7 +945,6 @@ class system:
 
         Parameters
         ----------
-        None
 
         Returns
         -------
@@ -973,7 +969,6 @@ class system:
 
         Parameters
         ----------
-        None
 
         Returns
         -------
@@ -994,7 +989,7 @@ class system:
         self.setParticlesHPS(hps)
 
     # User-hidden functions #
-
+    @staticmethod
     def _setParameters(term, parameters):
         """
         General function to set up or change force field parameters.
