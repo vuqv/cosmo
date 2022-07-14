@@ -128,8 +128,8 @@ else:
     simulation.step(md_steps)
 
 # write the last frame
-lastframe = simulation.context.getState(getPositions=True, enforcePeriodicBox=pbc).getPositions()
-PDBFile.writeFile(cgModel.topology, lastframe, open(f'{protein_code}_final.pdb', 'w'))
+last_frame = simulation.context.getState(getPositions=True, enforcePeriodicBox=bool(pbc)).getPositions()
+PDBFile.writeFile(cgModel.topology, last_frame, open(f'{protein_code}_final.pdb', 'w'))
 simulation.saveCheckpoint(checkpoint)
 
 print("--- Finished in %s seconds ---" % (time.time() - start_time))
