@@ -8,14 +8,14 @@ Accurate optimization of amino acid form factors for computing small-angle X-ray
 J. Appl. Crystallogr. 49, 1148–1161 (2016).
 """
 
+import itertools
+import time
+from math import sin
+
 import MDAnalysis as mda
 import numpy as np
 import pandas as pd
-import itertools
-from math import sin
-import matplotlib.pyplot as plt
 from numba import njit
-import time
 
 # In[2]:
 
@@ -55,7 +55,7 @@ def get_I(idx, qs, distance_pair):
             for j in range(n_atoms):
                 if i != j:
                     I += form_factor_np[idx, i] * form_factor_np[idx, j] * sin(qs[idx] * distance_pair[i, j]) / (
-                                qs[idx] * distance_pair[i, j])
+                            qs[idx] * distance_pair[i, j])
     return I
 
 

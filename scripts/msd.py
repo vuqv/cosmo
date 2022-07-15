@@ -1,4 +1,5 @@
 import numpy as np
+
 from .base import AnalysisBase
 from ..core import groups
 
@@ -153,4 +154,4 @@ class EinsteinMSD(AnalysisBase):
         for n in range(self.n_particles):
             self.results.msds_by_particle[:, n] = tidynamics.msd(
                 positions[:, n, :])
-        self.results.timeseries = self.results.msds_by_particle.mean(axis=1) 
+        self.results.timeseries = self.results.msds_by_particle.mean(axis=1)

@@ -6,7 +6,6 @@ import time
 import warnings
 from distutils.util import strtobool
 from json import loads
-from sys import stdout
 
 import numpy as np
 from openmm import *
@@ -56,7 +55,7 @@ End of reading parameters
 
 cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, hps_scale=model, box_dimension=box_dimension)
 # ashbaugh force has 1 global parameter: epsilon
-cgModel.ashbaugh_HatchForce.setGlobalParameterDefaultValue(0,lj_eps)
+cgModel.ashbaugh_HatchForce.setGlobalParameterDefaultValue(0, lj_eps)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

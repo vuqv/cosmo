@@ -1,13 +1,13 @@
- 
 import MDAnalysis as mda
 from MDAnalysis.transformations.translate import center_in_box
+
 # import nglview as nv
 
 u = mda.Universe('asyn.psf', 'asyn_equil.dcd')
 
 # create a transformation workflow
 ag = u.select_atoms('all')
-center_transformation = center_in_box(ag, point=[0,0,0])
+center_transformation = center_in_box(ag, point=[0, 0, 0])
 # apply transform
 u.trajectory.add_transformations(center_transformation)
 

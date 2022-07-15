@@ -1,15 +1,12 @@
 # Import OpenMM library
 # Import sbmOpenMM library
-import os
-import sys
 import time
 from sys import stdout
 
+import sbmOpenMM
 from simtk.openmm import *
 from simtk.openmm.app import *
 from simtk.unit import *
-
-import sbmOpenMM
 
 # MD parameter
 # let's decide here now long we want to run the simulation and the file writing period
@@ -18,9 +15,9 @@ dcdperiod = 1000  # 10 ps at 2 fs timestep
 logperiod = 100  # 10 ps at 2 fs timestep
 
 # stage of simulation equil, prod
-stage='equil'
+stage = 'equil'
 # which platform to run simulation: CPU/GPU
-device ='CPU'
+device = 'CPU'
 
 pdbname = 'asyn_ext_pymol'
 protein_code = 'asyn'
@@ -35,7 +32,6 @@ cgModel.dumpForceFieldData('forcefield.dat')
 cgModel.dumpStructure(f'{protein_code}_{stage}_init.pdb')
 cgModel.dumpTopology(f'{protein_code}.psf')
 
-
 if device == 'GPU':
 
     # Run simulation on CUDA
@@ -48,7 +44,7 @@ if device == 'GPU':
     simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
 
 elif device == 'CPU':
-    integrator = LangevinIntegrator(298*kelvin, 1/picosecond, 30*femtoseconds)
+    integrator = LangevinIntegrator(298 * kelvin, 1 / picosecond, 30 * femtoseconds)
     simulation = Simulation(cgModel.topology, cgModel.system, integrator)
 
 # Set initial positions
@@ -73,13 +69,13 @@ simulation.reporters.append(DCDReporter(f'{protein_code}_{stage}.dcd', dcdperiod
 # If we don't need too details, we can use the default reporter from OpenMM
 simulation.reporters.append(
     StateDataReporter(stdout, logperiod, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                          totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
-                          totalSteps=mdsteps, separator='\t'))
+                      totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
+                      totalSteps=mdsteps, separator='\t'))
 simulation.reporters.append(
-    StateDataReporter(f'{protein_code}_{stage}.log', logperiod, step=True, time=True, potentialEnergy=True, kineticEnergy=True,
-                          totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
-                          totalSteps=mdsteps, separator='\t'))
-
+    StateDataReporter(f'{protein_code}_{stage}.log', logperiod, step=True, time=True, potentialEnergy=True,
+                      kineticEnergy=True,
+                      totalEnergy=True, temperature=True, progress=True, remainingTime=True, speed=True,
+                      totalSteps=mdsteps, separator='\t'))
 
 print('Minimization')
 # simulation.minimizeEnergy(10)

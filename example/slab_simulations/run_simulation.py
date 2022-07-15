@@ -106,7 +106,13 @@ else:
     integrator = LangevinIntegrator(ref_t, tau_t, dt)
     # barostat, using Monte Carlo algorithm to scale box dimension
     barostat = MonteCarloBarostat(ref_p, ref_t, nstpcouple)
-    # add barostat to system
+    """
+        add barostat to system. We don't need to call reinitialize() since the simulation is not created yet.
+        Otherwise, if the simulation has been created and run, e.g in NVT, then we add barostat to run at NPT, we
+        need to call reinitialize(), e.g: simulation.context.reinitialize(preserveState=True) such that simulation
+        will see the changes. For details, check this: 
+        https://openmm.github.io/openmm-cookbook/dev/notebooks/cookbook/Changing%20Temperature%20and%20Pressure.html
+    """
     cgModel.system.addForce(barostat)
     simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
     # Set initial positions: translate input coordinate, the coordinate is >=0

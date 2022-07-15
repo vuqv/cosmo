@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import sys
+
 import matplotlib as mtl
 import matplotlib.pyplot as plt
 import numpy as np
@@ -15,22 +16,21 @@ font = {'family': 'normal',
 
 mtl.rc('font', **font)
 
-
 if len(sys.argv) != 2:
     print(f'[0] = script')
     print(f'[1] = Input data (entanglement analysis)')
     quit()
 
-
 result_file = sys.argv[1]
-logfile = result_file.split('.')[0]+'.log'
-raw_img_file = result_file.split('.')[0]+'_raw.png'
+logfile = result_file.split('.')[0] + '.log'
+raw_img_file = result_file.split('.')[0] + '_raw.png'
 # system specific
 
 data = np.loadtxt(result_file, usecols=5)
 threshold = 0.6
 timestep = 10  # ps
-tau_max = 500 #maximum number of frames to calculate autocorrelation
+tau_max = 500  # maximum number of frames to calculate autocorrelation
+
 
 ################################################
 def map_binary(x):
@@ -55,29 +55,30 @@ def map_binary_unentanled(x):
         return set([1])
 
 
-def fit_biexponential(tau_timeseries, ac_timeseries, initial_guess = [1, 0.5, 1, 2]):
+def fit_biexponential(tau_timeseries, ac_timeseries, initial_guess=[1, 0.5, 1, 2]):
     """Fit a biexponential function to a hydrogen bond time autocorrelation function
 
     Return the two time constants
     """
     print(f"initial guess: {initial_guess}")
-    
 
     def model(t, A, tau1, B, tau2):
         """Fit data to a biexponential function.
         """
         return A * np.exp(-t / tau1) + B * np.exp(-t / tau2)
 
-    params, params_covariance = curve_fit(model, tau_timeseries, ac_timeseries, initial_guess, bounds=(0,[1,np.inf,1,np.inf]))
+    params, params_covariance = curve_fit(model, tau_timeseries, ac_timeseries, initial_guess,
+                                          bounds=(0, [1, np.inf, 1, np.inf]))
 
     fit_t = np.linspace(tau_timeseries[0], tau_timeseries[-1], 1000)
     fit_ac = model(fit_t, *params)
 
     return params, fit_t, fit_ac
 
+
 # Main program
 
-f=open(logfile,'w')
+f = open(logfile, 'w')
 
 states = [map_binary(x >= threshold) for x in data]
 tau_frames, timeseries, timeseries_data = autocorrelation(states, tau_max)
@@ -87,10 +88,12 @@ params, fit_t, fit_ac = fit_biexponential(tau_frames, timeseries)
 A, tau1, B, tau2 = params
 # this is equivalent to integrate.
 time_constant = A * tau1 + B * tau2
-print(f"Raw data: time_constant = {time_constant*timestep:.2f} (ps)",file=f)
-print(f"A = {params[0]:.2f}, tau1 = {params[1]*timestep:.2f} (ps), B = {params[2]:.2f}, tau2 = {params[3]*timestep:.2f} (ps)",file=f)
+print(f"Raw data: time_constant = {time_constant * timestep:.2f} (ps)", file=f)
+print(
+    f"A = {params[0]:.2f}, tau1 = {params[1] * timestep:.2f} (ps), B = {params[2]:.2f}, tau2 = {params[3] * timestep:.2f} (ps)",
+    file=f)
 allow_lag = min(int(params[1]) + 1, int(params[3]) + 1)
-print(f"Lagframe to use to get rid of fast event: {allow_lag} frames = {allow_lag*timestep} (ps)",file=f)
+print(f"Lagframe to use to get rid of fast event: {allow_lag} frames = {allow_lag * timestep} (ps)", file=f)
 
 # plot for raw data
 tau_times = np.array(tau_frames) * timestep  # ps
@@ -123,8 +126,10 @@ params, fit_t, fit_ac = fit_biexponential(tau_frames, timeseries, initial_guess=
 A, tau1, B, tau2 = params
 # this is equivalent to integrate.
 time_constant = A * tau1 + B * tau2
-print(f"corrected_intermittency data: time_constant = {time_constant*timestep:.2f} (ps)",file=f)
-print(f"A = {params[0]:.2f}, tau1 = {params[1]*timestep:.2f} (ps), B = {params[2]:.2f}, tau2 = {params[3]*timestep:.2f} (ps)",file=f)
+print(f"corrected_intermittency data: time_constant = {time_constant * timestep:.2f} (ps)", file=f)
+print(
+    f"A = {params[0]:.2f}, tau1 = {params[1] * timestep:.2f} (ps), B = {params[2]:.2f}, tau2 = {params[3] * timestep:.2f} (ps)",
+    file=f)
 
 # plot for data with intermittency
 tau_times = np.array(tau_frames) * timestep
@@ -143,9 +148,9 @@ ax.plot(fit_t * timestep, fit_ac, label=(
 plt.title(f"Entanglement lifetime (intermittency = {allow_lag} frames)", weight="bold")
 plt.xlabel(r"$\tau\ \rm (ps)$")
 plt.ylabel(r"$C(\tau)$")
-plt.ylim(0,1)
+plt.ylim(0, 1)
 ax.legend()
 # plt.show()
-intermit_img_file = result_file.split('.')[0]+'_intermittency_'+f'{allow_lag}_frames.png'
+intermit_img_file = result_file.split('.')[0] + '_intermittency_' + f'{allow_lag}_frames.png'
 fig.savefig(intermit_img_file, dpi=600)
 f.close()

@@ -11,6 +11,7 @@ for ts in u.trajectory:
 
 k_vec = 1 / 3.9 * np.array([1, 1, 1])
 
+
 # @njit(fastmath=True)
 def calculate_ISF(max_t):
     lagtimes = np.arange(1, max_t + 1)

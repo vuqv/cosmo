@@ -6,22 +6,19 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import os
+import sys
+
+from docutils.parsers.rst import directives
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from sphinx.ext.autosummary import Autosummary
 from sphinx.ext.autosummary import get_documenter
-from docutils.parsers.rst import directives
 from sphinx.util.inspect import safe_getattr
-import os
-import sys
-import sphinx
-import sphinx_rtd_theme
-
 
 sys.path.insert(0, os.path.abspath('..'))
-
 
 # -- Project information -----------------------------------------------------
 
@@ -60,14 +57,13 @@ autosummary_generate = True
 numpydoc_show_class_members = True
 autodoc_default_flags = ['members', 'inherited-members']
 
-
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 # If true, the current module name will be prepended to all description unit titles.
 add_module_names = True
 master_doc = 'index'
 html_sidebars = {
-        '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html'],
+    '**': ['localtoc.html', 'sourcelink.html', 'searchbox.html'],
 }
 
 # List of patterns, relative to source directory, that match files and
@@ -85,7 +81,7 @@ pygments_style = 'sphinx'
 html_theme = 'sphinx_rtd_theme'
 
 html_theme_options = {
-    'analytics_id': 'G-XXXXXXXXXX',  #  Provided by Google in your dashboard
+    'analytics_id': 'G-XXXXXXXXXX',  # Provided by Google in your dashboard
     'analytics_anonymize_ip': False,
     'logo_only': False,
     'display_version': True,
@@ -107,7 +103,6 @@ html_static_path = ['_static']
 
 html_logo = "_static/logo.svg"
 
-
 # Example configuration for intersphinx: refer to the Python standard library.
 intersphinx_mapping = {
     'rtd': ('https://docs.readthedocs.io/en/stable/', None),
@@ -116,7 +111,6 @@ intersphinx_mapping = {
 
 
 class AutoAutoSummary(Autosummary):
-
     option_spec = {
         'methods': directives.unchanged,
         'attributes': directives.unchanged
@@ -209,7 +203,6 @@ html_context['version'] = current_version
 # POPULATE LINKS TO OTHER LANGUAGES
 html_context['languages'] = [('en', '/' + REPO_NAME + '/en/' + current_version + '/')]
 
-
 # POPULATE LINKS TO OTHER VERSIONS
 html_context['versions'] = list()
 
@@ -236,5 +229,3 @@ html_context['display_github'] = True
 html_context['github_user'] = 'qvv5013'
 html_context['github_repo'] = 'rtd-github-pages'
 html_context['github_version'] = 'main'
-
-

@@ -1,15 +1,16 @@
 # Import OpenMM library
-from os import system
 import time
+import warnings
 from sys import stdout
+
 import numpy as np
 from openmm import *
 from openmm.app import *
 from openmm.unit import *
+from parmed.exceptions import OpenMMWarning
 
 import hps
-import warnings
-from parmed.exceptions import OpenMMWarning
+
 warnings.filterwarnings("ignore", category=OpenMMWarning)
 # MD parameter
 # let's decide here now as long as we want to run the simulation and the file writing period
@@ -29,7 +30,7 @@ pdb_file = f'{pdbname}.pdb'
 # No PBC
 # cgModel = hps.models.buildHPSModel(pdb_file, hps_scale='kr')
 # With PBC, or can call: box_dimension= [Lx, Ly, Lz]
-cgModel = hps.models.buildHPSModel(pdb_file, hps_scale='kr', box_dimension= 40)
+cgModel = hps.models.buildHPSModel(pdb_file, hps_scale='kr', box_dimension=40)
 if device == 'GPU':
     # Run simulation on CUDA
     platform = Platform.getPlatformByName('CUDA')
@@ -45,22 +46,20 @@ integrator = LangevinIntegrator(500 * kelvin, 0.01 / picosecond, 10 * femtosecon
 simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
 
 # Set initial positions
-xyz = np.array(cgModel.positions/nanometer)
-xyz[:,0] -= np.amin(xyz[:,0])
-xyz[:,1] -= np.amin(xyz[:,1])
-xyz[:,2] -= np.amin(xyz[:,2])
-cgModel.positions = xyz*nanometer
+xyz = np.array(cgModel.positions / nanometer)
+xyz[:, 0] -= np.amin(xyz[:, 0])
+xyz[:, 1] -= np.amin(xyz[:, 1])
+xyz[:, 2] -= np.amin(xyz[:, 2])
+cgModel.positions = xyz * nanometer
 simulation.context.setPositions(cgModel.positions)
 # set velocity by temperature
 simulation.context.setVelocitiesToTemperature(298 * kelvin)
-
 
 # # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')
 # dump Structure into PDB file for visualize
 cgModel.dumpStructure(f'{protein_code}_{stage}_init.pdb')
 cgModel.dumpTopology(f'{protein_code}.psf')
-
 
 # Add a DCD reporter that writes coordinates every 100 steps.
 # simulation.reporters.append(DCDReporter(f'{protein_code}_{stage}.dcd', dcdperiod, enforcePeriodicBox=True))

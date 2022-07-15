@@ -6,6 +6,7 @@
 
 from openmm.app.statedatareporter import StateDataReporter
 from simtk import unit
+
 from hps.core import system
 
 
