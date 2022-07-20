@@ -1,5 +1,8 @@
 # hpsOpenMM
 
+-------------------------------------
+### A coarse-grained simulation engine empowered by openMM
+
 OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
 
 This is a repository contains the source code of hps-urry/kr model.
