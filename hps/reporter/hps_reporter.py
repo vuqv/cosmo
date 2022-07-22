@@ -1,16 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
-
-
 from openmm.app.statedatareporter import StateDataReporter
 from simtk import unit
 
 from hps.core import system
-
-
-# In[ ]:
 
 
 class hpsReporter(StateDataReporter):
@@ -118,3 +112,9 @@ def readOpenMMReporterFile(reporter_file):
             for line in lines[1:]:
                 data[r].append(float(line.strip().split(',')[i]))
     return data
+
+
+"""
+For more customization reporter, check this:
+http://docs.openmm.org/latest/userguide/application/04_advanced_sim_examples.html#extracting-and-reporting-forces-and-other-data
+"""
