@@ -1,33 +1,30 @@
-.. HPS-Urry documentation master file, created by
-sphinx-quickstart on Sun Aug 22 15:06:27 2021.
-You can adapt this file completely to your liking, but it should at least
-contain the root `toctree` directive.
+.. soursop documentation master file, created by
+   sphinx-quickstart on Thu Mar 15 13:55:56 2018.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
 
-Welcome to HPS's documentation!
-====================================
+Welcome to the hpsOpenMM docs!
+=========================================================
+
+This documentation is currently being generated as we finalize 
 
 .. toctree::
-   :maxdepth: 5
+   :maxdepth: 1
    :caption: Contents:
+   
+   modules/introduction
+   modules/system
+   modules/models
+   modules/parameters
 
-   modules
+   
 
-HPS Documentation
-#######################
+Changelog
+==========
 
-Introduction
-************
 
-.. include:: sections/introduction.rst
 
-HPS Models
-**********
+About
+========
 
-.. include:: sections/models.rst
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+ 

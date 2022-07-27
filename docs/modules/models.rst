@@ -1,10 +1,20 @@
+Models 
+=========================================================
+
 The models class contains three methods for automatic setting up predefined potentials.
+
 It works by initializing a system class with the necessary force field parameters.
 
 Coarse grained, alpha-carbon (CA), model
 ++++++++++++++++++++++++++++++++++++++++
 
-The coarse grained method represents the protein system as beads centered at the alpha carbons of each residue in the protein. It uses harmonic potentials to hold the covalent connectivity and geometry of the beads. Torsional geometries are modeled with a periodic torsion potential. Native contacts are represented through the use of Lennard-Jones potentials that allow to form and break non-bonded interactions, permitting complete and local unfolding of the structures.
+The coarse grained method represents the protein system as beads centered at the alpha carbons of each residue in the protein. 
+
+It uses harmonic potentials to hold the covalent connectivity and geometry of the beads. 
+
+Torsional geometries are modeled with a periodic torsion potential. 
+
+Native contacts are represented through the use of Lennard-Jones potentials that allow to form and break non-bonded interactions, permitting complete and local unfolding of the structures.
 
 To create a CA model, call:
 :code:`hps.models.getCAModel(pdb_file, hps_scale)`
@@ -68,3 +78,8 @@ The dielectric constant here is fixed, but it can be temperature dependent as th
 :math:`\kappa`: inverse Debye length, at 100mM NaCl has values of :math:`1 nm^{-1}`
 
 The cut-off distance for Electrostatics interactions: :math:`3.5 nm`
+
+.. autoclass:: hps.core.models
+
+        .. automethod:: __init__
+        .. automethod:: hps.core.models.buildHPSModel
