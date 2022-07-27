@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from .system import system
-
+from typing import Any
 
 class models:
     """
@@ -18,11 +18,11 @@ class models:
     """
 
     @staticmethod
-    def buildHPSModel(structure_file,
-                      minimize=False,
-                      hps_scale='hps_kr',
-                      box_dimension=None,
-                      forcefield_file=None):
+    def buildHPSModel(structure_file: str,
+                      minimize: bool = False,
+                      hps_scale: str = 'hps_kr',
+                      box_dimension: Any = None,
+                      forcefield_file: Any = None):
         """
         Initialises a coarse-grained, carbon alpha (CA), hpsOpenMM system class
         from a structure and a contact file defining the native contacts for the

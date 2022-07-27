@@ -400,7 +400,7 @@ class system:
 
     """ Functions for creating force objects with defined parameters """
 
-    def addHarmonicBondForces(self):
+    def addHarmonicBondForces(self) -> None:
         """
         Creates an :code:`openmm.HarmonicBondForce()` object with the bonds and
         parameters set up in the "bonds" dictionary attribute. The force object
@@ -432,7 +432,7 @@ class system:
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
 
-    def addYukawaForces(self, use_pbc: bool):
+    def addYukawaForces(self, use_pbc: bool) -> None:
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -485,7 +485,7 @@ class system:
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.yukawaForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
-    def addAshbaughHatchForces(self, use_pbc: bool):
+    def addAshbaughHatchForces(self, use_pbc: bool) -> None:
         """
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
@@ -562,8 +562,9 @@ class system:
 
     """ Functions for creating OpenMM system object """
 
-    def createSystemObject(self, check_bond_distances=True, minimize=False, check_large_forces=True,
-                           force_threshold=10.0, bond_threshold=0.5):
+    def createSystemObject(self, check_bond_distances: bool = True, minimize: bool = False,
+                           check_large_forces: bool = True, force_threshold: float = 10.0,
+                           bond_threshold: float = 0.5) -> None:
         """
         Creates an :code:`openmm.System()` object using the force field parameters
         given to the 'system' class. It adds particles, forces and
@@ -610,14 +611,14 @@ class system:
             # Check for high forces in atoms and minimize the system if necessary
             self.checkLargeForces(minimize=minimize, threshold=force_threshold)
 
-    def checkBondDistances(self, threshold=0.5):
+    def checkBondDistances(self, threshold: float = 0.5) -> None:
         """
         Searches for large bond distances for the atom pairs defined in
         the 'bonds' attribute. It raises an error when large bonds are found.
 
         Parameters
         ----------
-        threshold : float
+        threshold : (float, default=0.5 nm)
             Threshold to check for large bond distances.
 
         Returns
@@ -643,7 +644,7 @@ class system:
         print(f'All bonds seem to be OK (less than threshold: {threshold})')
         print('')
 
-    def checkLargeForces(self, minimize=False, threshold=10):
+    def checkLargeForces(self, minimize: bool = False, threshold: float = 10) -> None:
         """
         Prints the hps system energies of the input configuration of the
         system. It optionally checks for large forces acting upon all
@@ -652,9 +653,9 @@ class system:
 
         Parameters
         ----------
-        threshold : float (10)
+        threshold : (float, default=10)
             Threshold to check for large forces.
-        minimize : float
+        minimize : (bool, default= False)
             Whether to iteratively minimize the system until all forces are lower or equal to
             the threshold value.
 
@@ -818,7 +819,7 @@ class system:
             r.segid = r.chain
         top.save(f'{output_file}', overwrite=True)
 
-    def dumpForceFieldData(self, output_file):
+    def dumpForceFieldData(self, output_file: str) -> None:
         """
         Writes a file containing the current forcefield parameters in the
         CG system.
