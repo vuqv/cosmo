@@ -13,6 +13,7 @@ This documentation is currently being generated as we finalize
    :caption: Contents:
    
    modules/introduction
+   usage/installation
    modules/system
    modules/models
    modules/parameters
