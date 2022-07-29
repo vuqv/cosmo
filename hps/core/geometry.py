@@ -12,10 +12,7 @@ class geometry:
 
     Methods
     -------
-    position2Array:
-        convert position to array
-    bond:
-        get bond between two point
+
     """
 
     @staticmethod

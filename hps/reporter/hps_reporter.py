@@ -2,7 +2,7 @@
 # coding: utf-8
 
 from openmm.app.statedatareporter import StateDataReporter
-from simtk import unit
+from openmm import unit
 
 from hps.core import system
 
@@ -16,14 +16,11 @@ class hpsReporter(StateDataReporter):
     It is used in the same way as the OpenMM StateDataReporter class, but it takes as additional
     input an instance of the sbmOpenMM object with the option 'sbmObject'.
 
+    For more customization reporter, check this:
+    http://docs.openmm.org/latest/userguide/application/04_advanced_sim_examples.html#extracting-and-reporting-forces-and-other-data
+
     Methods
     -------
-    _constructHeaders:
-        Build headers for the StateDataReporter class
-    _constructReportValues:
-        Calculates the energies for the force groups in the hpsOpenMM system instance.
-    readOpenMMReporterFile:
-        Creates a dictionary containing all the entries in the reported data reporter_file
     """
 
     def __init__(self, file, reportInterval, sbmObject=None, **kwargs):
@@ -48,6 +45,8 @@ class hpsReporter(StateDataReporter):
 
     def _constructHeaders(self):
         """
+        Build headers for the StateDataReporter class.
+
         Build headers for the StateDataReporter class. It builds the headers
         for the force groups contained in the sbmOpenMM system instance.
 
@@ -112,9 +111,3 @@ def readOpenMMReporterFile(reporter_file):
             for line in lines[1:]:
                 data[r].append(float(line.strip().split(',')[i]))
     return data
-
-
-"""
-For more customization reporter, check this:
-http://docs.openmm.org/latest/userguide/application/04_advanced_sim_examples.html#extracting-and-reporting-forces-and-other-data
-"""

@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from .system import system
 from typing import Any
+
+from .system import system
+
 
 class models:
     """
@@ -10,11 +12,6 @@ class models:
 
     Methods
     -------
-
-    buildHPSModel(structure_file, kwarg**)
-        Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
-        initialized parameters.
-
     """
 
     @staticmethod
@@ -24,6 +21,9 @@ class models:
                       box_dimension: Any = None,
                       forcefield_file: Any = None):
         """
+        Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
+        initialized parameters.
+
         Initialises a coarse-grained, carbon alpha (CA), hpsOpenMM system class
         from a structure and a contact file defining the native contacts for the
         coarse grained model.

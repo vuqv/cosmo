@@ -69,56 +69,12 @@ class system:
 
     Methods
     -------
-    getCAlphaOnly()
-        Filter in only alpha carbon atoms from the input structure and updates
-        the topology object to add new bonds between them. Used specially for
-        creating alpha-carbon (CA) coarse-grained models.
-    getAtoms()
-        Reads atoms from topology, adds them to the main class and sorts them
-        into a dictionary to store their forcefield properties.
-    getBonds()
-        Reads bonds from topology, adds them to the main class and sorts them
-        into a dictionary to store their forcefield properties.
-    setBondForceConstants()
-        Change the forcefield parameters for bonded terms.
-    setParticlesMasses()
-        Change the mass parameter for each atom in the system.
-    setParticlesRadii()
-        Change the excluded volume radius parameter for each atom in the system.
-    addHarmonicBondForces()
-        Creates a harmonic bonded force term for each bond in the main
-        class using their defined forcefield parameters.
-    addYukawaForces()
-        Creates a nonbonded force term for electrostatic interaction DH potential.
-    addAshbaughHatchForces()
-        Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).
-    createSystemObject()
-        Creates OpenMM system object adding particles, masses and forces.
-        It also groups the added forces into Force-Groups for the hpsReporter
-        class.
-    addParticles()
-        Add particles to the system OpenMM class instance.
-    addSystemForces()
-        Add forces to the system OpenMM class instance. It also save
-        names for the added forces to include them in the reporter class.
-    dumpStructure()
-        Writes a structure file of the system in its current state.
-    dumpTopology()
-        Writes a topology file of the system in PSF format, this is used for visualization and post-analysis.
-    dumpForceFieldData()
-        Writes to a file the parameters of the forcefield.
+
+
     loadForcefieldFromFile()
         Loads forcefield parameters from a force field file written with
         the :code:`dumpForceFieldData()` method.
-    setCAMassPerResidueType()
-        Sets alpha carbon atoms to their average residue mass. Used specially for
-        modifying alpha-carbon (CA) coarse-grained models.
-    setCARadiusPerResidueType()
-        Sets alpha carbon atoms to their average residue mass. Used specially for
-        modifying alpha-carbon (CA) coarse-grained models.
-    setCAHPSPerResidueType()
-        Sets alpha carbon atoms to their residue hydropathy scale. Used specially for
-        modifying alpha-carbon (CA) coarse-grained models.
+
     """
 
     def __init__(self, structure_path, hps_scale):
@@ -184,8 +140,12 @@ class system:
         # Initialise an OpenMM system class instance
         self.system = System()
 
-    def getCAlphaOnly(self):
+    def getCAlphaOnly(self) -> None:
         """
+        Filter in only alpha carbon atoms from the input structure and updates
+        the topology object to add new bonds between them. Used specially for
+        creating alpha-carbon (CA) coarse-grained models.
+
         Keeps in the :code:`hps system` only the alpha carbon atoms from the :code:`OpenMM topology`.
 
         Parameters
@@ -226,6 +186,9 @@ class system:
 
     def getAtoms(self):
         """
+        Reads atoms from topology, adds them to the main class and sorts them
+        into a dictionary to store their forcefield properties.
+
         After getCAlphaOnly, C-alpha atoms are stored on :code:`self.topology only`.
         We need to add them to atoms attribute and system also.
         Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
@@ -254,6 +217,9 @@ class system:
 
     def getBonds(self, except_chains=None):
         """
+        Reads bonds from topology, adds them to the main class and sorts them
+        into a dictionary to store their forcefield properties.
+
         Adds :code:`bonds` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
 
         Parameters
@@ -310,6 +276,8 @@ class system:
 
     def setBondForceConstants(self, bond_force_constant):
         """
+        Change the forcefield parameters for bonded terms.
+
         Set the harmonic bond constant force parameters. The input can be
         a float, to set the same parameter for all force interactions, or
         a list, to define a unique parameter for each force interaction.
@@ -328,6 +296,8 @@ class system:
 
     def setParticlesMasses(self, particles_mass):
         """
+        Change the mass parameter for each atom in the system.
+
         Set the masses of the particles in the system. The input can be a
         float, to set the same mass for all particles, or a list, to define
         a unique mass for each particle.
@@ -346,6 +316,8 @@ class system:
 
     def setParticlesRadii(self, particles_radii):
         """
+        Change the excluded volume radius parameter for each atom in the system.
+
         Set the radii of the particles in the system. The input can be a
         float, to set the same radius for all particles, or a list, to define
         a unique radius for each particle.
@@ -402,6 +374,9 @@ class system:
 
     def addHarmonicBondForces(self) -> None:
         """
+        Creates a harmonic bonded force term for each bond in the main
+        class using their defined forcefield parameters.
+
         Creates an :code:`openmm.HarmonicBondForce()` object with the bonds and
         parameters set up in the "bonds" dictionary attribute. The force object
         is stored at the :code:`harmonicBondForce` attribute.
@@ -434,6 +409,8 @@ class system:
 
     def addYukawaForces(self, use_pbc: bool) -> None:
         """
+        Creates a nonbonded force term for electrostatic interaction DH potential.
+
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
         is initialized with the formula:
@@ -487,6 +464,8 @@ class system:
 
     def addAshbaughHatchForces(self, use_pbc: bool) -> None:
         """
+        Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).
+
         Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
         is initialized with the formula: (note: hps here is :math:`\lambda_{ij}^{0}` in the paper)
@@ -566,6 +545,10 @@ class system:
                            check_large_forces: bool = True, force_threshold: float = 10.0,
                            bond_threshold: float = 0.5) -> None:
         """
+        Creates OpenMM system object adding particles, masses and forces.
+        It also groups the added forces into Force-Groups for the hpsReporter
+        class.
+
         Creates an :code:`openmm.System()` object using the force field parameters
         given to the 'system' class. It adds particles, forces and
         creates a force group for each force object. Optionally the method
@@ -734,6 +717,8 @@ class system:
 
     def addParticles(self):
         """
+        Add particles to the system OpenMM class instance.
+
         Add a particle to the system for each atom in it. The mass
         of each particle is set up with the values in the :code:`particles_mass`
         attribute.
@@ -753,6 +738,9 @@ class system:
 
     def addSystemForces(self):
         """
+        Add forces to the system OpenMM class instance. It also save
+        names for the added forces to include them in the reporter class.
+
         Adds generated forces to the system, also adding
         a force group to the :code:`forceGroups` attribute dictionary.
 
@@ -772,6 +760,8 @@ class system:
 
     def dumpStructure(self, output_file):
         """
+        Writes a structure file of the system in its current state.
+
         Writes a PDB file containing the currently defined CG system atoms and its positions.
 
         Parameters
@@ -788,6 +778,8 @@ class system:
 
     def dumpTopology(self, output_file):
         """
+        Writes a topology file of the system in PSF format, this is used for visualization and post-analysis.
+
         Writes a file containing the current topology in the
         hpsOpenMM system. This file contains topology of system, used in visualization and analysis.
 
@@ -821,6 +813,8 @@ class system:
 
     def dumpForceFieldData(self, output_file: str) -> None:
         """
+        Writes to a file the parameters of the forcefield.
+
         Writes a file containing the current forcefield parameters in the
         CG system.
 
@@ -891,6 +885,9 @@ class system:
 
     def setCAMassPerResidueType(self):
         """
+        Sets alpha carbon atoms to their average residue mass. Used specially for
+        modifying alpha-carbon (CA) coarse-grained models.
+
         Sets the masses of the alpha carbon atoms to the average mass
         of its amino acid residue.
 
@@ -914,6 +911,9 @@ class system:
 
     def setCARadiusPerResidueType(self):
         """
+        Sets alpha carbon atoms to their average residue mass. Used specially for
+        modifying alpha-carbon (CA) coarse-grained models.
+
         Sets the excluded volume radii of the alpha carbon atoms
         to characteristic radii of their corresponding amino acid
         residue.
@@ -967,6 +967,9 @@ class system:
 
     def setCAHPSPerResidueType(self):
         """
+        Sets alpha carbon atoms to their residue hydropathy scale. Used specially for
+        modifying alpha-carbon (CA) coarse-grained models.
+
         Sets the HPS model of the alpha carbon atoms using corresponding scale.
 
         Parameters
