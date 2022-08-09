@@ -60,4 +60,4 @@ We would like to thank:
 
 ## Do you want to cite this work?
 
-- We will make this source code open to everyone to use.
+Vu, Quyen. (2022). hpsOpenMM (1.2). Zenodo. https://doi.org/10.5281/zenodo.6976690
