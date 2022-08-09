@@ -27,7 +27,10 @@ This is a repository contains the source code of hps-urry/kr model.
 - Download folder and place in target location, for example: `PATH_TO_CODE/hpsOpenMM/`
 - Add folder in Python path (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`
 - The standard example can be found at `example/standard_example`
-
+- Run simulation: 
+  - goto example folder, e.g standard_example/: 
+  - edit simulation config file: `md.ini`
+  - execute command: `python run_simulation.py -f md.ini`
 #### Windows:
 
 - No idea (no time to test) !!!
@@ -61,3 +64,5 @@ We would like to thank:
 ## Do you want to cite this work?
 
 Vu, Quyen. (2022). hpsOpenMM (1.2). Zenodo. https://doi.org/10.5281/zenodo.6976690
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6976690.svg)](https://doi.org/10.5281/zenodo.6976690)
