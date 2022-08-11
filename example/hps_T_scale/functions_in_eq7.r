@@ -1,4 +1,4 @@
-lambda = lambda(HPS) +[-alpha*Tr*(b+cTr-2c*Ts)] +[alpha*(b-2c*Ts)]*T + [c*alpha]*T2
+ lambda = lambda(HPS) +[-alpha*Tr*(b+cTr-2c*Ts)] +[alpha*(b-2c*Ts)]*T + [c*alpha]*T2
 shortening: replace alpha=0.7836, Tr= 296.7, Ts=61.97 and set:
 
 fx =-0.7836*296.7*(b+c*296.7-2*c*61.97)
