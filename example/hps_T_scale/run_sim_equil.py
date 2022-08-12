@@ -59,6 +59,14 @@ cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, hps_scale=model,
 
 # ashbaugh force has 1 global parameter: epsilon
 """
+The eq. 7d in paper has typo mistake in 'T' term, should be minus
+
+lambda(H) = lambda_HPS + -25.47406054 + 0.14536949*T - 0.00020058*T^2
+lambda(A) = lambda_HPS + -26.18813544 + 0.15033133*T - 0.00020919*T^2
+lambda(O) = lambda_HPS + 2.45798364 - 0.01432925*T + 0.00002037*T^2
+lambda(P) = lambda_HPS + 11.795 - 0.067679*T + 0.00009411*T^2
+lambda(C) = lambda_HPS + 9.66118972 - 0.05425780*T + 0.00007312*T^2
+
 change hps parameter for every atoms:
 using: 
 lj=simulation.system.getForce(2) # force 2 in the system is ashbaugh force
