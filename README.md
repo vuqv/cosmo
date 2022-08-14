@@ -5,19 +5,23 @@
 
 OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
 
-This is a repository contains the source code of hps-urry/kr model.
+
 
 `hps:` hydropathy scale. Currently, there are two models are supported:
 
-1) `urry:` Hydropathy according to Urry scale.
-2) `kr:`  Kapcha-Rossy scale (default).
-   This model has parameters for nucleic acids and post-translational modification.
+1) `hps_urry:` Hydropathy according to Urry scale.
+2) `hps_kr:`  Kapcha-Rossy scale (default).
+   This model has parameters for nucleic acids and post-translational modification residues.
+3) other models can be easily implemented by defining them in `hps/parameters/model_parameters.py`
+
+The package is ready for studying various problems such as, conformation dynamics of single chain, LLPS ...
+
 
 -------------------------------------
 
 ## Requirements:
 
-- **OpenMM 7.7**
+- **OpenMM 7.7** (select cuda version that compatible with your nvidia driver)
 - **Parmed**
 
 ## How to use hpsOpenMM:
@@ -28,7 +32,7 @@ This is a repository contains the source code of hps-urry/kr model.
 - Add folder in Python path (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`
 - The standard example can be found at `example/standard_example`
 - Run simulation: 
-  - goto example folder, e.g standard_example/: 
+  - goto example folder, e.g examples/standard_example/: 
   - edit simulation config file: `md.ini`
   - execute command: `python run_simulation.py -f md.ini`
 #### Windows:
@@ -58,7 +62,7 @@ We would like to thank:
 
 - OpenMM team for developing an excellent and open source engine.
 - SBMOpenMM's developer team for developing an excellent model and open sourcing the software.
-- Sugita's group to make a clear tutorial to introduce many features of OpenMM
+- Sugita's group for making a clear tutorial to introduce many features of OpenMM
 - OpenMM Github community for many useful discussions
 
 ## Do you want to cite this work?
