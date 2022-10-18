@@ -8,8 +8,9 @@ from distutils.util import strtobool
 from json import loads
 
 import numpy as np
-from openmm import *
-from openmm.app import *
+import openmm
+from openmm import unit
+# from openmm.app import *
 from parmed.exceptions import OpenMMWarning
 
 import hps
@@ -63,14 +64,14 @@ cgModel.dumpTopology(f'{protein_code}.psf')
 if device == 'GPU':
     # Run simulation on CUDA
     print(f"Running simulation on GPU CUDA")
-    platform = Platform.getPlatformByName('CUDA')
+    platform = openmm.Platform.getPlatformByName('CUDA')
     properties = {'CudaPrecision': 'mixed', "DeviceIndex": "0"}
     # in case of many GPUs present, we can select which one to use
 
 
 elif device == 'CPU':
     print(f"Running simulation on CPU using {ppn} cores")
-    platform = Platform.getPlatformByName('CPU')
+    platform = openmm.Platform.getPlatformByName('CPU')
     properties = {'Threads': str(ppn)}
 
 print('Simulation started')
@@ -78,26 +79,26 @@ start_time = time.time()
 
 if restart:
     # simulation reporter
-    integrator = LangevinIntegrator(ref_t, tau_t, dt)
-    simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
+    integrator = openmm.LangevinIntegrator(ref_t, tau_t, dt)
+    simulation = openmm.app.Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
     simulation.loadCheckpoint(checkpoint)
     print(
         f"Restart from checkpoint, Time = {simulation.context.getState().getTime()}, Step= {simulation.context.getState().getStepCount()}")
     # number of steps remain to run
     nsteps_remain = md_steps - simulation.context.getState().getStepCount()
     simulation.reporters = []
-    simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
-    simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
+    simulation.reporters.append(openmm.app.CheckpointReporter(checkpoint, nstxout))
+    simulation.reporters.append(openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
     simulation.reporters.append(
-        StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
-                          kineticEnergy=True,
-                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-                          totalSteps=md_steps, separator='\t', append=True))
+        openmm.app.StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
+                                     kineticEnergy=True,
+                                     totalEnergy=True, temperature=True, remainingTime=True, speed=True,
+                                     totalSteps=md_steps, separator='\t', append=True))
     simulation.step(nsteps_remain)
 else:
     # Production phase, create new integrator and simulation context to reset number of steps
-    integrator = LangevinIntegrator(ref_t, tau_t, dt)
-    simulation = Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
+    integrator = openmm.LangevinIntegrator(ref_t, tau_t, dt)
+    simulation = openmm.app.Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
     # Set initial positions: translate input coordinate, the coordinate is >=0
     xyz = np.array(cgModel.positions / unit.nanometer)
     xyz[:, 0] -= np.amin(xyz[:, 0])
@@ -107,18 +108,18 @@ else:
     simulation.context.setPositions(cgModel.positions)
     simulation.context.setVelocitiesToTemperature(ref_t)
     simulation.reporters = []
-    simulation.reporters.append(CheckpointReporter(checkpoint, nstxout))
-    simulation.reporters.append(DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
+    simulation.reporters.append(openmm.app.CheckpointReporter(checkpoint, nstxout))
+    simulation.reporters.append(openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
     simulation.reporters.append(
-        StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
-                          kineticEnergy=True,
-                          totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-                          totalSteps=md_steps, separator='\t', append=False))
+        openmm.app.StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
+                                     kineticEnergy=True,
+                                     totalEnergy=True, temperature=True, remainingTime=True, speed=True,
+                                     totalSteps=md_steps, separator='\t', append=False))
     simulation.step(md_steps)
 
 # write the last frame
 last_frame = simulation.context.getState(getPositions=True, enforcePeriodicBox=bool(pbc)).getPositions()
-PDBFile.writeFile(cgModel.topology, last_frame, open(f'{protein_code}_final.pdb', 'w'))
+openmm.app.PDBFile.writeFile(cgModel.topology, last_frame, open(f'{protein_code}_final.pdb', 'w'))
 simulation.saveCheckpoint(checkpoint)
 
 print("--- Finished in %s seconds ---" % (time.time() - start_time))

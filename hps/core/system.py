@@ -4,11 +4,14 @@
 from collections import OrderedDict
 
 import numpy as np
+import openmm
 import parmed as pmd
-from openmm import *
-from openmm.app import *
 
 from ..parameters import model_parameters
+
+
+# from openmm import *
+# from openmm.app import *
 
 
 class system:
@@ -96,9 +99,9 @@ class system:
         self.structure_path = structure_path
         # Recognize format of input structure file
         if structure_path.endswith('.pdb'):
-            self.structure = PDBFile(structure_path)
+            self.structure = openmm.app.PDBFile(structure_path)
         elif structure_path.endswith('.cif'):
-            self.structure = pdbxfile.PDBxFile(structure_path)
+            self.structure = openmm.app.pdbxfile.PDBxFile(structure_path)
         else:
             raise ValueError(
                 'Structure file extension not recognized. It must end with .pdb or .cif accordingly.')
@@ -124,21 +127,21 @@ class system:
 
         # PairWise potential
         self.ashbaugh_HatchForce = None
-        self.epsilon = 0.8368 * unit.kilojoule_per_mole
-        self.cutoff_Ashbaugh_Hatch = 2.0 * unit.nanometer
+        self.epsilon = 0.8368 * openmm.unit.kilojoule_per_mole
+        self.cutoff_Ashbaugh_Hatch = 2.0 * openmm.unit.nanometer
 
         # Define parameter for DH potential
         self.yukawaForce = None
         self.particles_charge = None
-        self.lD = 1.0 * unit.nanometer
-        self.electric_factor = 138.935458 * unit.kilojoule_per_mole * unit.nanometer / unit.elementary_charge ** 2
-        self.yukawa_cutoff = 3.5 * unit.nanometer
+        self.lD = 1.0 * openmm.unit.nanometer
+        self.electric_factor = 138.935458 * openmm.unit.kilojoule_per_mole * openmm.unit.nanometer / openmm.unit.elementary_charge ** 2
+        self.yukawa_cutoff = 3.5 * openmm.unit.nanometer
         self.epsilon_r = 80.0
 
         self.forceGroups = OrderedDict()
 
         # Initialise an OpenMM system class instance
-        self.system = System()
+        self.system = openmm.System()
 
     def getCAlphaOnly(self) -> None:
         """
@@ -165,7 +168,7 @@ class system:
                 atoms_to_remove.append(a)
 
         # Remove all non C-alpha atoms
-        modeller_topology = modeller.Modeller(self.topology, self.positions)
+        modeller_topology = openmm.app.modeller.Modeller(self.topology, self.positions)
         modeller_topology.delete(atoms_to_remove)
         self.topology = modeller_topology.getTopology()
         self.positions = modeller_topology.getPositions()
@@ -256,7 +259,7 @@ class system:
         # Add bonds to hps object
         self.n_bonds = 0
         for bond in bonds:
-            bond_length = self.bond_length * unit.nanometer
+            bond_length = self.bond_length * openmm.unit.nanometer
             self.bonds[bond] = (bond_length, None)
             self.n_bonds += 1
 
@@ -400,7 +403,7 @@ class system:
         None
         """
 
-        self.harmonicBondForce = HarmonicBondForce()
+        self.harmonicBondForce = openmm.HarmonicBondForce()
         for bond in self.bonds:
             self.harmonicBondForce.addBond(bond[0].index,
                                            bond[1].index,
@@ -436,15 +439,15 @@ class system:
         """
 
         energy_function = 'factor*charge1*charge2/epsilon_r/r*exp(-r/lD)'
-        self.yukawaForce = CustomNonbondedForce(energy_function)
+        self.yukawaForce = openmm.CustomNonbondedForce(energy_function)
         self.yukawaForce.addGlobalParameter('factor', self.electric_factor)
         self.yukawaForce.addGlobalParameter('epsilon_r', self.epsilon_r)
         self.yukawaForce.addGlobalParameter('lD', self.lD)
         self.yukawaForce.addPerParticleParameter('charge')
         if use_pbc:
-            self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
+            self.yukawaForce.setNonbondedMethod(openmm.NonbondedForce.CutoffPeriodic)
         else:
-            self.yukawaForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+            self.yukawaForce.setNonbondedMethod(openmm.NonbondedForce.CutoffNonPeriodic)
 
         self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
 
@@ -513,15 +516,15 @@ class system:
         energy_function += '+(1-step(2^(1/6)*sigma-r)) * (hps*4*epsilon*((sigma/r)^12-(sigma/r)^6));'
         energy_function += 'sigma=0.5*(sigma1+sigma2);'
         energy_function += 'hps=0.5*(hps1+hps2)'
-        self.ashbaugh_HatchForce = CustomNonbondedForce(energy_function)
+        self.ashbaugh_HatchForce = openmm.CustomNonbondedForce(energy_function)
         self.ashbaugh_HatchForce.addGlobalParameter('epsilon', self.epsilon)
         self.ashbaugh_HatchForce.addPerParticleParameter('sigma')
         self.ashbaugh_HatchForce.addPerParticleParameter('hps')
         #
         if use_pbc:
-            self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffPeriodic)
+            self.ashbaugh_HatchForce.setNonbondedMethod(openmm.NonbondedForce.CutoffPeriodic)
         else:
-            self.ashbaugh_HatchForce.setNonbondedMethod(NonbondedForce.CutoffNonPeriodic)
+            self.ashbaugh_HatchForce.setNonbondedMethod(openmm.NonbondedForce.CutoffNonPeriodic)
 
         self.ashbaugh_HatchForce.setCutoffDistance(self.cutoff_Ashbaugh_Hatch)
 
@@ -610,7 +613,7 @@ class system:
         """
         print('Checking large bonds ...')
         if isinstance(threshold, float):
-            threshold = threshold * unit.nanometer
+            threshold = threshold * openmm.unit.nanometer
 
         for b in self.bonds:
             if self.bonds[b][0] >= threshold:
@@ -652,8 +655,9 @@ class system:
         print('Energy from initial structure (input structure):')
 
         # Define test simulation to extract forces
-        integrator = LangevinIntegrator(1 * unit.kelvin, 1 / unit.picosecond, 0.0005 * unit.picoseconds)
-        sim = Simulation(self.topology, self.system, integrator)
+        integrator = openmm.LangevinIntegrator(1 * openmm.unit.kelvin, 1 / openmm.unit.picosecond,
+                                               0.0005 * openmm.unit.picoseconds)
+        sim = openmm.app.Simulation(self.topology, self.system, integrator)
         sim.context.setPositions(self.positions)
         state = sim.context.getState(getForces=True, getEnergy=True)
 
@@ -661,7 +665,7 @@ class system:
         print('The Potential Energy of the system is : %s' % state.getPotentialEnergy())
         for i, n in enumerate(self.forceGroups):
             energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
-                unit.kilojoules_per_mole)
+                openmm.unit.kilojoules_per_mole)
             print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
         print('')
 
@@ -686,7 +690,7 @@ class system:
                     print('Minimising system with energy tolerance of %.1f kj/mol' % tolerance)
                     print('')
 
-                sim.minimizeEnergy(tolerance=tolerance * unit.kilojoule / unit.mole)
+                sim.minimizeEnergy(tolerance=tolerance * openmm.unit.kilojoule / openmm.unit.mole)
                 # minimized = True
                 state = sim.context.getState(getForces=True)
                 prev_force = np.max(forces)
@@ -706,7 +710,7 @@ class system:
             print('The Potential Energy of the system (after minimized) is : %s' % state.getPotentialEnergy())
             for i, n in enumerate(self.forceGroups):
                 energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
-                    unit.kilojoules_per_mole)
+                    openmm.unit.kilojoules_per_mole)
                 print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
 
             print('')
