@@ -24,7 +24,7 @@ class models:
         Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
         initialized parameters.
 
-        Initialises a coarse-grained, carbon alpha (CA), hpsOpenMM system class
+        Initializes a coarse-grained, carbon alpha (CA), hpsOpenMM system class
         from a structure and a contact file defining the native contacts for the
         coarse grained model.
 
@@ -35,7 +35,7 @@ class models:
         3) Create the default force objects.
         4) Create the OpenMM system class.
 
-        The method can be used to generate an initialised hpsOpenMM system class, that only
+        The method can be used to generate an initialized hpsOpenMM system class, that only
         contains the geometrical parameters, by passing the option default_parameters as False.
 
         Finally, a forcefield file can be given in order to read the forcefield parameters from it.
@@ -50,7 +50,7 @@ class models:
             HPS scale. There are two options correspond to two scale:
             'hps_urry': using Urry scale (default).
             'hps_kr': using Kapcha-Rossy scale.
-            In the future will add more scale like, Tesei scale, HPS-T which hps is temperature dependent.
+            In the future will add more scale like, Tesei's scale, HPS-T which hps is temperature dependent.
         box_dimension : float or array (None)
             If box_dimension is supplied, then will use PBC.
             if float is given, then use cubic box
@@ -62,7 +62,7 @@ class models:
         Returns
         -------
         hps : :code:`hpsOpenMM.system`
-            Initialised hpsOpenMM.system class with default options for defining
+            Initialized hpsOpenMM.system class with default options for defining
             a coarse-grained CA force field.
         """
 
@@ -99,7 +99,7 @@ class models:
 
         # print('')
         print('Adding default bond force constant...')
-        # measured in unit of kj/mol/nm^2= 20kcal/mol/A^2
+        # measured in unit of kj/mol/nm^2 (k_bond is set to 20kcal/mol/A^2)
         hps.setBondForceConstants(8368.0)
         print('')
         print('_________________________________')
