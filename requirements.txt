@@ -223,3 +223,15 @@ yarg=0.1.9=pypi_0
 zipp=3.8.1=pyhd8ed1ab_0
 zlib=1.2.12=h166bdaf_2
 zstd=1.5.2=h6239696_4
+
+numpy>=1.22.4
+openmm>=7.7.0
+parmed>=3.4.3
+git>=2.37.3
+mdanalysis>=2.2.0
+matplotlib>=3.5.3
+pandas>=1.4.4
+numba>=0.55.2
+mdtraj>=1.9.7
+scipy>=1.9.1
+argparse>=1.4.0
