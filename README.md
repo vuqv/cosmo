@@ -9,8 +9,8 @@ OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
 
 `hps:` hydropathy scale. Currently, there are two models are supported:
 
-1) `hps_urry:` Hydropathy according to Urry scale (Recommended).
-2) `hps_kr:`  Kapcha-Rossy scale (default).
+1) `hps_urry:` Hydropathy according to Urry scale (default, Recommended).
+2) `hps_kr:`  Kapcha-Rossy scale.
    This model has parameters for nucleic acids and post-translational modification residues.
 3) other models can be easily implemented by defining them in `hps/parameters/model_parameters.py`
 
@@ -27,10 +27,14 @@ The package is ready for studying various problems such as, conformation dynamic
 ## How to use hpsOpenMM:
 
 #### Linux:
+The main requirements is openMM 7.7
+For my specific case, I don't know why I can not install openMM 7.7 with python version < 3.10
+For that reason, I will create a virtual environment with Python 3.10 and then install openMM 7.7.
+
 - Create conda environment: `conda create -n hpsOpenMM python=3.10`
 - activate `hpsOpenMM` env : `conda activate hpsOpenMM`
 - Install openMM 7.7: `conda install openMM=7.7 conda install openmm=7.7 cudatoolkit=10.2`
-- `(Note that cudatoolkit=10.2 for plgrid, 11.6 for masli6)`
+  - `(Note that cudatoolkit=10.2 for plgrid, 11.6 for masli6)`
 - Download folder and place in target location, for example: `PATH_TO_CODE/hpsOpenMM/`
 - Add folder in Python path (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`
 - The standard example can be found at `example/standard_example`

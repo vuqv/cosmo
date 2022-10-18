@@ -17,7 +17,7 @@ class models:
     @staticmethod
     def buildHPSModel(structure_file: str,
                       minimize: bool = False,
-                      hps_scale: str = 'hps_kr',
+                      hps_scale: str = 'hps_urry',
                       box_dimension: Any = None,
                       forcefield_file: Any = None):
         """
@@ -46,10 +46,10 @@ class models:
             Path to the input structure file.
         minimize : boolean (False)
             If True the initial structure will undergo the energy minimization.
-        hps_scale : string ('kr')
+        hps_scale : string ('hps_urry')
             HPS scale. There are two options correspond to two scale:
-            'hps_urry': using Urry scale
-            'hps_kr': using Kapcha-Rossy scale (default).
+            'hps_urry': using Urry scale (default).
+            'hps_kr': using Kapcha-Rossy scale.
             In the future will add more scale like, Tesei scale, HPS-T which hps is temperature dependent.
         box_dimension : float or array (None)
             If box_dimension is supplied, then will use PBC.
