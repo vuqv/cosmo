@@ -538,7 +538,7 @@ class system:
 
         energy_function = '-log(' + energy_function_alpha + energy_function_beta + ')'
         self.gaussianTorsionForce = openmm.CustomTorsionForce(energy_function)
-        self.gaussianTorsionForce.addGlobalParameter("k_alpha1", SOMEVALUES)
+        self.gaussianTorsionForce.addGlobalParameter("k_alpha1", SOMEVALUEs)
         self.gaussianTorsionForce.addGlobalParameter()
 
     def addYukawaForces(self, use_pbc: bool) -> None:
