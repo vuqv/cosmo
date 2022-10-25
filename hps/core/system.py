@@ -96,6 +96,7 @@ class system:
         """
 
         # Define structure object attributes
+
         self.structure_path = structure_path
         # Recognize format of input structure file
         if structure_path.endswith('.pdb'):
@@ -111,9 +112,25 @@ class system:
         # Define geometric attributes
         self.atoms = []
         self.n_atoms = None
+
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
+
+        self.angles = OrderedDict()
+        self.angles_indexes = []
+        self.n_angles = None
+        self.gamma = 0.0239 / openmm.unit.kilojoule_per_mole  # equal to 0.1 mol/kcal
+        self.eps_alpha = 17.9912 * openmm.unit.kilojoule_per_mole  # equal to 4.3 kcal/mol
+        self.theta_alpha = 1.6 * openmm.unit.radian
+        self.theta_beta = 2.27 * openmm.unit.radian
+        self.k_alpha = 445.1776 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2
+        self.k_beta = 110.0392 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2
+
+        self.torsions = OrderedDict()
+        self.torsions_indexes = []
+        self.n_torsions = None
+
         self.hps_scale = hps_scale
         self.bond_length = model_parameters.parameters[hps_scale]["bond_length"]
         self.bondedTo = None
@@ -121,14 +138,14 @@ class system:
 
         # Define force attributes
         self.harmonicBondForce = None
+        self.gaussianAngleForce = None
         self.rf_sigma = None
-        # self.rf_cutoff = None
-        self.particles_hps = None
 
         # PairWise potential
         self.ashbaugh_HatchForce = None
         self.epsilon = 0.8368 * openmm.unit.kilojoule_per_mole
         self.cutoff_Ashbaugh_Hatch = 2.0 * openmm.unit.nanometer
+        self.particles_hps = None
 
         # Define parameter for DH potential
         self.yukawaForce = None
@@ -275,6 +292,87 @@ class system:
             self.bondedTo[bond[0]].append(bond[1])
             self.bondedTo[bond[1]].append(bond[0])
 
+    def getAngles(self):
+        """
+        Adds angles to hpsOpenMM system class
+        """
+        unique_angles = set()
+        for bond in self.bonds:
+            for atom in self.bondedTo[bond[0]]:
+                if atom != bond[1]:
+                    if atom.index < bond[1].index:
+                        unique_angles.add((atom, bond[0], bond[1]))
+                    else:
+                        unique_angles.add((bond[1], bond[0], atom))
+            for atom in self.bondedTo[bond[1]]:
+                if atom != bond[0]:
+                    if atom.index > bond[0].index:
+                        unique_angles.add((bond[0], bond[1], atom))
+                    else:
+                        unique_angles.add((atom, bond[1], bond[0]))
+
+        # sort angles by index of first atom
+        unique_angles = sorted(list(unique_angles), key=lambda x: x[0].index)
+
+        # add angles to hps object
+        self.n_angles = 0
+        for angle in unique_angles:
+            self.angles[angle] = (
+                self.gamma, self.eps_alpha, self.theta_alpha, self.theta_beta, self.k_alpha, self.k_beta)
+            self.n_angles += 1
+            self.angles_indexes.append((angle[0].index, angle[1].index, angle[2].index))
+
+    def getTorsions(self):
+        unique_torsions = set()
+        for angle in self.angles:
+            for atom in self.bondedTo[angle[0]]:
+                if atom not in angle:
+                    if atom.index < angle[2].index:
+                        unique_torsions.add((atom, angle[0], angle[1], angle[2]))
+                    else:
+                        unique_torsions.add((angle[2], angle[1], angle[0], atom))
+
+            for atom in self.bondedTo[angle[2]]:
+                if atom not in angle:
+                    if atom.index > angle[0].index:
+                        unique_torsions.add((angle[0], angle[1], angle[2], atom))
+                    else:
+                        unique_torsions.add((atom, angle[2], angle[1], angle[0]))
+
+        # sort dihedral angles by the first atom index
+        unique_torsions = sorted(list(unique_torsions), key=lambda x: x[0].index)
+
+        # load parameter eps_di from parameter file
+        params = model_parameters.parameters[self.hps_scale]
+        # add dihedral angle to hps object
+        self.n_torsions = 0
+        for torsion in unique_torsions:
+            print(torsion)
+            if len(self.bondedTo[torsion[0]]) > 1:
+                for atom in self.bondedTo[torsion[0]]:
+                    if atom not in torsion:
+                        print(f"Atom not in torsion: {atom} {atom.residue.name}, {atom.residue.index}")
+                        eps_di_preceding = params[atom.residue.name]['eps_di']
+                        weight_preceding = 1
+            else:
+                eps_di_preceding, weight_preceding = 0, 0
+
+            if len(self.bondedTo[torsion[3]]) > 1:
+                for atom in self.bondedTo[torsion[3]]:
+                    if atom not in torsion:
+                        eps_di_succeeding = params[atom.residue.name]['eps_di']
+                        weight_succeeding = 1
+            else:
+                eps_di_succeeding, weight_succeeding = 0, 0
+
+            norminator = eps_di_preceding+params[torsion[0].residue.name]['eps_di']+params[torsion[3].residue.name]['eps_di']+eps_di_succeeding
+            dominator = weight_succeeding+weight_preceding+2
+            print(norminator, dominator)
+
+            self.torsions[torsion] = (None, None)  # add torsion angle parameters
+            self.n_torsions += 1
+            self.torsions_indexes.append((torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index))
+
     """ Functions for setting force specific parameters """
 
     def setBondForceConstants(self, bond_force_constant):
@@ -409,6 +507,23 @@ class system:
                                            bond[1].index,
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
+
+    def addGaussianAngleForces(self) -> None:
+        """
+        Add Gaussian functional form of angle
+        """
+        energy_function = '(-1 / gamma) * log(exp(-gamma * (k_alpha * (theta - theta_alpha) ^ 2 + eps_alpha)) ' \
+                          '+ exp(-gamma * k_beta * (theta - theta_beta) ^ 2))'
+        self.gaussianAngleForce = openmm.CustomAngleForce(energy_function)
+        self.gaussianAngleForce.addGlobalParameter('gamma', self.gamma)
+        self.gaussianAngleForce.addGlobalParameter('eps_alpha', self.eps_alpha)
+        self.gaussianAngleForce.addGlobalParameter('theta_alpha', self.theta_alpha)
+        self.gaussianAngleForce.addGlobalParameter('theta_beta', self.theta_beta)
+        self.gaussianAngleForce.addGlobalParameter('k_alpha', self.k_alpha)
+        self.gaussianAngleForce.addGlobalParameter('k_beta', self.k_beta)
+
+        for angle in self.angles:
+            self.gaussianAngleForce.addAngle(angle[0].index, angle[1].index, angle[2].index)
 
     def addYukawaForces(self, use_pbc: bool) -> None:
         """
@@ -753,6 +868,10 @@ class system:
         if self.harmonicBondForce is not None:
             self.system.addForce(self.harmonicBondForce)
             self.forceGroups['Harmonic Bond Energy'] = self.harmonicBondForce
+
+        if self.gaussianAngleForce is not None:
+            self.system.addForce(self.gaussianAngleForce)
+            self.forceGroups['Gaussian Angle Energy'] = self.gaussianAngleForce
 
         if self.yukawaForce is not None:
             self.system.addForce(self.yukawaForce)

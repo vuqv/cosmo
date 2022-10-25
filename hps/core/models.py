@@ -93,6 +93,12 @@ class models:
             hps.getBonds()
             print('Added ' + str(hps.n_bonds) + ' bonds')
 
+            hps.getAngles()
+            print(f'Added {hps.n_angles} angles ')
+
+            hps.getTorsions()
+            print(f'Added {hps.n_torsions} torsion angles ')
+
         elif forcefield_file is not None:
             print(
                 'Forcefield file given. Bonds, angles, torsions and native contacts definitions will be read from it!')
@@ -107,6 +113,9 @@ class models:
         print('Adding Forces:')
         hps.addHarmonicBondForces()
         print('Added Harmonic Bond Forces')
+
+        hps.addGaussianAngleForces()
+        print('Added Gaussian Angle Forces')
 
         if box_dimension:
             use_pbc = True
