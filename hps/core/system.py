@@ -120,6 +120,7 @@ class system:
         self.angles = OrderedDict()
         self.angles_indexes = []
         self.n_angles = None
+        self.gaussianAngleForce = None
         self.gamma = 0.0239 / openmm.unit.kilojoule_per_mole  # equal to 0.1 mol/kcal
         self.eps_alpha = 17.9912 * openmm.unit.kilojoule_per_mole  # equal to 4.3 kcal/mol
         self.theta_alpha = 1.6 * openmm.unit.radian
@@ -130,6 +131,7 @@ class system:
         self.torsions = OrderedDict()
         self.torsions_indexes = []
         self.n_torsions = None
+        self.gaussianTorsionForce = None
 
         self.hps_scale = hps_scale
         self.bond_length = model_parameters.parameters[hps_scale]["bond_length"]
@@ -138,7 +140,7 @@ class system:
 
         # Define force attributes
         self.harmonicBondForce = None
-        self.gaussianAngleForce = None
+
         self.rf_sigma = None
 
         # PairWise potential
@@ -347,11 +349,9 @@ class system:
         # add dihedral angle to hps object
         self.n_torsions = 0
         for torsion in unique_torsions:
-            print(torsion)
             if len(self.bondedTo[torsion[0]]) > 1:
                 for atom in self.bondedTo[torsion[0]]:
                     if atom not in torsion:
-                        print(f"Atom not in torsion: {atom} {atom.residue.name}, {atom.residue.index}")
                         eps_di_preceding = params[atom.residue.name]['eps_di']
                         weight_preceding = 1
             else:
@@ -365,11 +365,11 @@ class system:
             else:
                 eps_di_succeeding, weight_succeeding = 0, 0
 
-            norminator = eps_di_preceding+params[torsion[0].residue.name]['eps_di']+params[torsion[3].residue.name]['eps_di']+eps_di_succeeding
-            dominator = weight_succeeding+weight_preceding+2
-            print(norminator, dominator)
+            # using weighting rule 1-1001-1: (i-1), i, (i+3), (i+4) are 1 and (i+1), (i+2) are 0
+            eps_d = (eps_di_preceding + params[torsion[0].residue.name]['eps_di'] + params[torsion[3].residue.name][
+                'eps_di'] + eps_di_succeeding) / (weight_succeeding + weight_preceding + 2)
 
-            self.torsions[torsion] = (None, None)  # add torsion angle parameters
+            self.torsions[torsion] = (eps_d, None)  # add torsion angle parameters
             self.n_torsions += 1
             self.torsions_indexes.append((torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index))
 
@@ -510,7 +510,8 @@ class system:
 
     def addGaussianAngleForces(self) -> None:
         """
-        Add Gaussian functional form of angle
+        Add Gaussian functional form of angle.
+        Note that in openMM log is neutral logarithm
         """
         energy_function = '(-1 / gamma) * log(exp(-gamma * (k_alpha * (theta - theta_alpha) ^ 2 + eps_alpha)) ' \
                           '+ exp(-gamma * k_beta * (theta - theta_beta) ^ 2))'
@@ -524,6 +525,21 @@ class system:
 
         for angle in self.angles:
             self.gaussianAngleForce.addAngle(angle[0].index, angle[1].index, angle[2].index)
+
+    def addGaussianTorsionForces(self) -> None:
+        energy_function_alpha = 'exp(-k_alpha1*(theta-theta_alpha1)^2-esp_d)'
+        energy_function_alpha += '+exp(-k_alpha2*(theta-theta_alpha2)^4+esp_0)'
+        energy_function_alpha += '+exp(-k_alpha2*(theta-theta_alpha2+2*pi)^4+esp_0)'
+
+        energy_function_beta = 'exp(-k_beta1*(theta-theta_beta1)^2+esp_1+esp_d)'
+        energy_function_beta += '+exp(-k_beta1*(theta-theta_beta1-2*pi)^2+esp_1+esp_d)'
+        energy_function_beta += '+exp(-k_beta2*(theta-theta_beta2)^4+esp_2)'
+        energy_function_beta += '+exp(-k_beta2*(theta-theta_beta2-2*pi)^4+esp_2)'
+
+        energy_function = '-log(' + energy_function_alpha + energy_function_beta + ')'
+        self.gaussianTorsionForce = openmm.CustomTorsionForce(energy_function)
+        self.gaussianTorsionForce.addGlobalParameter("k_alpha1", SOMEVALUE)
+        self.gaussianTorsionForce.addGlobalParameter()
 
     def addYukawaForces(self, use_pbc: bool) -> None:
         """
