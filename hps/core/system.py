@@ -290,7 +290,11 @@ class system:
 
     def getAngles(self):
         """
-        Adds angles to hpsOpenMM system class
+        Reads bonds from topology, adds them to the main class and sorts them
+        into a dictionary to store their forcefield properties.
+
+        Angles are built from bond (bondedTo instance).
+        This function modify :code:`self.angles`, :code:`self.angles_indexes` and :code:`self.n_angles`
         """
         unique_angles = set()
         for bond in self.bonds:
@@ -318,6 +322,13 @@ class system:
             self.angles_indexes.append((angle[0].index, angle[1].index, angle[2].index))
 
     def getTorsions(self):
+        """
+        Reads bonds from topology, adds them to the main class and sorts them
+        into a dictionary to store their forcefield properties.
+
+        Torsion Angles are built from angles and bondedTo instance.
+        This function modify :code:`self.torsions`, :code:`self.torsions_indexes` and :code:`self.n_torsions`
+        """
         unique_torsions = set()
         for angle in self.angles:
             for atom in self.bondedTo[angle[0]]:
@@ -504,7 +515,9 @@ class system:
     def addGaussianAngleForces(self) -> None:
         """
         Add Gaussian functional form of angle.
-        Note that in openMM log is neutral logarithm
+        Note that in openMM log is neutral logarithm.
+
+        Angle potential is taken from reference:
         """
 
         gamma = 0.0239 / openmm.unit.kilojoule_per_mole  # equal to 0.1 mol/kcal
