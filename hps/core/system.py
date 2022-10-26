@@ -54,6 +54,16 @@ class system:
         Stores the OpenMM :code:`HarmonicBondForce` initialised-class. Implements
         a harmonic bond potential between pairs of particles, that depends
         quadratically on their distance.
+    n_angles : :code:`int`
+        Total number of angles in the model.
+    gaussianAngleForce : :code:`openmm.CustomAngleForce`
+        Stores the OpenMM :code:`CustomAngleForce` initialised-class. Implements
+        a Gaussian angle bond potential between pairs of three particles.
+    n_torsions : :code:`int`
+        Total number of torsion angles in the model.
+    gaussianTorsionForce : :code:`openmm.CustomTorsionForce`
+        Stores the OpenMM :code:`CustomTorsionForce` initialised-class. Implements
+        a Gaussian torsion angle bond potential between pairs of four particles.
     yukawaForce : :code:`openmm.CustomNonbondedForce`
         Stores the OpenMM :code:`CustomNonbondedForce` initialized-class.
         Implements the Debye-Huckle potential.
@@ -517,6 +527,12 @@ class system:
         Add Gaussian functional form of angle.
         Note that in openMM log is neutral logarithm.
 
+        Angle potential take Gaussian functional form in hps-ss model.
+
+        .. math::
+            U_{angle}(\\theta) = \\frac{-1}{\gamma}
+            \\ln{[e^{-\gamma[k_\\alpha( \\theta-\\theta_\\alpha)^2+\\epsilon_\\alpha]}+e^{-\\gamma k_\\beta(\\theta-\\theta_\\beta)^2}]}
+
         Angle potential is taken from reference:
         """
 
@@ -541,6 +557,29 @@ class system:
             self.gaussianAngleForce.addAngle(angle[0].index, angle[1].index, angle[2].index)
 
     def addGaussianTorsionForces(self) -> None:
+        """
+        Torsion potential in hps-ss model takes the form:
+
+        .. math::
+            U_{torsion}(\\theta) = -\\ln\\left[ U_{torsion, \\alpha}(\\theta, \\epsilon_d) + U_{torsion, \\beta}(\\theta, \\epsilon_d)\\right]
+
+        where,
+
+
+        .. math::
+
+            U_{torsion, \\alpha}(\\theta, \\epsilon_d)  &= e^{-k_{\\alpha, 1}(\\theta-\\theta_{\\alpha,1})^2-\\epsilon_d}
+                                                        + e^{-k_{\\alpha, 2}(\\theta-\\theta_{\\alpha,2})^4 + e_0}
+                                                        + e^{-k_{\\alpha, 2}(\\theta-\\theta_{\\alpha,2}+2\\pi)^4 + e_0} \\
+
+
+            U_{torsion, \\beta}(\\theta, \\epsilon_d) &= e^{-k_{\\beta,1}(\\theta-\\theta_{\\beta,1})^2+e_1+\\epsilon_d}
+                                                    + e^{-k_{\\beta,1}(\\theta-\\theta_{\\beta,1}-2\\pi)^2+e_1+\\epsilon_d} \\
+
+                                                    &+ e^{-k_{\\beta,2}(\\theta-\\theta_{\\beta,2})^4+e_2}
+                                                    + e^{-k_{\\beta,2}(\\theta-\\theta_{\\beta,2}-2\\pi)^4+e_2}
+
+        """
 
         k_alpha1 = 47.6976 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2  # 11.4 kcal/mol/rad^2
         k_alpha2 = 0.6276 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 4  # 0.15 kcal/mol/rad^4
