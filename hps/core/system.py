@@ -200,7 +200,7 @@ class system:
             Update system atoms, then add bonds between C-alpha atoms of the same chain.
             openMM load input PDB file and separate chain if encounter TER instruction. It doesn't matter if two chains
             have the same chain name.
-            This may have a vulnerable is that if two CA atom on the same chain not not consecutive, like residue
+            This may have a vulnerable is that if two CA atom on the same chain not consecutive, like residue
             8 and 10 are listed consecutively on input file but residue 9 was missing. The code will add bond between
             residue 8 and 10 which cause large bond. The better solution is check the input file carefully and the logic
             condition in code has nothing to do.
@@ -350,6 +350,10 @@ class system:
 
             for atom in self.bondedTo[angle[2]]:
                 if atom not in angle:
+                    """ 
+                        it is stupid for checking atom.index as following line but it happens in all-atom model, when
+                        chain of atoms my be branched. just keep it here.
+                    """
                     if atom.index > angle[0].index:
                         unique_torsions.add((angle[0], angle[1], angle[2], atom))
                     else:
@@ -363,6 +367,16 @@ class system:
         # add dihedral angle to hps object
         self.n_torsions = 0
         for torsion in unique_torsions:
+            """
+            when there are two residues bonded to first atom of torsion mean that this torsion angle is not the first
+            angle. One residues will be in list of torsion atoms and the other is out of the list.
+            Atom not in the list of torsion atom is preceding of residue (i).
+            
+            Same as last atom of torsion angle, atom not in torsion atom list is succeeding atom, (i+4)
+            
+            When there is only one atom bonded to first or last atom in torsion angle, means this is the first or 
+            the last torsion angle.
+            """
             if len(self.bondedTo[torsion[0]]) > 1:
                 for atom in self.bondedTo[torsion[0]]:
                     if atom not in torsion:
@@ -531,13 +545,14 @@ class system:
 
         .. math::
             U_{angle}(\\theta) = \\frac{-1}{\gamma}
-            \\ln{[e^{-\gamma[k_\\alpha( \\theta-\\theta_\\alpha)^2+\\epsilon_\\alpha]}+e^{-\\gamma k_\\beta(\\theta-\\theta_\\beta)^2}]}
+                \\ln{[e^{-\gamma[k_\\alpha( \\theta-\\theta_\\alpha)^2+\\epsilon_\\alpha]}
+                +e^{-\\gamma k_\\beta(\\theta-\\theta_\\beta)^2}]}
 
         Angle potential is taken from reference:
         """
 
-        gamma = 0.0239 / openmm.unit.kilojoule_per_mole  # equal to 0.1 mol/kcal
-        eps_alpha = 17.9912 * openmm.unit.kilojoule_per_mole  # equal to 4.3 kcal/mol
+        gamma = 0.0239 / openmm.unit.kilojoule_per_mole  # 0.1 mol/kcal
+        eps_alpha = 17.9912 * openmm.unit.kilojoule_per_mole  # 4.3 kcal/mol
         theta_alpha = 1.6 * openmm.unit.radian
         theta_beta = 2.27 * openmm.unit.radian
         k_alpha = 445.1776 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2
@@ -878,7 +893,7 @@ class system:
         state = sim.context.getState(getForces=True, getEnergy=True)
 
         # Print initial state of the system
-        print('The Potential Energy of the system is : %s' % state.getPotentialEnergy())
+        print(f'The Potential Energy of the system is : {state.getPotentialEnergy()}')
         for i, n in enumerate(self.forceGroups):
             energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                 openmm.unit.kilojoules_per_mole)
@@ -919,7 +934,7 @@ class system:
                     raise ValueError('The system could not be minimized at the requested convergence\n' +
                                      'Try to increase the force threshold value to achieve convergence.')
 
-            print('All forces are less than %.2f kj/mol/nm' % threshold)
+            print(f'All forces are less than {threshold:.2f} kj/mol/nm')
             print('______________________')
             state = sim.context.getState(getPositions=True, getEnergy=True)
             print('After minimisation:')
@@ -935,7 +950,7 @@ class system:
             print('______________________')
             print('')
 
-    def addParticles(self):
+    def addParticles(self) -> None:
         """
         Add particles to the system OpenMM class instance.
 
@@ -956,7 +971,7 @@ class system:
             for i in range(len(self.particles_mass)):
                 self.system.addParticle(self.particles_mass[i])
 
-    def addSystemForces(self):
+    def addSystemForces(self) -> None:
         """
         Add forces to the system OpenMM class instance. It also save
         names for the added forces to include them in the reporter class.
@@ -986,7 +1001,7 @@ class system:
             self.system.addForce(self.ashbaugh_HatchForce)
             self.forceGroups['PairWise Energy'] = self.ashbaugh_HatchForce
 
-    def dumpStructure(self, output_file):
+    def dumpStructure(self, output_file: str) -> None:
         """
         Writes a structure file of the system in its current state.
 
@@ -1004,7 +1019,7 @@ class system:
 
         self.structure.writeFile(self.topology, self.positions, file=open(output_file, 'w'))
 
-    def dumpTopology(self, output_file):
+    def dumpTopology(self, output_file: str) -> None:
         """
         Writes a topology file of the system in PSF format, this is used for visualization and post-analysis.
 

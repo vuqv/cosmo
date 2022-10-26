@@ -33,9 +33,11 @@ Regy, R. M., Thompson, J., Kim, Y. C., ; Mittal, J. (2021).
 Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins.
 Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
 
-lambda_ij = muy*lambda0_ij -delta
-where muy=1, delta= 0.08 is the optimal set for the set of 42 proteins they studied.
-lambda_ij = lambda0_ij - 0.08 = 0.5*(lambda_i+lambda_j) - 0.08 = 0.5(lambda_i -0.08 + lambda_j-0.08)
+..math::
+    \\lambda_{ij} = \\muy \\lambda_0_ij - \\delta
+
+    \\muy=1, \\delta= 0.08 is the optimal set for the set of 42 proteins they studied.
+    \\lambda_{ij} = \\lambda0_{ij} - 0.08 = 0.5*(\\lambda_i+\\lambda_j) - 0.08 = 0.5(\\lambda_i -0.08 + \\lambda_j-0.08)
 
 In both version, KR and Urry, we can tune directly lambda parameter in Urry by 0.08 so we can use only one equation for
 two model (choose parameter when passing hps_scale parameter)
@@ -347,6 +349,17 @@ parameters = {
 
     },
     "hps_ss": {
+        """
+        HPS-Urry with angle and torsion potential.
+        eps_di is parameter control the dihedral potential. Here we implemented the (i,i+4) assignment and 1-1001-1
+        mixing rule. 
+        torsion angle made by residue (i, i+3)
+        residue (i-1) and (i+4) are preceding and succeeding residues
+        1-1001-1 means:
+            weight of residues (i-1), (i), (i+3) and (i+4) are 1
+            weight of residues (i+1), (i+2) are 0
+         
+        """
         "bond_length": 0.382,
         "bonded_exclusions_index": 3,
         "ALA": {

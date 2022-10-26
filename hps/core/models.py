@@ -37,7 +37,6 @@ class models:
         The method can be used to generate an initialized hpsOpenMM system class, that only
         contains the geometrical parameters, by passing the option default_parameters as False.
 
-        Finally, a forcefield file can be given in order to read the forcefield parameters from it.
 
         Parameters
         ----------
@@ -46,10 +45,10 @@ class models:
         minimize : boolean (False)
             If True the initial structure will undergo the energy minimization.
         hps_scale : string ('hps_urry')
-            HPS scale. There are two options correspond to two scale:
-            'hps_urry': using Urry scale (default).
-            'hps_kr': using Kapcha-Rossy scale.
-            In the future will add more scale like, Tesei's scale, HPS-T which hps is temperature dependent.
+            HPS scale. There are three options correspond to two scale:
+                * 'hps_urry': using Urry scale (default).
+                * 'hps_ss': hps_urry with angle and torsion potential.
+                * 'hps_kr': using Kapcha-Rossy scale.
         box_dimension : float or array (None)
             If box_dimension is supplied, then will use PBC.
             if float is given, then use cubic box
