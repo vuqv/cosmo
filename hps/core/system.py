@@ -118,7 +118,12 @@ class system:
                 'Structure file extension not recognized. It must end with .pdb or .cif accordingly.')
         self.topology = self.structure.topology
         self.positions = self.structure.positions
+
+        # particle properties
         self.particles_mass = None
+        self.rf_sigma = None  # particle vdw radius
+        self.particles_charge = None
+
         # Define geometric attributes
         self.atoms = []
         self.n_atoms = None
@@ -126,6 +131,7 @@ class system:
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
+        self.harmonicBondForce = None
 
         self.angles = OrderedDict()
         self.angles_indexes = []
@@ -142,20 +148,14 @@ class system:
         self.bondedTo = None
         self.bonded_exclusions_index = model_parameters.parameters[hps_scale]["bonded_exclusions_index"]
 
-        # Define force attributes
-        self.harmonicBondForce = None
-
-        self.rf_sigma = None
-
-        # PairWise potential
+        # Parameters for PairWise potential
         self.ashbaugh_HatchForce = None
         self.epsilon = 0.8368 * openmm.unit.kilojoule_per_mole
         self.cutoff_Ashbaugh_Hatch = 2.0 * openmm.unit.nanometer
         self.particles_hps = None
 
-        # Define parameter for DH potential
+        # Define parameters for DH potential
         self.yukawaForce = None
-        self.particles_charge = None
         self.lD = 1.0 * openmm.unit.nanometer
         self.electric_factor = 138.935458 * openmm.unit.kilojoule_per_mole * openmm.unit.nanometer / openmm.unit.elementary_charge ** 2
         self.yukawa_cutoff = 3.5 * openmm.unit.nanometer
