@@ -121,12 +121,6 @@ class system:
         self.angles_indexes = []
         self.n_angles = None
         self.gaussianAngleForce = None
-        self.gamma = 0.0239 / openmm.unit.kilojoule_per_mole  # equal to 0.1 mol/kcal
-        self.eps_alpha = 17.9912 * openmm.unit.kilojoule_per_mole  # equal to 4.3 kcal/mol
-        self.theta_alpha = 1.6 * openmm.unit.radian
-        self.theta_beta = 2.27 * openmm.unit.radian
-        self.k_alpha = 445.1776 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2
-        self.k_beta = 110.0392 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2
 
         self.torsions = OrderedDict()
         self.torsions_indexes = []
@@ -319,8 +313,7 @@ class system:
         # add angles to hps object
         self.n_angles = 0
         for angle in unique_angles:
-            self.angles[angle] = (
-                self.gamma, self.eps_alpha, self.theta_alpha, self.theta_beta, self.k_alpha, self.k_beta)
+            self.angles[angle] = None
             self.n_angles += 1
             self.angles_indexes.append((angle[0].index, angle[1].index, angle[2].index))
 
@@ -513,33 +506,73 @@ class system:
         Add Gaussian functional form of angle.
         Note that in openMM log is neutral logarithm
         """
+
+        gamma = 0.0239 / openmm.unit.kilojoule_per_mole  # equal to 0.1 mol/kcal
+        eps_alpha = 17.9912 * openmm.unit.kilojoule_per_mole  # equal to 4.3 kcal/mol
+        theta_alpha = 1.6 * openmm.unit.radian
+        theta_beta = 2.27 * openmm.unit.radian
+        k_alpha = 445.1776 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2
+        k_beta = 110.0392 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2
+
         energy_function = '(-1 / gamma) * log(exp(-gamma * (k_alpha * (theta - theta_alpha) ^ 2 + eps_alpha)) ' \
                           '+ exp(-gamma * k_beta * (theta - theta_beta) ^ 2))'
         self.gaussianAngleForce = openmm.CustomAngleForce(energy_function)
-        self.gaussianAngleForce.addGlobalParameter('gamma', self.gamma)
-        self.gaussianAngleForce.addGlobalParameter('eps_alpha', self.eps_alpha)
-        self.gaussianAngleForce.addGlobalParameter('theta_alpha', self.theta_alpha)
-        self.gaussianAngleForce.addGlobalParameter('theta_beta', self.theta_beta)
-        self.gaussianAngleForce.addGlobalParameter('k_alpha', self.k_alpha)
-        self.gaussianAngleForce.addGlobalParameter('k_beta', self.k_beta)
+        self.gaussianAngleForce.addGlobalParameter('gamma', gamma)
+        self.gaussianAngleForce.addGlobalParameter('eps_alpha', eps_alpha)
+        self.gaussianAngleForce.addGlobalParameter('theta_alpha', theta_alpha)
+        self.gaussianAngleForce.addGlobalParameter('theta_beta', theta_beta)
+        self.gaussianAngleForce.addGlobalParameter('k_alpha', k_alpha)
+        self.gaussianAngleForce.addGlobalParameter('k_beta', k_beta)
 
         for angle in self.angles:
             self.gaussianAngleForce.addAngle(angle[0].index, angle[1].index, angle[2].index)
 
     def addGaussianTorsionForces(self) -> None:
-        energy_function_alpha = 'exp(-k_alpha1*(theta-theta_alpha1)^2-esp_d)'
-        energy_function_alpha += '+exp(-k_alpha2*(theta-theta_alpha2)^4+esp_0)'
-        energy_function_alpha += '+exp(-k_alpha2*(theta-theta_alpha2+2*pi)^4+esp_0)'
 
-        energy_function_beta = 'exp(-k_beta1*(theta-theta_beta1)^2+esp_1+esp_d)'
-        energy_function_beta += '+exp(-k_beta1*(theta-theta_beta1-2*pi)^2+esp_1+esp_d)'
-        energy_function_beta += '+exp(-k_beta2*(theta-theta_beta2)^4+esp_2)'
-        energy_function_beta += '+exp(-k_beta2*(theta-theta_beta2-2*pi)^4+esp_2)'
+        k_alpha1 = 47.6976 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2  # 11.4 kcal/mol/rad^2
+        k_alpha2 = 0.6276 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 4  # 0.15 kcal/mol/rad^4
+        theta_alpha1 = 0.9 * openmm.unit.radian
+        theta_alpha2 = 1.02 * openmm.unit.radian
+        e_0 = 1.12968 * openmm.unit.kilojoule_per_mole  # 0.27 kcal/mol
+
+        k_beta1 = 7.5312 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 2  # 1.8 kcal/mol/rad^2
+        k_beta2 = 2.7196 * openmm.unit.kilojoule_per_mole / openmm.unit.radian ** 4  # 0.65 kcal/mol/rad^4
+        theta_beta1 = -1.55 * openmm.unit.radian
+        theta_beta2 = -2.5 * openmm.unit.radian
+        e_1 = 0.58576 * openmm.unit.kilojoule_per_mole  # 0.14 kcal/mol
+        e_2 = 1.6736 * openmm.unit.kilojoule_per_mole  # 0.4 kcal/mol
+        # pi = np.pi
+
+        energy_function_alpha = 'exp(-k_alpha1*(theta-theta_alpha1)^2 - esp_d)'
+        energy_function_alpha += '+exp(-k_alpha2*(theta-theta_alpha2)^4 + e_0)'
+        energy_function_alpha += '+exp(-k_alpha2*(theta-theta_alpha2+2*pi)^4 + e_0)'
+
+        energy_function_beta = '+exp(-k_beta1*(theta-theta_beta1)^2 + e_1 + esp_d)'
+        energy_function_beta += '+exp(-k_beta1*(theta-theta_beta1-2*pi)^2 + e_1 + esp_d)'
+        energy_function_beta += '+exp(-k_beta2*(theta-theta_beta2)^4 + e_2)'
+        energy_function_beta += '+exp(-k_beta2*(theta-theta_beta2-2*pi)^4 + e_2)'
 
         energy_function = '-log(' + energy_function_alpha + energy_function_beta + ')'
         self.gaussianTorsionForce = openmm.CustomTorsionForce(energy_function)
-        self.gaussianTorsionForce.addGlobalParameter("k_alpha1", SOMEVALUEs)
-        self.gaussianTorsionForce.addGlobalParameter()
+        self.gaussianTorsionForce.addGlobalParameter("k_alpha1", k_alpha1)
+        self.gaussianTorsionForce.addGlobalParameter("theta_alpha1", theta_alpha1)
+        self.gaussianTorsionForce.addGlobalParameter("k_alpha2", k_alpha2)
+        self.gaussianTorsionForce.addGlobalParameter("theta_alpha2", theta_alpha2)
+        self.gaussianTorsionForce.addGlobalParameter("e_0", e_0)
+
+        self.gaussianTorsionForce.addGlobalParameter("k_beta1", k_beta1)
+        self.gaussianTorsionForce.addGlobalParameter("theta_beta1", theta_beta1)
+        self.gaussianTorsionForce.addGlobalParameter("k_beta2", k_beta2)
+        self.gaussianTorsionForce.addGlobalParameter("theta_beta2", theta_beta2)
+        self.gaussianTorsionForce.addGlobalParameter("e_1", e_1)
+        self.gaussianTorsionForce.addGlobalParameter("e_2", e_2)
+        self.gaussianTorsionForce.addGlobalParameter("pi", np.pi)
+
+        self.gaussianTorsionForce.addPerTorsionParameter("esp_d")
+
+        for torsion in self.torsions:
+            self.gaussianTorsionForce.addTorsion(torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index,
+                                                 (self.torsions[torsion][0],))
 
     def addYukawaForces(self, use_pbc: bool) -> None:
         """
@@ -838,7 +871,7 @@ class system:
             print('______________________')
             state = sim.context.getState(getPositions=True, getEnergy=True)
             print('After minimisation:')
-            print('The Potential Energy of the system (after minimized) is : %s' % state.getPotentialEnergy())
+            print(f'The Potential Energy of the system (after minimized) is : {state.getPotentialEnergy()}')
             for i, n in enumerate(self.forceGroups):
                 energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                     openmm.unit.kilojoules_per_mole)
@@ -888,6 +921,10 @@ class system:
         if self.gaussianAngleForce is not None:
             self.system.addForce(self.gaussianAngleForce)
             self.forceGroups['Gaussian Angle Energy'] = self.gaussianAngleForce
+
+        if self.gaussianTorsionForce is not None:
+            self.system.addForce(self.gaussianTorsionForce)
+            self.forceGroups['Gaussian Torsion Energy'] = self.gaussianTorsionForce
 
         if self.yukawaForce is not None:
             self.system.addForce(self.yukawaForce)

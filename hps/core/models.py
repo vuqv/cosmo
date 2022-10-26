@@ -18,8 +18,7 @@ class models:
     def buildHPSModel(structure_file: str,
                       minimize: bool = False,
                       hps_scale: str = 'hps_urry',
-                      box_dimension: Any = None,
-                      forcefield_file: Any = None):
+                      box_dimension: Any = None):
         """
         Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
         initialized parameters.
@@ -56,8 +55,6 @@ class models:
             if float is given, then use cubic box
             if an array of (3,1) is given, then use rectangular box with the given dimension
             if not specify: do not use PBC
-        forcefield_file : string (None)
-            Path to the input forcefield file.
 
         Returns
         -------
@@ -76,34 +73,29 @@ class models:
         hps.getCAlphaOnly()
         hps.getAtoms()
         print('Added ' + str(hps.n_atoms) + ' CA atoms')
-        if forcefield_file is None:
 
-            print("Setting alpha-carbon masses to their average residue mass.")
-            hps.setCAMassPerResidueType()
+        print("Setting alpha-carbon masses to their average residue mass.")
+        hps.setCAMassPerResidueType()
 
-            print("Setting alpha-carbon atoms radii to their statistical residue radius.")
-            hps.setCARadiusPerResidueType()
+        print("Setting alpha-carbon atoms radii to their statistical residue radius.")
+        hps.setCARadiusPerResidueType()
 
-            print("Setting alpha-carbon charge to their residue charge.")
-            hps.setCAChargePerResidueType()
+        print("Setting alpha-carbon charge to their residue charge.")
+        hps.setCAChargePerResidueType()
 
-            print(f"Setting hydropathy scale to their residue, Using {hps_scale} scale.")
-            hps.setCAHPSPerResidueType()
+        print(f"Setting hydropathy scale to their residue, Using {hps_scale} scale.")
+        hps.setCAHPSPerResidueType()
 
-            hps.getBonds()
-            print('Added ' + str(hps.n_bonds) + ' bonds')
+        hps.getBonds()
+        print('Added ' + str(hps.n_bonds) + ' bonds')
 
+        if hps_scale == "hps_ss":
             hps.getAngles()
             print(f'Added {hps.n_angles} angles ')
 
             hps.getTorsions()
             print(f'Added {hps.n_torsions} torsion angles ')
 
-        elif forcefield_file is not None:
-            print(
-                'Forcefield file given. Bonds, angles, torsions and native contacts definitions will be read from it!')
-
-        # print('')
         print('Adding default bond force constant...')
         # measured in unit of kj/mol/nm^2 (k_bond is set to 20kcal/mol/A^2)
         hps.setBondForceConstants(8368.0)
@@ -114,8 +106,12 @@ class models:
         hps.addHarmonicBondForces()
         print('Added Harmonic Bond Forces')
 
-        hps.addGaussianAngleForces()
-        print('Added Gaussian Angle Forces')
+        if hps_scale == "hps_ss":
+            hps.addGaussianAngleForces()
+            print('Added Gaussian Angle Forces')
+
+            hps.addGaussianTorsionForces()
+            print('Add Gaussian Torsion Forces')
 
         if box_dimension:
             use_pbc = True
