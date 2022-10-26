@@ -130,7 +130,7 @@ class system:
         self.hps_scale = hps_scale
         self.bond_length = model_parameters.parameters[hps_scale]["bond_length"]
         self.bondedTo = None
-        self.bonded_exclusions_index = 1
+        self.bonded_exclusions_index = model_parameters.parameters[hps_scale]["bonded_exclusions_index"]
 
         # Define force attributes
         self.harmonicBondForce = None

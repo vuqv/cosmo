@@ -50,6 +50,7 @@ parameters:
 parameters = {
     "hps_kr": {
         "bond_length": 0.38,
+        "bonded_exclusions_index": 1,
         "ALA": {
             "mass": 71.08,
             "radii": 0.504,
@@ -222,6 +223,7 @@ parameters = {
     },
     "hps_urry": {
         "bond_length": 0.382,
+        "bonded_exclusions_index": 1,
         "ALA": {
             "mass": 71.08,
             "radii": 0.504,
@@ -346,6 +348,7 @@ parameters = {
     },
     "hps_ss": {
         "bond_length": 0.382,
+        "bonded_exclusions_index": 3,
         "ALA": {
             "mass": 71.08,
             "radii": 0.504,

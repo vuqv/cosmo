@@ -88,7 +88,8 @@ if restart:
     nsteps_remain = md_steps - simulation.context.getState().getStepCount()
     simulation.reporters = []
     simulation.reporters.append(openmm.app.CheckpointReporter(checkpoint, nstxout))
-    simulation.reporters.append(openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, append=True))
+    simulation.reporters.append(
+        openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, enforcePeriodicBox=bool(pbc), append=True))
     simulation.reporters.append(
         openmm.app.StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                                      kineticEnergy=True,
@@ -109,7 +110,8 @@ else:
     simulation.context.setVelocitiesToTemperature(ref_t)
     simulation.reporters = []
     simulation.reporters.append(openmm.app.CheckpointReporter(checkpoint, nstxout))
-    simulation.reporters.append(openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, append=False))
+    simulation.reporters.append(
+        openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, enforcePeriodicBox=bool(pbc), append=False))
     simulation.reporters.append(
         openmm.app.StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
                                      kineticEnergy=True,
