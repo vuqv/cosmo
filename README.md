@@ -7,7 +7,7 @@ OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
 
 
 
-`hps:` hydropathy scale. Currently, there are two models are supported:
+`hps:` hydropathy scale. Currently, there are three models are supported:
 
 1) `hps_urry:` Hydropathy according to Urry scale (default, Recommended).
 2) `hps_kr:`  Kapcha-Rossy scale.
