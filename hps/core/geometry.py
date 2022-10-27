@@ -24,13 +24,13 @@ class geometry:
         position : openmm.unit.quantity.Quantity
             Array containing quantity objects [e.g. (x,y,z) array returned
             from positions].
-        output_unit : openmm.unit
+        output_unit : openmm.unit.nanometer
             Unit in which to return the items of the array.
 
         Returns
         -------
         numpy.ndarray
-            A numpy array containing the quantity values converted to float.
+            A numpy array containing the quantity values in unit of nm, converted to float.
         """
 
         return np.array([c.value_in_unit(output_unit) for c in position])

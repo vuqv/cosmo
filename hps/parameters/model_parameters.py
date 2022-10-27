@@ -349,17 +349,6 @@ parameters = {
 
     },
     "hps_ss": {
-        """
-        HPS-Urry with angle and torsion potential.
-        eps_di is parameter control the dihedral potential. Here we implemented the (i,i+4) assignment and 1-1001-1
-        mixing rule. 
-        torsion angle made by residue (i, i+3)
-        residue (i-1) and (i+4) are preceding and succeeding residues
-        1-1001-1 means:
-            weight of residues (i-1), (i), (i+3) and (i+4) are 1
-            weight of residues (i+1), (i+2) are 0
-         
-        """
         "bond_length": 0.382,
         "bonded_exclusions_index": 3,
         "ALA": {
@@ -504,3 +493,14 @@ parameters = {
         }
     }
 }
+"""
+        HPS_SS = HPS-Urry with angle and torsion potential.
+        eps_di is parameter control the dihedral potential. Here we implemented the (i,i+4) assignment and 1-1001-1
+        mixing rule. 
+        torsion angle made by residue (i, i+3)
+        residue (i-1) and (i+4) are preceding and succeeding residues
+        1-1001-1 means:
+            weight of residues (i-1), (i), (i+3) and (i+4) are 1
+            weight of residues (i+1), (i+2) are 0
+
+"""

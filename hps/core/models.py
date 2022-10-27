@@ -64,12 +64,18 @@ class models:
 
         print('Generating CA hps for structure file ' + structure_file)
         print('')
+        hps = system(structure_file, hps_scale)
+        print("Checking input structure file:")
+
         # Set up geometric parameters of the model
         print('Setting up geometrical parameters:')
-        print('_________________________________')
-        hps = system(structure_file, hps_scale)
+        print('__________________________________________________________________')
         print('Keeping only alpha carbon atoms in topology')
         hps.getCAlphaOnly()
+
+        print(f'There are {hps.n_chains} chain(s) in the input file.')
+        print(f'Chain list: {hps.chains}')
+
         hps.getAtoms()
         print('Added ' + str(hps.n_atoms) + ' CA atoms')
 
@@ -99,7 +105,7 @@ class models:
         # measured in unit of kj/mol/nm^2 (k_bond is set to 20kcal/mol/A^2)
         hps.setBondForceConstants(8368.0)
         print('')
-        print('_________________________________')
+        print('__________________________________________________________________')
 
         print('Adding Forces:')
         hps.addHarmonicBondForces()
@@ -140,7 +146,7 @@ class models:
         hps.addAshbaughHatchForces(use_pbc)
         print('Added PairWise Force')
         print('')
-        print('_________________________________')
+        print('__________________________________________________________________')
 
         # Generate the system object and add previously generated forces
 

@@ -38,13 +38,18 @@ class system:
     particles_mass : :code:`float or list`
         Mass of each particle. If float then uniform masses are given to all
         particles. If list per-particle masses are assigned.
+    particles_charge : :code:`list`
+        Charge of each particle.
+    rf_sigma : :code:`float`
+        Sigma parameter used in the pairwise force object.
+        This is vdw Radius of beads
     atoms : :code:`list`
-        A list of the current atoms in the model. The items are :code:`simtk.openmm.app.topology.Atom`
+        A list of the current atoms in the model. The items are :code:`openmm.app.topology.atoms`
         initialised classes.
     n_atoms : :code:`int`
         Total numer of atoms in the model.
     bonds : :code:`collections.OrderedDict`
-        A dict that uses bonds (2-tuple of :code:`simtk.openmm.app.topology.Atom` objects)
+        A dict that uses bonds (2-tuple of :code:`openmm.app.topology.bonds` objects)
         present in the model as keys and their forcefield properties as values.
     bonds_indexes : :code:`list`
         A list containing the zero-based indexes of the atoms defining the bonds in the model.
@@ -76,9 +81,7 @@ class system:
     system : :code:`openmm.System`
         Stores the OpenMM System initialised class. It stores all the forcefield
         information for the hps model.
-    rf_sigma : :code:`float`
-        Sigma parameter used in the pairwise force object.
-        This is vdw Radius of beads
+
 
     Methods
     -------
@@ -98,8 +101,8 @@ class system:
         ----------
         structure_path : string [requires]
             Name of the input PDB or CIF file
-        hps_scale: 'hps_kr','hps_urry' [optional, default='hps_kr']
-            Hydropathy scale. Currently, there are two models are supported.
+        hps_scale: 'hps_kr','hps_urry', or 'hps_ss' [optional, default='hps_urry']
+            Hydropathy scale. Currently, there are three models are supported.
         Returns
         -------
         None
@@ -127,6 +130,9 @@ class system:
         # Define geometric attributes
         self.atoms = []
         self.n_atoms = None
+
+        self.chains = []
+        self.n_chains = None
 
         self.bonds = OrderedDict()
         self.bonds_indexes = []
@@ -195,6 +201,17 @@ class system:
         modeller_topology.delete(atoms_to_remove)
         self.topology = modeller_topology.getTopology()
         self.positions = modeller_topology.getPositions()
+
+        chains = []
+        for chain in self.topology.chains():
+            print(chain)
+            chains.append(chain)
+            # self.n_chains += 1
+
+        self.n_chains = 0
+        for chain in chains:
+            self.chains.append(chain)
+            self.n_chains += 1
 
         """
             Update system atoms, then add bonds between C-alpha atoms of the same chain.
@@ -882,8 +899,8 @@ class system:
         """
 
         # minimized = False
-        print('_________________________________')
-        print('Energy from initial structure (input structure):')
+        print('__________________________________________________________________')
+        print('Potential Energy from initial structure (input structure):')
 
         # Define test simulation to extract forces
         integrator = openmm.LangevinIntegrator(1 * openmm.unit.kelvin, 1 / openmm.unit.picosecond,
@@ -901,7 +918,7 @@ class system:
         print('')
 
         if minimize:
-            print('_________________________________')
+            print('__________________________________________________________________')
             print('Perform energy minimization ...')
             # Find if there is an acting force larger than threshold
             # minimize the system until forces have converged
@@ -919,6 +936,7 @@ class system:
                     print(f'Atom: {atom.index} {atom.name}')
                     print(f'Residue: {residue.name} {residue.index}')
                     print('Minimising system with energy tolerance of %.1f kj/mol' % tolerance)
+                    print('_______________________')
                     print('')
 
                 sim.minimizeEnergy(tolerance=tolerance * openmm.unit.kilojoule / openmm.unit.mole)
@@ -937,7 +955,7 @@ class system:
             print(f'All forces are less than {threshold:.2f} kj/mol/nm')
             print('______________________')
             state = sim.context.getState(getPositions=True, getEnergy=True)
-            print('After minimisation:')
+            print('Potential Energy After minimisation:')
             print(f'The Potential Energy of the system (after minimized) is : {state.getPotentialEnergy()}')
             for i, n in enumerate(self.forceGroups):
                 energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
@@ -947,7 +965,7 @@ class system:
             print('')
             self.positions = state.getPositions()
             print('Saving minimized positions')
-            print('______________________')
+            print('__________________________________________________________________')
             print('')
 
     def addParticles(self) -> None:
