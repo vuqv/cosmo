@@ -55,6 +55,8 @@ class system:
         A list containing the zero-based indexes of the atoms defining the bonds in the model.
     n_bonds : :code:`int`
         Total number of bonds in the model.
+    bonded_exclusions_index : :code:`int`
+        Exclusion rule for nonbonded force. =1 for hps_kr and hps_urry, =3 for hps_ss
     harmonicBondForce : :code:`openmm.HarmonicBondForce`
         Stores the OpenMM :code:`HarmonicBondForce` initialised-class. Implements
         a harmonic bond potential between pairs of particles, that depends
@@ -122,10 +124,12 @@ class system:
         self.topology = self.structure.topology
         self.positions = self.structure.positions
 
+        self.hps_scale = hps_scale
         # particle properties
         self.particles_mass = None
         self.rf_sigma = None  # particle vdw radius
         self.particles_charge = None
+        self.particles_hps = None  # hydropathy scale of particles
 
         # Define geometric attributes
         self.atoms = []
@@ -137,6 +141,8 @@ class system:
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
+        self.bond_length = model_parameters.parameters[hps_scale]["bond_length"]
+        self.bondedTo = None
         self.harmonicBondForce = None
 
         self.angles = OrderedDict()
@@ -149,23 +155,14 @@ class system:
         self.n_torsions = None
         self.gaussianTorsionForce = None
 
-        self.hps_scale = hps_scale
-        self.bond_length = model_parameters.parameters[hps_scale]["bond_length"]
-        self.bondedTo = None
+        # Exclusion rule for nonbonded forces
         self.bonded_exclusions_index = model_parameters.parameters[hps_scale]["bonded_exclusions_index"]
 
-        # Parameters for PairWise potential
+        # Parameters for PairWise potential Force
         self.ashbaugh_HatchForce = None
-        self.epsilon = 0.8368 * openmm.unit.kilojoule_per_mole
-        self.cutoff_Ashbaugh_Hatch = 2.0 * openmm.unit.nanometer
-        self.particles_hps = None
 
-        # Define parameters for DH potential
+        # Define parameters for DH potential Force
         self.yukawaForce = None
-        self.lD = 1.0 * openmm.unit.nanometer
-        self.electric_factor = 138.935458 * openmm.unit.kilojoule_per_mole * openmm.unit.nanometer / openmm.unit.elementary_charge ** 2
-        self.yukawa_cutoff = 3.5 * openmm.unit.nanometer
-        self.epsilon_r = 80.0
 
         self.forceGroups = OrderedDict()
 
@@ -686,18 +683,23 @@ class system:
         None
         """
 
+        lD = 1.0 * openmm.unit.nanometer
+        electric_factor = 138.935458 * openmm.unit.kilojoule_per_mole * openmm.unit.nanometer / openmm.unit.elementary_charge ** 2
+        yukawa_cutoff = 3.5 * openmm.unit.nanometer
+        epsilon_r = 80.0
+
         energy_function = 'factor*charge1*charge2/epsilon_r/r*exp(-r/lD)'
         self.yukawaForce = openmm.CustomNonbondedForce(energy_function)
-        self.yukawaForce.addGlobalParameter('factor', self.electric_factor)
-        self.yukawaForce.addGlobalParameter('epsilon_r', self.epsilon_r)
-        self.yukawaForce.addGlobalParameter('lD', self.lD)
+        self.yukawaForce.addGlobalParameter('factor', electric_factor)
+        self.yukawaForce.addGlobalParameter('epsilon_r', epsilon_r)
+        self.yukawaForce.addGlobalParameter('lD', lD)
         self.yukawaForce.addPerParticleParameter('charge')
         if use_pbc:
             self.yukawaForce.setNonbondedMethod(openmm.NonbondedForce.CutoffPeriodic)
         else:
             self.yukawaForce.setNonbondedMethod(openmm.NonbondedForce.CutoffNonPeriodic)
 
-        self.yukawaForce.setCutoffDistance(self.yukawa_cutoff)
+        self.yukawaForce.setCutoffDistance(yukawa_cutoff)
 
         if isinstance(self.particles_charge, float):
             for i in range(len(self.atoms)):
@@ -758,6 +760,8 @@ class system:
         -------
         None
         """
+        epsilon = 0.8368 * openmm.unit.kilojoule_per_mole
+        ashbaugh_Hatch_cutoff = 2.0 * openmm.unit.nanometer
 
         energy_function = 'step(2^(1/6)*sigma - r) *'
         energy_function += '(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-hps)*epsilon )'
@@ -765,7 +769,7 @@ class system:
         energy_function += 'sigma=0.5*(sigma1+sigma2);'
         energy_function += 'hps=0.5*(hps1+hps2)'
         self.ashbaugh_HatchForce = openmm.CustomNonbondedForce(energy_function)
-        self.ashbaugh_HatchForce.addGlobalParameter('epsilon', self.epsilon)
+        self.ashbaugh_HatchForce.addGlobalParameter('epsilon', epsilon)
         self.ashbaugh_HatchForce.addPerParticleParameter('sigma')
         self.ashbaugh_HatchForce.addPerParticleParameter('hps')
         #
@@ -774,11 +778,11 @@ class system:
         else:
             self.ashbaugh_HatchForce.setNonbondedMethod(openmm.NonbondedForce.CutoffNonPeriodic)
 
-        self.ashbaugh_HatchForce.setCutoffDistance(self.cutoff_Ashbaugh_Hatch)
+        self.ashbaugh_HatchForce.setCutoffDistance(ashbaugh_Hatch_cutoff)
 
         if isinstance(self.rf_sigma, float):
             for i in range(len(self.atoms)):
-                self.ashbaugh_HatchForce.addParticle((self.rf_sigma,))
+                self.ashbaugh_HatchForce.addParticle((self.rf_sigma, self.particles_hps[i],))
 
         # in the case each atom has different sigma para.
         elif isinstance(self.rf_sigma, list):
@@ -914,7 +918,7 @@ class system:
         for i, n in enumerate(self.forceGroups):
             energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                 openmm.unit.kilojoules_per_mole)
-            print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
+            print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kJ/mol')
         print('')
 
         if minimize:
@@ -932,10 +936,10 @@ class system:
                 if np.max(forces) != prev_force:
                     atom = self.atoms[np.argmax(forces)]
                     residue = atom.residue
-                    print('Large force %.3f kj/(mol nm) found in:' % np.max(forces))
+                    print(f'Large force {np.max(forces):.3f} kJ/(mol nm) found in:')
                     print(f'Atom: {atom.index} {atom.name}')
                     print(f'Residue: {residue.name} {residue.index}')
-                    print('Minimising system with energy tolerance of %.1f kj/mol' % tolerance)
+                    print(f'Minimising system with energy tolerance of {tolerance:.1f} kJ/mol')
                     print('_______________________')
                     print('')
 
@@ -952,7 +956,7 @@ class system:
                     raise ValueError('The system could not be minimized at the requested convergence\n' +
                                      'Try to increase the force threshold value to achieve convergence.')
 
-            print(f'All forces are less than {threshold:.2f} kj/mol/nm')
+            print(f'All forces are less than {threshold:.2f} kJ/mol/nm')
             print('______________________')
             state = sim.context.getState(getPositions=True, getEnergy=True)
             print('Potential Energy After minimisation:')
@@ -960,7 +964,7 @@ class system:
             for i, n in enumerate(self.forceGroups):
                 energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                     openmm.unit.kilojoules_per_mole)
-                print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kj/mol')
+                print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kJ/mol')
 
             print('')
             self.positions = state.getPositions()
