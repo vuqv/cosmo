@@ -201,7 +201,6 @@ class system:
 
         chains = []
         for chain in self.topology.chains():
-            print(chain)
             chains.append(chain)
             # self.n_chains += 1
 
