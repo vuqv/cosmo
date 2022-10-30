@@ -25,5 +25,6 @@ The library is open-source and offers flexibility.
 from .core import geometry
 from .core import models
 from .core import system
+from .dynamics import dynamics
 from .parameters import model_parameters
 from .reporter import hpsReporter
