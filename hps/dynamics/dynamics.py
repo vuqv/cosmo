@@ -43,6 +43,13 @@ class Dynamics:
         config.read(config_file)
         params = config['DEFAULT']
         # Reading parameters
+        """
+        This can be check like:
+        if 'md_steps' in params:
+            do something
+        else:
+            raise error of just ignore this variable if it is not necessary.
+        """
         self.md_steps = int(params['md_steps'])
         self.dt = float(params['dt']) * unit.picoseconds
         self.nstxout = int(params['nstxout'])
