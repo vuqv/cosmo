@@ -10,6 +10,8 @@ from openmm import unit
 
 from ..core import models
 
+# TODO: check input file and variables that user provide
+
 
 @dataclass
 class Dynamics:
@@ -17,9 +19,6 @@ class Dynamics:
     Dynamics class contains two main functions: read config file and run simulation.
     User only need to provide config file, e.g md.ini and specify parameters control simulation there.
     """
-    #
-    # def __init__(self):
-    #     self.model = None
 
     def __init__(self):
         self.md_steps: int = None
