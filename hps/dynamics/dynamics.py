@@ -17,22 +17,27 @@ class Dynamics:
     Dynamics class contains two main functions: read config file and run simulation.
     User only need to provide config file, e.g md.ini and specify parameters control simulation there.
     """
-    md_steps: int
-    dt: float
-    nstxout: int
-    nstlog: int
-    model: str
-    ref_t: float
-    tau_t: float
-    pbc: bool
-    box_dimension: Any
-    protein_code: str
-    checkpoint: str
-    pdb_file: str
-    device: str
-    ppn: int
-    restart: bool
-    minimize: bool
+    #
+    # def __init__(self):
+    #     self.model = None
+
+    def __init__(self):
+        self.md_steps: int = None
+        self.dt: float = None
+        self.nstxout: int = None
+        self.nstlog: int = None
+        self.model: str = None
+        self.ref_t: float = None
+        self.tau_t: float = None
+        self.pbc: bool = None
+        self.box_dimension: Any = None
+        self.protein_code: str = None
+        self.checkpoint: str = None
+        self.pdb_file: str = None
+        self.device: str = None
+        self.ppn: int = None
+        self.restart: bool = None
+        self.minimize: bool = None
 
     def read_config(self, config_file):
         config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
