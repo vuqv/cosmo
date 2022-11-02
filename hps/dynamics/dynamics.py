@@ -1,4 +1,5 @@
 import configparser
+import time
 from distutils.util import strtobool
 from json import loads
 from typing import Any
@@ -52,6 +53,9 @@ class Dynamics:
         # restart simulation or run from beginning
         self.restart: bool = False
         self.minimize = None
+
+        # store hps object to inspect
+        self.hps_model = None
 
     def read_config(self, config_file):
         config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
@@ -118,11 +122,11 @@ class Dynamics:
         -------
 
         """
-        hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, hps_scale=self.model,
-                                         box_dimension=self.box_dimension)
+        self.hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, hps_scale=self.model,
+                                              box_dimension=self.box_dimension)
         # dump topology PSF file and initial coordinate pdb file
-        hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
-        hps_model.dumpTopology(f'{self.protein_code}.psf')
+        self.hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
+        self.hps_model.dumpTopology(f'{self.protein_code}.psf')
 
         if self.device == 'GPU':
             # Run simulation on CUDA
@@ -136,18 +140,21 @@ class Dynamics:
             platform = openmm.Platform.getPlatformByName('CPU')
             properties = {'Threads': str(self.ppn)}
 
+        start_time = time.time()
+
         if self.restart:
             # simulation reporter
             integrator = openmm.LangevinIntegrator(self.ref_t, self.tau_t, self.dt)
             if self.pcoupl:
                 # if pressure coupling is on, add barostat force to the system.
                 barostat = openmm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
-                hps_model.system.addForce(barostat)
+                self.hps_model.system.addForce(barostat)
 
-            simulation = openmm.app.Simulation(hps_model.topology, hps_model.system, integrator, platform, properties)
+            simulation = openmm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
+                                               properties)
             simulation.loadCheckpoint(self.checkpoint)
-            print(
-                f"Restart from checkpoint, Time = {simulation.context.getState().getTime()}, Step= {simulation.context.getState().getStepCount()}")
+            prev_time, prev_steps = simulation.context.getState().getTime(), simulation.context.getState().getStepCount()
+            print(f"Restart from checkpoint, Time = {prev_time}, Step= {prev_steps}")
             # number of steps remain to run
             nsteps_remain = self.md_steps - simulation.context.getState().getStepCount()
             simulation.reporters = []
@@ -167,16 +174,17 @@ class Dynamics:
             if self.pcoupl:
                 # if pressure coupling is on, add barostat force to the system.
                 barostat = openmm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
-                hps_model.system.addForce(barostat)
+                self.hps_model.system.addForce(barostat)
 
-            simulation = openmm.app.Simulation(hps_model.topology, hps_model.system, integrator, platform, properties)
+            simulation = openmm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
+                                               properties)
             # Set initial positions: translate input coordinate, the coordinate is >=0
-            xyz = np.array(hps_model.positions / unit.nanometer)
+            xyz = np.array(self.hps_model.positions / unit.nanometer)
             xyz[:, 0] -= np.amin(xyz[:, 0])
             xyz[:, 1] -= np.amin(xyz[:, 1])
             xyz[:, 2] -= np.amin(xyz[:, 2])
-            hps_model.positions = xyz * unit.nanometer
-            simulation.context.setPositions(hps_model.positions)
+            self.hps_model.positions = xyz * unit.nanometer
+            simulation.context.setPositions(self.hps_model.positions)
             simulation.context.setVelocitiesToTemperature(self.ref_t)
             simulation.reporters = []
             simulation.reporters.append(openmm.app.CheckpointReporter(self.checkpoint, self.nstxout))
@@ -192,5 +200,6 @@ class Dynamics:
 
         # write the last frame
         last_frame = simulation.context.getState(getPositions=True, enforcePeriodicBox=bool(self.pbc)).getPositions()
-        openmm.app.PDBFile.writeFile(hps_model.topology, last_frame, open(f'{self.protein_code}_final.pdb', 'w'))
+        openmm.app.PDBFile.writeFile(self.hps_model.topology, last_frame, open(f'{self.protein_code}_final.pdb', 'w'))
         simulation.saveCheckpoint(self.checkpoint)
+        print("--- Finished in %s seconds ---" % (time.time() - start_time))
