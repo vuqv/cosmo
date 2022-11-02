@@ -18,5 +18,5 @@ args = parser.parse_args()
 hps_sim = hps.dynamics.Dynamics()
 
 hps_sim.read_config(args.input)
-print(vars(hps_sim))
+# print(vars(hps_sim))
 hps_sim.dynamics()

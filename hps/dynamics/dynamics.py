@@ -122,12 +122,7 @@ class Dynamics:
         -------
 
         """
-        self.hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, hps_scale=self.model,
-                                              box_dimension=self.box_dimension)
-        # dump topology PSF file and initial coordinate pdb file
-        self.hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
-        self.hps_model.dumpTopology(f'{self.protein_code}.psf')
-
+        # Setup platform to run simulation
         if self.device == 'GPU':
             # Run simulation on CUDA
             print(f"Running simulation on GPU CUDA")
@@ -140,18 +135,25 @@ class Dynamics:
             platform = openmm.Platform.getPlatformByName('CPU')
             properties = {'Threads': str(self.ppn)}
 
+        # Initialize model
+        self.hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, hps_scale=self.model,
+                                              box_dimension=self.box_dimension)
+        # dump topology PSF file and initial coordinate pdb file
+        self.hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
+        self.hps_model.dumpTopology(f'{self.protein_code}.psf')
+        self.hps_model.system.addForce(openmm.CMMotionRemover())
+
+        # setup integrator and simulation object
+        integrator = openmm.LangevinIntegrator(self.ref_t, self.tau_t, self.dt)
+        if self.pcoupl:
+            # if pressure coupling is on, add barostat force to the system.
+            barostat = openmm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
+            self.hps_model.system.addForce(barostat)
+
+        simulation = openmm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
+                                           properties)
         start_time = time.time()
-
         if self.restart:
-            # simulation reporter
-            integrator = openmm.LangevinIntegrator(self.ref_t, self.tau_t, self.dt)
-            if self.pcoupl:
-                # if pressure coupling is on, add barostat force to the system.
-                barostat = openmm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
-                self.hps_model.system.addForce(barostat)
-
-            simulation = openmm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
-                                               properties)
             simulation.loadCheckpoint(self.checkpoint)
             prev_time, prev_steps = simulation.context.getState().getTime(), simulation.context.getState().getStepCount()
             print(f"Restart from checkpoint, Time = {prev_time}, Step= {prev_steps}")
@@ -169,15 +171,6 @@ class Dynamics:
                                              totalSteps=self.md_steps, separator='\t', append=True))
             simulation.step(nsteps_remain)
         else:
-            # Production phase, create new integrator and simulation context to reset number of steps
-            integrator = openmm.LangevinIntegrator(self.ref_t, self.tau_t, self.dt)
-            if self.pcoupl:
-                # if pressure coupling is on, add barostat force to the system.
-                barostat = openmm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
-                self.hps_model.system.addForce(barostat)
-
-            simulation = openmm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
-                                               properties)
             # Set initial positions: translate input coordinate, the coordinate is >=0
             xyz = np.array(self.hps_model.positions / unit.nanometer)
             xyz[:, 0] -= np.amin(xyz[:, 0])

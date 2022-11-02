@@ -74,7 +74,6 @@ class models:
         hps.getCAlphaOnly()
 
         print(f'There are {hps.n_chains} chain(s) in the input file.')
-        print(f'Chain list: {hps.chains}')
 
         hps.getAtoms()
         print('Added ' + str(hps.n_atoms) + ' CA atoms')
