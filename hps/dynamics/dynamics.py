@@ -32,7 +32,40 @@ class Dynamics:
     nstlog: int [1, steps]
         number of steps that elapse between writing energies to the log file, the last energies are always written
     nstcomm: int [1, steps]
-
+        frequency for center of mass motion removal
+    model: str ['hps_urry']
+        Hydropathy scale
+    tcoupl: bool
+        Using temperature coupling.
+    ref_t: float [Kelvin]
+        reference temperature for coupling
+    tau_t: float [ps]
+        ime constant for temperature coupling
+    pcoupl: bool
+        Pressure coupling
+    ref_p: float [bar]
+        The reference pressure for coupling.
+    frequency_p: int [25, steps]
+        The frequency for coupling the pressure.
+    pbc: bool
+        Use periodic boundary conditions.
+    box_dimension: float or list of float
+        Box dimension defined the unit cell, better to use rectangular for simplicity
+    protein_code: str
+        Prefix to write output file based on this parameter
+    checkpoint: str
+        Checkpoint file name
+    pdb_file: str
+        Input structure read to generate model.
+    device: str
+        Device to perform simulation [GPU/CPU] if CPU is used, then need to provide number of threads to run simulation.
+    ppn: int [1, cores]
+        In case simulation is run on CPU, use this parameter to control the number of threads to run simulation.
+    restart: bool [No]
+        If simulation run from beginning or restart from checkpoint.
+    minimize: bool
+        If simulation run from beginning then need to perform energy minimization. If simulation restarted, this
+        parameters will be override to False.
 
     Returns
     -------
@@ -55,7 +88,7 @@ class Dynamics:
         # pressure coupling
         self.pcoupl = None
         self.ref_p = None
-        self.frequency_p = None
+        self.frequency_p = 25
 
         # periodic boundary condition
         self.pbc = None

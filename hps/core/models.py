@@ -44,7 +44,7 @@ class models:
             Path to the input structure file.
         minimize : boolean (False)
             If True the initial structure will undergo the energy minimization.
-        hps_scale : string ('hps_urry')
+        hps_scale : string [Optional, hps_urry]
             HPS scale. There are three options correspond to two scale:
                 * 'hps_urry': using Urry scale (default).
                 * 'hps_ss': hps_urry with angle and torsion potential.
