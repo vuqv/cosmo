@@ -11,20 +11,40 @@ from openmm import unit
 from ..core import models
 
 
-# TODO: check input file and variables that user provide
-
-
 class Dynamics:
     """
     Dynamics class contains two main functions: read config file and run simulation.
     User only need to provide config file, e.g md.ini and specify parameters control simulation there.
+
+    Parameters
+    ----------
+    config_file: str
+        control parameters for simulation
+
+    Attributes
+    ----------
+    md_steps: int [1, steps]
+        Number of steps to perform molecular dynamics simulation
+    dt: float [0.01, ps]
+        time step for integration
+    nstxout: int [1, steps]
+        number of steps that elapse between writing coordinates to output trajectory file, the last coordinates are always written
+    nstlog: int [1, steps]
+        number of steps that elapse between writing energies to the log file, the last energies are always written
+    nstcomm: int [1, steps]
+
+
+    Returns
+    -------
+
     """
 
-    def __init__(self):
+    def __init__(self, config_file):
         self.md_steps: int = 1
         self.dt: float = 0.01
         self.nstxout: int = 1
         self.nstlog: int = 1
+        self.nstcomm: int = 100
         self.model: str = 'hps_urry'
 
         # temperature coupling
@@ -54,6 +74,9 @@ class Dynamics:
         self.restart: bool = False
         self.minimize = None
 
+        # call read_config function to initialize these attribute
+        self.read_config(config_file)
+
         # store hps object to inspect
         self.hps_model = None
 
@@ -74,6 +97,7 @@ class Dynamics:
         self.dt = float(params['dt']) * unit.picoseconds
         self.nstxout = int(params['nstxout'])
         self.nstlog = int(params['nstlog'])
+        self.nstcomm = int(params['nstcomm'])
         self.model = params['model']
 
         # temperature coupling. Pretty sure it is always on.
@@ -141,7 +165,7 @@ class Dynamics:
         # dump topology PSF file and initial coordinate pdb file
         self.hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
         self.hps_model.dumpTopology(f'{self.protein_code}.psf')
-        self.hps_model.system.addForce(openmm.CMMotionRemover())
+        self.hps_model.system.addForce(openmm.CMMotionRemover(self.nstcomm))
 
         # setup integrator and simulation object
         integrator = openmm.LangevinIntegrator(self.ref_t, self.tau_t, self.dt)

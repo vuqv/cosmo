@@ -15,8 +15,8 @@ parser = argparse.ArgumentParser(description="\n Usage: python run_simulation.py
 parser.add_argument('-input', '-f', type=str, help='simulation config file')
 args = parser.parse_args()
 
-hps_sim = hps.dynamics.Dynamics()
+hps_sim = hps.dynamics.Dynamics(args.input)
 
-hps_sim.read_config(args.input)
+# hps_sim.read_config(args.input)
 # print(vars(hps_sim))
 hps_sim.dynamics()
