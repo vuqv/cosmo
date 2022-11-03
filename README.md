@@ -35,14 +35,24 @@ For that reason, I will create a virtual environment with Python 3.10 and then i
 - Create conda environment: `conda create -n hpsOpenMM python=3.10`
 - activate `hpsOpenMM` env : `conda activate hpsOpenMM`
 - Install openMM 7.7: `conda install openmm=7.7 cudatoolkit=10.2`
-  - `(Note that cudatoolkit=10.2 for plgrid, 11.6 for masli6)`
+  (Note that cudatoolkit=10.2 for plgrid, 11.6 for masli6)
 - Download folder and place in target location, for example: `PATH_TO_CODE/hpsOpenMM/`
 - Add hps module in Python path so that Python know what `hps` is (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`
 - The standard example can be found at `example/standard_example`
 - Run simulation: 
-  - goto example folder, e.g examples/standard_example/: 
-  - edit simulation config file: `md.ini`
-  - execute command: `python run_simulation.py -f md.ini`
+  - I give you two options to perform simulations:
+    * First option:
+      - goto example folder, e.g examples/standard_example/: 
+      - edit simulation config file: `md.ini`
+      - execute command: `python run_simulation.py -f md.ini`
+    * Second option:
+      * add python environment created above in the beginning of `hps-simulation.py` script: by changing its first line.
+      * make the `hps-simulation.py` script to be executable: `chmod +x /PATH_TO_HPS/hps-simulation.py`
+      * Create an `alias` to `hps-simulation.py`. e.g: I modify my `.bashrc`: 
+        `alias hps-simulation='/home/qvv5013/work3/code/hpsOpenMM/hps/hps-simulation.py '`
+      * in your simulation directory, prepare control file contains simulation parameters.
+      * run simulation: `hps-simulation -f md.ini`
+       
 #### Windows:
 
 - No idea (no time to test) !!!

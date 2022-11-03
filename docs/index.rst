@@ -13,10 +13,12 @@ This documentation is currently being generated as we finalize
    :caption: Contents:
    
    modules/introduction
-   usage/installation
+   usage/simulation_control
+   modules/parameters
    modules/system
    modules/models
-   modules/parameters
+   modules/dynamics
+   
 
    
 

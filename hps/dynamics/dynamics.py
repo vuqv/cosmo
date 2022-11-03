@@ -7,8 +7,10 @@ from typing import Any
 import numpy as np
 import openmm
 from openmm import unit
-
 from ..core import models
+import warnings
+from parmed.exceptions import OpenMMWarning
+warnings.filterwarnings("ignore", category=OpenMMWarning)
 
 
 class Dynamics:
@@ -114,17 +116,13 @@ class Dynamics:
         self.hps_model = None
 
     def read_config(self, config_file):
+        """
+        Read simulation control parameters from config file *.ini into class attributes.
+        """
         config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
         config.read(config_file)
         params = config['OPTIONS']
         # Reading parameters
-        """
-        This can be check like:
-        if 'md_steps' in params:
-            do something
-        else:
-            raise error of just ignore this variable if it is not necessary.
-        """
         # must have parameters
         self.md_steps = int(params['md_steps'])
         self.dt = float(params['dt']) * unit.picoseconds
@@ -179,18 +177,6 @@ class Dynamics:
         -------
 
         """
-        # Setup platform to run simulation
-        if self.device == 'GPU':
-            # Run simulation on CUDA
-            print(f"Running simulation on GPU CUDA")
-            platform = openmm.Platform.getPlatformByName('CUDA')
-            properties = {'CudaPrecision': 'mixed', "DeviceIndex": "0"}
-            # in case of many GPUs present, we can select which one to use
-
-        elif self.device == 'CPU':
-            print(f"Running simulation on CPU using {self.ppn} cores")
-            platform = openmm.Platform.getPlatformByName('CPU')
-            properties = {'Threads': str(self.ppn)}
 
         # Initialize model
         self.hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, hps_scale=self.model,
@@ -206,6 +192,19 @@ class Dynamics:
             # if pressure coupling is on, add barostat force to the system.
             barostat = openmm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
             self.hps_model.system.addForce(barostat)
+
+        # Setup platform to run simulation
+        if self.device == 'GPU':
+            # Run simulation on CUDA
+            print(f"Running simulation on GPU CUDA")
+            platform = openmm.Platform.getPlatformByName('CUDA')
+            properties = {'CudaPrecision': 'mixed', "DeviceIndex": "0"}
+            # in case of many GPUs present, we can select which one to use
+
+        elif self.device == 'CPU':
+            print(f"Running simulation on CPU using {self.ppn} cores")
+            platform = openmm.Platform.getPlatformByName('CPU')
+            properties = {'Threads': str(self.ppn)}
 
         simulation = openmm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
                                            properties)

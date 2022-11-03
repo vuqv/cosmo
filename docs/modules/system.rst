@@ -1,5 +1,9 @@
 System 
 ========================================================= 
+
+A class containing methods and parameters for generating CG systems to be simulated using the OpenMM interface.
+    It offers flexibility to create default and custom CG systems and to easily modify their parameters.
+
 .. autoclass:: hps.core.system
 
         .. automethod:: __init__

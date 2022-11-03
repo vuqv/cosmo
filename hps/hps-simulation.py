@@ -1,3 +1,4 @@
+#!/home/qvv5013/anaconda3/envs/py310/bin/python
 # Import OpenMM library
 # Import hpsOpenMM library
 import argparse
@@ -10,3 +11,4 @@ args = parser.parse_args()
 
 hps_sim = hps.dynamics.Dynamics(args.input)
 hps_sim.dynamics()
+ 
