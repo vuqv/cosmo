@@ -1,5 +1,6 @@
 import configparser
 import time
+import warnings
 from distutils.util import strtobool
 from json import loads
 from typing import Any
@@ -7,9 +8,10 @@ from typing import Any
 import numpy as np
 import openmm
 from openmm import unit
-from ..core import models
-import warnings
 from parmed.exceptions import OpenMMWarning
+
+from ..core import models
+
 warnings.filterwarnings("ignore", category=OpenMMWarning)
 
 
@@ -30,10 +32,11 @@ class Dynamics:
     dt: float [0.01, ps]
         time step for integration
     nstxout: int [1, steps]
-        number of steps that elapse between writing coordinates to output trajectory file, the last coordinates are always written
+        number of steps that elapse between writing coordinates to output trajectory file,
+        the last coordinates are always written
     nstlog: int [1, steps]
         number of steps that elapse between writing energies to the log file, the last energies are always written
-    nstcomm: int [1, steps]
+    nstcomm: int [100, steps]
         frequency for center of mass motion removal
     model: str ['hps_urry']
         Hydropathy scale
