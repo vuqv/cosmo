@@ -122,58 +122,105 @@ class Dynamics:
         """
         Read simulation control parameters from config file *.ini into class attributes.
         """
+        print(f"Reading simulation parameters from {config_file} file...")
         config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
         config.read(config_file)
         params = config['OPTIONS']
         # Reading parameters
         # must have parameters
-        self.md_steps = int(params['md_steps'])
-        self.dt = float(params['dt']) * unit.picoseconds
+        if 'md_steps' in params:
+            self.md_steps = int(params['md_steps'])
+            print(f'Running simulation for {self.md_steps} steps')
+        else:
+            print(f'not found md_steps keyword in control file, use default md_steps = {self.md_steps}')
+        if 'dt' in params:
+            self.dt = float(params['dt']) * unit.picoseconds
+            print(f'Timestep to integrate equation of motion: dt = {self.dt}')
+        else:
+            print(f'use default dt={self.dt} ps')
         self.nstxout = int(params['nstxout'])
         self.nstlog = int(params['nstlog'])
-        self.nstcomm = int(params['nstcomm'])
-        self.model = params['model']
+        if 'nstcomm' in params:
+            self.nstcomm = int(params['nstcomm'])
+            print(f'Remove center of mass motion every {self.nstcomm} step')
+        else:
+            print(f'Use default nstcomm = {self.nstcomm} steps for center of mass remover')
+        if 'model' in params:
+            self.model = params['model']
+            print(f'Hydropathy scale is set to: {self.model}')
+        else:
+            print(f'Use default model={self.model}')
 
         # temperature coupling. Pretty sure it is always on.
-        self.tcoupl = strtobool(params['tcoupl'])
+        if 'tcoupl' in params:
+            self.tcoupl = strtobool(params['tcoupl'])
+            print('Turn on temperature coupling')
         if self.tcoupl:
             self.ref_t = float(params['ref_t']) * unit.kelvin
             self.tau_t = float(params['tau_t']) / unit.picoseconds
+            print(f'Temperature is set to: {self.ref_t} with time constant = {self.tau_t}')
 
         # Periodic Boundary condition
-        self.pbc = strtobool(params['pbc'])
+        if 'pbc' in params:
+            self.pbc = strtobool(params['pbc'])
         if self.pbc:
             self.box_dimension = loads(params['box_dimension'])
+            print(f'Using Periodic boundary condition with box dimension: {self.box_dimension} nm')
         else:
             self.box_dimension = None
+            print('Not using Periodic boundary condition')
 
         # Pressure coupling
-        self.pcoupl = strtobool(params['pcoupl'])
+        if 'pcoupl' in params:
+            self.pcoupl = strtobool(params['pcoupl'])
+            # print('Pressure coupling')
         if self.pcoupl:
             assert self.pbc, f"Pressure coupling requires box dimensions and periodic boundary condition is on"
             self.ref_p = float(params['ref_p']) * unit.bar
             self.frequency_p = int(params['frequency_p'])
+            print(f'Pressure is set to reference of {self.ref_p} with frequency of coupling {self.frequency_p}')
 
         # prefix IO files
+        if 'pdb_file' in params:
+            self.pdb_file = params['pdb_file']
+            print(f'Input structure: {self.pdb_file}')
+        else:
+            raise EOFError('Not found pdb_file keyword in control file')
+
         self.protein_code = params['protein_code']
-        self.checkpoint = params['checkpoint']
-        self.pdb_file = params['pdb_file']
+        print(f'Prefix use to write file: {self.protein_code}')
+
+        if 'checkpoint' in params:
+            self.checkpoint = params['checkpoint']
+            print(f'Checkpoint will be writen to: {self.checkpoint}')
+        else:
+            self.checkpoint = self.pdb_file.split('.')[0] + '.chk'
+            print(f'not found checkpoint keyword in control file. Set based on input structure: {self.checkpoint}')
 
         # Platform to run simulation
-        self.device = params['device']
+        if 'device' in params:
+            self.device = params['device']
+            print(f'Platform used to perform simulation: {self.device}')
+        else:
+            print(f'not found device keyword in control file. Set to {self.device}')
+
         self.ppn = params['ppn']
 
         # Restart simulation or run from beginning
-        self.restart = strtobool(params['restart'])
+        if 'restart' in params:
+            self.restart = strtobool(params['restart'])
+            print(f'Restart simulation: {self.restart}')
         if not self.restart:
             self.minimize = strtobool(params['minimize'])
+            print(f'perform Energy minimization of input structure: {self.minimize}')
         else:
             self.minimize = False
+        print('__________________________________________________________________')
         """
         End of reading parameters
         """
 
-    def dynamics(self):
+    def run(self):
         """
         Run simulation
         Returns

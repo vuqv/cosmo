@@ -23,7 +23,7 @@ class system:
     ----------
         structure_path : string [requires]
             Name of the input PDB or CIF file
-        hps_scale: 'hps_kr','hps_urry' [optional, default='hps_kr']
+        hps_scale: 'hps_kr','hps_urry' [optional, default='hps_urry']
             Hydropathy scale. Currently, there are two models are supported.
 
     Attributes
@@ -92,6 +92,36 @@ class system:
     loadForcefieldFromFile()
         Loads forcefield parameters from a force field file written with
         the :code:`dumpForceFieldData()` method.
+
+    getCAlphaOnly()
+    getAtoms()
+    getBonds()
+    getAngles()
+    getTorsions()
+    setBondForceConstant()
+    setParticleMass()
+    setParticleRadii()
+    setParticleCharge()
+    setParticleHPS()
+    addHarmonicBondForces()
+    addGaussianAngleForces()
+    addGaussianTorsionForces()
+    addYukawaForces()
+    addAshbaughHatchForces()
+    createSystemObject()
+    checkBondDistances()
+    checkLargeForces()
+    addParticles()
+    addSystemForces()
+    dumpStructure()
+    dumpTopology()
+    dumpForceFieldData()
+    setCAMassPerResidueType()
+    setCARadiusPerResidueType()
+    setCAChargePerResidueType()
+    setCAHPSPerResidueType()
+    _setParameters()
+
 
     """
 
@@ -436,7 +466,7 @@ class system:
 
         system._setParameters(self.bonds, bond_force_constant)
 
-    def setParticlesMasses(self, particles_mass):
+    def setParticlesMass(self, particles_mass):
         """
         Change the mass parameter for each atom in the system.
 
@@ -1171,7 +1201,7 @@ class system:
             else:
                 raise ValueError('Residue ' + r.name + ' not found in masses dictionary.')
 
-        self.setParticlesMasses(masses)
+        self.setParticlesMass(masses)
 
     def setCARadiusPerResidueType(self):
         """
