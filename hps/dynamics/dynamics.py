@@ -86,17 +86,17 @@ class Dynamics:
         self.model: str = 'hps_urry'
 
         # temperature coupling
-        self.tcoupl = None
-        self.ref_t = None
+        self.tcoupl: bool = True
+        self.ref_t: float = 300.0
         self.tau_t = None
 
         # pressure coupling
-        self.pcoupl = None
-        self.ref_p = None
-        self.frequency_p = 25
+        self.pcoupl: bool = False
+        self.ref_p: float = 1.0
+        self.frequency_p: int = 25
 
         # periodic boundary condition
-        self.pbc = None
+        self.pbc: bool = False
         self.box_dimension: Any = None
 
         # prefix and io file name
@@ -110,7 +110,7 @@ class Dynamics:
 
         # restart simulation or run from beginning
         self.restart: bool = False
-        self.minimize = None
+        self.minimize: bool = True
 
         # call read_config function to initialize these attribute
         self.read_config(config_file)
