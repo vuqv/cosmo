@@ -249,7 +249,7 @@ class system:
             condition in code has nothing to do.
         """
         atoms = list(self.topology.atoms())
-        for i in range(1, len(atoms)):
+        for i in np.arange(1, len(atoms)):
             if atoms[i].residue.chain == atoms[i - 1].residue.chain:
                 self.topology.addBond(atoms[i - 1], atoms[i])
 
@@ -731,7 +731,7 @@ class system:
         self.yukawaForce.setCutoffDistance(yukawa_cutoff)
 
         if isinstance(self.particles_charge, float):
-            for i in range(len(self.atoms)):
+            for i in np.arange(len(self.atoms)):
                 self.yukawaForce.addParticle((self.particles_charge,))
 
         # in the case each atom has different sigma para.
@@ -810,7 +810,7 @@ class system:
         self.ashbaugh_HatchForce.setCutoffDistance(ashbaugh_Hatch_cutoff)
 
         if isinstance(self.rf_sigma, float):
-            for i in range(len(self.atoms)):
+            for i in np.arange(len(self.atoms)):
                 self.ashbaugh_HatchForce.addParticle((self.rf_sigma, self.particles_hps[i],))
 
         # in the case each atom has different sigma para.
@@ -1013,13 +1013,13 @@ class system:
 
         # Set same mass for each atom
         if isinstance(self.particles_mass, float):
-            for i in range(len(self.atoms)):
+            for i in np.arange(len(self.atoms)):
                 self.system.addParticle(self.particles_mass)
 
         # Set unique masses for each atom
         if isinstance(self.particles_mass, list):
             assert len(self.particles_mass) == len(self.atoms)
-            for i in range(len(self.particles_mass)):
+            for i in np.arange(len(self.particles_mass)):
                 self.system.addParticle(self.particles_mass[i])
 
     def addSystemForces(self) -> None:
