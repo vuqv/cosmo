@@ -156,7 +156,7 @@ class Dynamics:
 
         # temperature coupling. Pretty sure it is always on.
         if 'tcoupl' in params:
-            self.tcoupl = strtobool(params['tcoupl'])
+            self.tcoupl = bool(strtobool(params['tcoupl']))
             print('Turn on temperature coupling')
         if self.tcoupl:
             self.ref_t = float(params['ref_t']) * unit.kelvin
@@ -165,7 +165,7 @@ class Dynamics:
 
         # Periodic Boundary condition
         if 'pbc' in params:
-            self.pbc = strtobool(params['pbc'])
+            self.pbc = bool(strtobool(params['pbc']))
         if self.pbc:
             self.box_dimension = loads(params['box_dimension'])
             print(f'Using Periodic boundary condition with box dimension: {self.box_dimension} nm')
@@ -175,7 +175,7 @@ class Dynamics:
 
         # Pressure coupling
         if 'pcoupl' in params:
-            self.pcoupl = strtobool(params['pcoupl'])
+            self.pcoupl = bool(strtobool(params['pcoupl']))
             # print('Pressure coupling')
         if self.pcoupl:
             assert self.pbc, f"Pressure coupling requires box dimensions and periodic boundary condition is on"
@@ -211,11 +211,11 @@ class Dynamics:
 
         # Restart simulation or run from beginning
         if 'restart' in params:
-            self.restart = strtobool(params['restart'])
+            self.restart = bool(strtobool(params['restart']))
             print(f'Restart simulation: {self.restart}')
         if not self.restart:
-            self.minimize = strtobool(params['minimize'])
-            print(f'perform Energy minimization of input structure: {self.minimize}')
+            self.minimize = bool(strtobool(params['minimize']))
+            print(f'Perform Energy minimization of input structure: {self.minimize}')
         else:
             self.minimize = False
         print('__________________________________________________________________')
