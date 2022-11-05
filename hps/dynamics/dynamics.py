@@ -121,6 +121,9 @@ class Dynamics:
     def read_config(self, config_file):
         """
         Read simulation control parameters from config file *.ini into class attributes.
+
+        TODO: check parameters in control file more carefully.
+                Raise error and exit immediately if something wrong.
         """
         print(f"Reading simulation parameters from {config_file} file...")
         config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
