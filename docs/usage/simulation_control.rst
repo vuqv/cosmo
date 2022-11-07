@@ -1,7 +1,7 @@
 Simulation control options
 ========================================================= 
 
-This file contains an example of how config file of simulation looks like.
+An example of how config file of simulation looks like.
 
 .. code-block::
 
