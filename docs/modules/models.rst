@@ -48,9 +48,7 @@ Angle Potential
 +++++++++++++++
 .. math::
     U_{angle}(\theta) = \frac{-1}{\gamma}
-                    \ln{e^{-\gamma[k_\alpha( \theta-\theta_\alpha)^2+\epsilon_\\alpha]}
-                    +e^{-\gamma k_\beta(\theta-\theta_\beta)^2}]}
-
+    \ln \left[ e^{ -\gamma[ k_{\alpha} (\theta-\theta_{\alpha})^2+\epsilon_{\alpha} ]} +e^{ -\gamma k_{\beta} (\theta-\theta_{\beta})^2 } \right]
 
 Parameters:
 
@@ -65,15 +63,15 @@ Torsion Potential
 .. math::
     U_{torsion}(\theta) = -\ln\left[ U_{torsion, \alpha}(\theta, \epsilon_d) + U_{torsion, \beta}(\theta, \epsilon_d)\right]
 
-    U_{torsion, \alpha}(\theta, \epsilon_d)  &= e^{-k_{\alpha, 1}(\theta-\theta_{\alpha,1})^2-\epsilon_d}
-                                                        + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2})^4 + e_0}
-                                                        + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2}+2\pi)^4 + e_0}
 
-    U_{torsion, \beta}(\theta, \epsilon_d) &= e^{-k_{\beta,1}(\theta-\theta_{\beta,1})^2+e_1+\epsilon_d}
-                                                    + e^{-k_{\beta,1}(\theta-\theta_{\beta,1}-2\pi)^2+e_1+\epsilon_d} \\
+    U_{torsion, \alpha}(\theta, \epsilon_d)  = e^{-k_{\alpha, 1}(\theta-\theta_{\alpha,1})^2-\epsilon_d}
+                                                + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2})^4 + e_0}
+                                                + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2}+2\pi)^4 + e_0}
 
-                                                    &+ e^{-k_{\beta,2}(\theta-\theta_{\beta,2})^4+e_2}
-                                                    + e^{-k_{\beta,2}(\theta-\theta_{\beta,2}-2\pi)^4+e_2}
+    U_{torsion, \beta}(\theta, \epsilon_d) = e^{-k_{\beta,1}(\theta-\theta_{\beta,1})^2+e_1+\epsilon_d}
+                                           + e^{-k_{\beta,1}(\theta-\theta_{\beta,1}-2\pi)^2+e_1+\epsilon_d} \\
+                                           + e^{-k_{\beta,2}(\theta-\theta_{\beta,2})^4+e_2}
+                                           + e^{-k_{\beta,2}(\theta-\theta_{\beta,2}-2\pi)^4+e_2}
 
 
 Parameters:
