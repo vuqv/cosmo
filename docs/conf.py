@@ -26,7 +26,7 @@ author = u'Quyen Vu'
 # The short X.Y version
 version = '2022.0'
 # The full version, including alpha/beta/rc tags
-release = 'v1.2'
+release = 'v1.3'
 
 
 # -- General configuration ---------------------------------------------------
@@ -52,12 +52,15 @@ autosummary_generate = True
 # ones.
 extensions = [
 #    'numpydoc', # automatically includes `sphinx.ext.autosummary`
+    'rst2pdf.pdfbuilder',
     'sphinx.ext.autodoc',
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',    
     'sphinx.ext.githubpages',
 ]
+
+pdf_documents = [('index', u'rst2pdf', u'hpsOpenMM', u'Quyen Vu'),]
 
 
 #mathjax_config = {

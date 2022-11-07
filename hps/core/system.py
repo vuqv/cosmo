@@ -93,36 +93,6 @@ class system:
         Loads forcefield parameters from a force field file written with
         the :code:`dumpForceFieldData()` method.
 
-    getCAlphaOnly()
-    getAtoms()
-    getBonds()
-    getAngles()
-    getTorsions()
-    setBondForceConstant()
-    setParticleMass()
-    setParticleRadii()
-    setParticleCharge()
-    setParticleHPS()
-    addHarmonicBondForces()
-    addGaussianAngleForces()
-    addGaussianTorsionForces()
-    addYukawaForces()
-    addAshbaughHatchForces()
-    createSystemObject()
-    checkBondDistances()
-    checkLargeForces()
-    addParticles()
-    addSystemForces()
-    dumpStructure()
-    dumpTopology()
-    dumpForceFieldData()
-    setCAMassPerResidueType()
-    setCARadiusPerResidueType()
-    setCAChargePerResidueType()
-    setCAHPSPerResidueType()
-    _setParameters()
-
-
     """
 
     def __init__(self, structure_path, hps_scale):

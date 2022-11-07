@@ -27,12 +27,69 @@ The force field equations are:
 .. math::
 	H_A = \sum_{bonds}V_{bond}+\sum_{i,j}\Phi_{ij}^{vdw}+\sum_{i,j}\Phi_{i,j}^{el}
 
+If hps_ss model is used, the Hamiltonian is:
+
+.. math::
+	H_{hps-ss} = \sum_{bonds}V_{bond}+\sum_{angle}V_{angle}+\sum_{torsion}V_{torsion}+\sum_{i,j}\Phi_{ij}^{vdw}+\sum_{i,j}\Phi_{i,j}^{el}
+
+
 The Bonded potential:
 ++++++++++++++++++++++
+
 .. math::
         V_{bond} = \frac{k_b}{2}(r-r_0)^2
 
-Here the default values are :math:`k_b= 8368 kJ/(mol \times nm^2), r_0=0.382 nm`
+Here the default values are:
+
+    :math:`k_b= 8368 kJ/(mol \times nm^2),\\
+    r_0=0.382 nm`
+
+Angle Potential
++++++++++++++++
+.. math::
+    U_{angle}(\theta) = \frac{-1}{\gamma}
+                    \ln{e^{-\gamma[k_\alpha( \theta-\theta_\alpha)^2+\epsilon_\\alpha]}
+                    +e^{-\gamma k_\beta(\theta-\theta_\beta)^2}]}
+
+
+Parameters:
+
+    :math:`\gamma = 0.1 mol/kcal,\\
+    \epsilon_{\alpha}=4.3 kcal/mol,\\
+    \theta_{\alpha}=1.6 rad, \\
+    \theta_{\beta}=2.27 rad`
+
+Torsion Potential
+++++++++++++++++++
+
+.. math::
+    U_{torsion}(\theta) = -\ln\left[ U_{torsion, \alpha}(\theta, \epsilon_d) + U_{torsion, \beta}(\theta, \epsilon_d)\right]
+
+    U_{torsion, \alpha}(\theta, \epsilon_d)  &= e^{-k_{\alpha, 1}(\theta-\theta_{\alpha,1})^2-\epsilon_d}
+                                                        + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2})^4 + e_0}
+                                                        + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2}+2\pi)^4 + e_0}
+
+    U_{torsion, \beta}(\theta, \epsilon_d) &= e^{-k_{\beta,1}(\theta-\theta_{\beta,1})^2+e_1+\epsilon_d}
+                                                    + e^{-k_{\beta,1}(\theta-\theta_{\beta,1}-2\pi)^2+e_1+\epsilon_d} \\
+
+                                                    &+ e^{-k_{\beta,2}(\theta-\theta_{\beta,2})^4+e_2}
+                                                    + e^{-k_{\beta,2}(\theta-\theta_{\beta,2}-2\pi)^4+e_2}
+
+
+Parameters:
+
+    :math:`k_{\alpha,1}=11.4 kcal/(mol \times rad^2),\\
+    k_{\alpha,2}=0.15 kcal/(mol\times rad^4),\\
+    \theta_{\alpha,1} = 0.9 rad,\\
+    \theta_{\alpha,2}=1.02 rad,\\
+    e_0 = 0.27 kcal/mol,\\
+    k_{\beta,1}=1.8kcal/(mol \times rad^2),\\
+    k_{\beta,2}=0.65kcal/(mol\times rad^4),\\
+    \theta_{\beta,1}=-1.55 rad,\\
+    \theta_{\beta,2}=-2.5 rad,\\
+    e_1 = 0.14 kcal/mol,\\
+    e_2 = 0.4 kcal/mol`
+
 
 The Pairwise potential:
 +++++++++++++++++++++++
@@ -57,7 +114,8 @@ where, :math:`\sigma_{i,j}=\frac{\sigma_i+\sigma_j}{2}`: is the vdW radius inter
 
 In the current implementation, hydropathy scales are taken from Urry model, :math:`(\mu, \Delta) = (1, 0.08)`
 
-Nonbonded exclusion rule is :code:`1-2`, which we only exclude pair of atoms in bonded.
+Nonbonded exclusion rule is :code:`1-2`, for hps_kr and hps_urry which we only exclude pair of atoms in bonded.
+while it is :code:`1-4` for hps-ss, which we exclude 3 bonds.
 
 The cut-off distance for Lennard-Jone potential: :math:`2.0 nm`
 
