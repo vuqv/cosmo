@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation control options &mdash; hpsOpenMM v1.3 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parameters" href="../modules/parameters.html" />
+    <link rel="prev" title="Introduction" href="../modules/introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> hpsOpenMM
+            <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                main
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Simulation control options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#general-information">General information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#run-control">Run control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-parameter">Model parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#temperature-coupling">Temperature coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pressure-coupling">Pressure coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#periodic-boundary-condition">Periodic boundary condition:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-input-output">File input/output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#simulation-platform">Simulation platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#restart-simulation">Restart simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/parameters.html#note-on-hps-lambda-in-urry-scale">Note on hps (lambda) in urry scale:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules/models.html#coarse-grained-alpha-carbon-ca-model">Coarse grained, alpha-carbon (CA), model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/models.html#the-bonded-potential">The Bonded potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/models.html#angle-potential">Angle Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/models.html#torsion-potential">Torsion Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/models.html#the-pairwise-potential">The Pairwise potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules/models.html#the-debye-huckle-potential-has-following-form">The Debye-Huckle potential has following form:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/dynamics.html">Dynamics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">hpsOpenMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Simulation control options</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/qvv5013/rtd-github-pages/blob/mainusage/simulation_control.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simulation-control-options">
+<h1>Simulation control options<a class="headerlink" href="#simulation-control-options" title="Permalink to this heading"></a></h1>
+<p>An example of how config file of simulation looks like.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">OPTIONS</span><span class="p">]</span>
+<span class="n">md_steps</span> <span class="o">=</span> <span class="mi">30_000</span> <span class="c1"># number of steps</span>
+<span class="n">dt</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="p">;</span> <span class="n">time</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">ps</span>
+<span class="n">nstxout</span> <span class="o">=</span> <span class="mi">1000</span> <span class="p">;</span> <span class="n">number</span> <span class="n">of</span> <span class="n">steps</span> <span class="n">to</span> <span class="n">write</span> <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">nstxout</span>
+<span class="n">nstlog</span> <span class="o">=</span> <span class="mi">1000</span> <span class="p">;</span> <span class="n">number</span> <span class="n">of</span> <span class="n">steps</span> <span class="n">to</span> <span class="nb">print</span> <span class="n">log</span>
+<span class="n">nstcomm</span> <span class="o">=</span> <span class="mi">100</span> <span class="p">;</span> <span class="n">frequency</span> <span class="k">for</span> <span class="n">center</span> <span class="n">of</span> <span class="n">mass</span> <span class="n">motion</span> <span class="n">removal</span>
+<span class="p">;</span> <span class="n">select</span> <span class="n">HPS</span> <span class="n">model</span><span class="p">,</span> <span class="n">available</span> <span class="n">options</span><span class="p">:</span> <span class="n">hps_kr</span><span class="p">,</span> <span class="n">hps_urry</span><span class="p">,</span> <span class="ow">or</span> <span class="n">hps_ss</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">hps_urry</span>
+
+<span class="p">;</span> <span class="n">control</span> <span class="n">temperature</span> <span class="n">coupling</span>
+<span class="n">tcoupl</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">ref_t</span> <span class="o">=</span> <span class="mi">310</span> <span class="p">;</span> <span class="n">Kelvin</span><span class="o">-</span> <span class="n">reference</span> <span class="n">temperature</span>
+<span class="n">tau_t</span> <span class="o">=</span> <span class="mf">0.01</span> <span class="p">;</span> <span class="n">ps</span><span class="o">^-</span><span class="mi">1</span>
+
+<span class="p">;</span><span class="n">pressure</span> <span class="n">coupling</span>
+<span class="n">pcoupl</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="n">ref_p</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">frequency_p</span> <span class="o">=</span> <span class="mi">25</span>
+
+<span class="p">;</span> <span class="n">Periodic</span> <span class="n">boundary</span> <span class="n">condition</span><span class="p">:</span> <span class="k">if</span> <span class="n">pcoupl</span> <span class="ow">is</span> <span class="n">yes</span> <span class="n">then</span> <span class="n">pbc</span> <span class="n">must</span> <span class="n">be</span> <span class="n">yes</span><span class="o">.</span>
+<span class="n">pbc</span> <span class="o">=</span> <span class="n">yes</span>
+<span class="p">;</span> <span class="k">if</span> <span class="n">pbc</span><span class="o">=</span><span class="n">yes</span><span class="p">,</span> <span class="n">then</span> <span class="n">use</span> <span class="n">box_dimension</span> <span class="n">option</span> <span class="n">to</span> <span class="n">specify</span> <span class="n">box_dimension</span> <span class="o">=</span> <span class="n">x</span> <span class="ow">or</span> <span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">],</span> <span class="n">unit</span> <span class="n">of</span> <span class="n">nanometer</span>
+<span class="n">box_dimension</span> <span class="o">=</span> <span class="mi">30</span> <span class="p">;</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">]</span>
+
+<span class="p">;</span> <span class="nb">input</span>
+<span class="n">protein_code</span> <span class="o">=</span> <span class="n">FUS_100chains</span>
+<span class="n">pdb_file</span> <span class="o">=</span> <span class="n">FUS_100chains</span><span class="o">.</span><span class="n">pdb</span>
+<span class="p">;</span> <span class="n">output</span>
+<span class="n">checkpoint</span> <span class="o">=</span> <span class="n">FUS_100chains</span><span class="o">.</span><span class="n">chk</span>
+<span class="p">;</span><span class="n">Use</span> <span class="n">GPU</span><span class="o">/</span><span class="n">CPU</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">GPU</span>
+<span class="p">;</span> <span class="n">If</span> <span class="n">CPU</span> <span class="ow">is</span> <span class="n">specified</span><span class="p">,</span> <span class="n">then</span> <span class="n">use</span> <span class="n">ppn</span> <span class="n">variable</span>
+<span class="n">ppn</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="p">;</span><span class="n">Restart</span> <span class="n">simulation</span>
+<span class="n">restart</span> <span class="o">=</span> <span class="n">no</span>
+<span class="n">minimize</span> <span class="o">=</span> <span class="n">yes</span> <span class="p">;</span><span class="k">if</span> <span class="ow">not</span> <span class="n">restart</span><span class="p">,</span> <span class="n">then</span> <span class="n">minimize</span> <span class="n">will</span> <span class="n">be</span> <span class="n">loaded</span><span class="p">,</span> <span class="n">otherwise</span><span class="p">,</span> <span class="n">minimize</span><span class="o">=</span><span class="kc">False</span>
+</pre></div>
+</div>
+<hr class="docutils" />
+<section id="general-information">
+<h2>General information<a class="headerlink" href="#general-information" title="Permalink to this heading"></a></h2>
+<p>Simulation parameters are input from <cite>.ini</cite> file which is loaded by <cite>ConfigParser</cite> module in Python.
+The section title <code class="docutils literal notranslate"><span class="pre">[OPTIONS]</span></code> is required, do not change section’s name.</p>
+<ul class="simple">
+<li><p>Comment can be inline or in new line, start with <cite>;</cite> or <cite>#</cite></p></li>
+<li><p>Keyword and value can be separated by <cite>=</cite> or <cite>:</cite></p></li>
+</ul>
+</section>
+<section id="run-control">
+<h2>Run control<a class="headerlink" href="#run-control" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">md_steps</span><span class="p">:</span>   <span class="p">(</span><span class="n">long</span> <span class="nb">int</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">Maximum</span> <span class="n">number</span> <span class="n">of</span> <span class="n">steps</span> <span class="n">to</span> <span class="n">integrate</span> <span class="ow">or</span> <span class="n">minimize</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">dt</span><span class="p">:</span>         <span class="p">(</span><span class="n">double</span><span class="p">)</span>
+            <span class="p">(</span><span class="mf">0.01</span><span class="p">)[</span><span class="n">ps</span><span class="p">]</span> <span class="n">Time</span> <span class="n">step</span> <span class="k">for</span> <span class="n">integration</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">nstxout</span><span class="p">:</span>    <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">[</span><span class="n">step</span><span class="p">]</span> <span class="n">number</span> <span class="n">of</span> <span class="n">steps</span> <span class="n">that</span> <span class="n">elapse</span> <span class="n">between</span> <span class="n">writing</span> <span class="n">coordinates</span> <span class="n">to</span> <span class="n">output</span> <span class="n">trajectory</span> <span class="n">file</span><span class="p">,</span>
+                  <span class="n">the</span> <span class="n">last</span> <span class="n">coordinates</span> <span class="n">are</span> <span class="n">always</span> <span class="n">written</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">nstlog</span><span class="p">:</span>     <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="n">number</span> <span class="n">of</span> <span class="n">steps</span> <span class="n">that</span> <span class="n">elapse</span> <span class="n">between</span> <span class="n">writing</span> <span class="n">energies</span> <span class="n">to</span> <span class="n">the</span> <span class="n">log</span> <span class="n">file</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">nstcomm</span><span class="p">:</span>    <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="n">frequency</span> <span class="k">for</span> <span class="n">center</span> <span class="n">of</span> <span class="n">mass</span> <span class="n">motion</span> <span class="n">removal</span>
+</pre></div>
+</div>
+</section>
+<section id="model-parameter">
+<h2>Model parameter<a class="headerlink" href="#model-parameter" title="Permalink to this heading"></a></h2>
+<p>There are three models supported now: <cite>hps_kr</cite>, <cite>hps_urry</cite> and <cite>hps_ss</cite>.</p>
+<p><cite>hps_kr</cite> has parameters for a wide range of residues, i.e RNA, phosphorylation residues … but this model is less accurate</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="p">:</span>      <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+            <span class="n">hps_kr</span><span class="p">:</span> <span class="n">Kapcha</span><span class="o">-</span><span class="n">Rossy</span> <span class="n">hydropathy</span> <span class="n">scale</span><span class="p">,</span> <span class="n">parameterize</span> <span class="kn">from</span> <span class="nn">OPLS</span><span class="o">-</span><span class="n">AA</span> <span class="n">forcefield</span>
+
+            <span class="n">hps_urry</span> <span class="p">(</span><span class="n">default</span><span class="p">):</span> <span class="n">Urry</span> <span class="n">hydropathy</span> <span class="n">scale</span><span class="p">,</span> <span class="n">parameterize</span> <span class="kn">from</span> <span class="nn">experiment</span>
+
+            <span class="n">hps_ss</span><span class="p">:</span> <span class="n">hps_urry</span> <span class="k">with</span> <span class="n">bonded</span> <span class="n">potential</span> <span class="p">(</span><span class="n">angle</span> <span class="ow">and</span> <span class="n">torsion</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="temperature-coupling">
+<h2>Temperature coupling<a class="headerlink" href="#temperature-coupling" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">tcoupl</span><span class="p">:</span>     <span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">yes</span> <span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="p">:</span> <span class="n">The</span> <span class="n">only</span> <span class="n">available</span> <span class="n">option</span> <span class="k">for</span> <span class="n">now</span><span class="p">,</span> <span class="n">we</span> <span class="n">don</span><span class="s1">&#39;t care about NVE ensemble.</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">ref_t</span><span class="p">:</span>      <span class="p">(</span><span class="n">double</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">300</span><span class="p">)</span> <span class="p">[</span><span class="n">K</span><span class="p">]</span> <span class="p">:</span> <span class="n">Reference</span> <span class="n">temperature</span> <span class="ow">in</span> <span class="n">unit</span> <span class="n">of</span> <span class="n">Kelvin</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">tau_t</span><span class="p">:</span>      <span class="p">(</span><span class="n">double</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">ps</span><span class="o">^-</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="n">The</span> <span class="n">friction</span> <span class="n">coefficient</span> <span class="n">which</span> <span class="n">couples</span> <span class="n">the</span> <span class="n">system</span> <span class="n">to</span> <span class="n">the</span> <span class="n">heat</span> <span class="n">bath</span> <span class="p">(</span><span class="ow">in</span> <span class="n">inverse</span> <span class="n">picoseconds</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="pressure-coupling">
+<h2>Pressure coupling<a class="headerlink" href="#pressure-coupling" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pcoupl</span>      <span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+            <span class="n">yes</span> <span class="p">:</span> <span class="n">Using</span> <span class="n">pressure</span> <span class="n">coupling</span>
+
+            <span class="n">no</span> <span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="p">:</span> <span class="n">Run</span> <span class="n">on</span> <span class="n">NVT</span> <span class="n">ensemble</span> <span class="n">only</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">ref_p</span>       <span class="p">(</span><span class="n">double</span><span class="p">)</span>
+             <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">[</span><span class="n">bar</span><span class="p">]</span> <span class="n">The</span> <span class="n">default</span> <span class="n">pressure</span> <span class="n">acting</span> <span class="n">on</span> <span class="n">the</span> <span class="n">system</span><span class="o">.</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">frequency_p</span> <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="p">(</span><span class="mi">25</span><span class="p">)</span> <span class="p">[</span><span class="n">steps</span><span class="p">]</span> <span class="n">the</span> <span class="n">frequency</span> <span class="n">at</span> <span class="n">which</span> <span class="n">Monte</span> <span class="n">Carlo</span> <span class="n">pressure</span> <span class="n">changes</span> <span class="n">should</span> <span class="n">be</span> <span class="n">attempted</span>
+</pre></div>
+</div>
+</section>
+<section id="periodic-boundary-condition">
+<h2>Periodic boundary condition:<a class="headerlink" href="#periodic-boundary-condition" title="Permalink to this heading"></a></h2>
+<p>if pcoupl is yes then pbc must be yes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>pbc         (bool)
+            yes : Using periodic boundary condition.
+                    If this option is chosen, then it will affect to non-bonded forces in the system,
+                    and the coordinate writen in PDB and DCD file as well. No worries since I have handled these.
+
+            no (default) : Without periodic boundary condition.
+------------------------------------------------------------------------------------
+box_dimension   (float or list of float)
+            [nm] An example of box dimension:
+            If you want a cubic box of 30x30x30 nm^3, put: 30 or [30, 30, 30]
+            If you want a rectangular box? Put:  [30, 30, 60]
+</pre></div>
+</div>
+</section>
+<section id="file-input-output">
+<h2>File input/output<a class="headerlink" href="#file-input-output" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">protein_code</span>    <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+                <span class="n">String</span> <span class="k">for</span> <span class="n">output</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">i</span><span class="o">.</span><span class="n">e</span> <span class="p">{</span><span class="n">protein_code</span><span class="p">}</span><span class="o">.</span><span class="n">dcd</span><span class="p">,</span> <span class="p">{</span><span class="n">protein_code</span><span class="p">}</span><span class="o">.</span><span class="n">log</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">pdb_file</span>        <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+                <span class="p">[</span><span class="o">.</span><span class="n">pdb</span><span class="p">,</span> <span class="o">.</span><span class="n">cif</span><span class="p">]</span> <span class="n">Input</span> <span class="n">structure</span> <span class="k">for</span> <span class="n">loading</span> <span class="n">topology</span> <span class="ow">and</span> <span class="n">initial</span> <span class="n">coordinate</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">checkpoint</span>      <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+                <span class="p">[</span><span class="o">.</span><span class="n">chk</span><span class="p">]</span> <span class="n">Checkpoint</span> <span class="n">file</span> <span class="n">name</span><span class="p">,</span> <span class="n">here</span> <span class="n">I</span> <span class="n">ask</span> <span class="n">you</span> <span class="n">to</span> <span class="n">provide</span> <span class="n">it</span> <span class="n">explicitly</span> <span class="n">since</span>
+                        <span class="n">because</span> <span class="n">checkpoint</span> <span class="n">can</span> <span class="n">be</span> <span class="n">used</span> <span class="n">to</span> <span class="n">load</span> <span class="n">state</span> <span class="ow">or</span> <span class="n">save</span> <span class="n">state</span><span class="o">.</span>
+                        <span class="ow">in</span> <span class="n">case</span> <span class="k">if</span> <span class="n">you</span> <span class="n">restart</span> <span class="n">simulation</span> <span class="k">with</span> <span class="n">different</span> <span class="n">name</span><span class="p">,</span> <span class="n">you</span> <span class="n">have</span> <span class="n">to</span> <span class="n">provide</span> <span class="n">it</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+<section id="simulation-platform">
+<h2>Simulation platform<a class="headerlink" href="#simulation-platform" title="Permalink to this heading"></a></h2>
+<p>Simulation can be run on CPU with number of threads is control by <cite>ppn</cite> or using GPU.
+If <cite>device=CPU</cite> then ppn need to be specify, otherwise simulation will run on 1 core</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">device</span>          <span class="p">(</span><span class="n">string</span><span class="p">)</span>
+                <span class="n">GPU</span> <span class="p">:</span> <span class="n">Use</span> <span class="n">gpu</span> <span class="n">to</span> <span class="n">run</span> <span class="n">simulation</span>
+
+                <span class="n">CPU</span> <span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="p">:</span> <span class="n">use</span> <span class="n">cpu</span> <span class="n">to</span> <span class="n">run</span> <span class="n">simulation</span><span class="p">,</span> <span class="k">if</span> <span class="n">you</span> <span class="n">specify</span> <span class="n">cpu</span><span class="p">,</span> <span class="n">you</span> <span class="n">should</span> <span class="n">modify</span> <span class="n">ppn</span> <span class="n">option</span><span class="p">,</span> <span class="n">it</span> <span class="n">control</span>
+                        <span class="n">how</span> <span class="n">many</span> <span class="n">cores</span> <span class="n">will</span> <span class="n">be</span> <span class="n">used</span> <span class="n">to</span> <span class="n">run</span> <span class="n">simulation</span><span class="p">,</span> <span class="k">if</span> <span class="ow">not</span><span class="p">,</span> <span class="n">default</span> <span class="ow">is</span> <span class="mf">1.</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+<span class="n">ppn</span>             <span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">[</span><span class="n">threads</span><span class="p">]</span> <span class="n">Number</span> <span class="n">of</span> <span class="n">threads</span> <span class="n">used</span> <span class="n">to</span> <span class="n">run</span> <span class="n">simulation</span> <span class="n">on</span> <span class="n">CPU</span><span class="o">.</span> <span class="n">When</span> <span class="n">using</span> <span class="n">GPU</span><span class="p">,</span>
+                            <span class="n">performance</span> <span class="ow">is</span> <span class="n">boosted</span> <span class="n">a</span> <span class="n">lot</span> <span class="n">so</span> <span class="n">ppn</span> <span class="ow">in</span> <span class="n">that</span> <span class="n">case</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">to</span> <span class="mf">1.</span>
+</pre></div>
+</div>
+</section>
+<section id="restart-simulation">
+<h2>Restart simulation<a class="headerlink" href="#restart-simulation" title="Permalink to this heading"></a></h2>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">restart</span>         <span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+                <span class="n">yes</span> <span class="p">:</span> <span class="n">restart</span> <span class="n">simulation</span> <span class="kn">from</span> <span class="nn">checkpoint</span> <span class="n">file</span><span class="o">.</span> <span class="n">This</span> <span class="n">can</span> <span class="n">be</span> <span class="kc">True</span><span class="p">,</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">whatever</span> <span class="n">are</span> <span class="ow">not</span> <span class="p">(</span><span class="n">FALSE</span><span class="p">)</span>
+                        <span class="ow">in</span> <span class="n">python</span> <span class="n">condition</span><span class="o">.</span> <span class="n">If</span> <span class="n">this</span> <span class="n">option</span> <span class="ow">is</span> <span class="n">selected</span><span class="p">,</span> <span class="n">minimize</span> <span class="n">will</span> <span class="n">be</span> <span class="n">force</span> <span class="n">to</span> <span class="kc">False</span><span class="o">.</span>
+
+                <span class="n">no</span> <span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="p">:</span> <span class="n">Run</span> <span class="n">simulation</span> <span class="kn">from</span> <span class="nn">beginning</span><span class="p">,</span> <span class="k">if</span> <span class="n">this</span> <span class="n">option</span> <span class="ow">is</span> <span class="n">selected</span><span class="p">,</span> <span class="n">you</span> <span class="n">can</span> <span class="n">choose</span> <span class="k">if</span> <span class="n">you</span> <span class="n">want</span> <span class="n">to</span> <span class="n">minimize</span> <span class="n">your</span>
+                    <span class="n">system</span> <span class="n">before</span> <span class="n">running</span> <span class="n">simulation</span><span class="o">.</span>
+<span class="o">------------------------------------------------------------------------------------</span>
+
+<span class="n">minimize</span>        <span class="p">(</span><span class="nb">bool</span><span class="p">)</span>
+                <span class="n">yes</span> <span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="p">:</span> <span class="n">perform</span> <span class="n">energy</span> <span class="n">minimization</span> <span class="n">before</span> <span class="n">run</span> <span class="n">molecular</span> <span class="n">dynamics</span><span class="o">.</span>
+
+                <span class="n">no</span> <span class="p">:</span> <span class="n">Not</span> <span class="n">running</span> <span class="n">energy</span> <span class="n">minimization</span><span class="o">.</span> <span class="n">This</span> <span class="ow">is</span> <span class="n">default</span> <span class="n">option</span> <span class="n">when</span> <span class="n">restart</span> <span class="n">option</span> <span class="ow">is</span> <span class="nb">set</span> <span class="n">to</span> <span class="n">yes</span><span class="o">.</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../modules/introduction.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../modules/parameters.html" class="btn btn-neutral float-right" title="Parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Quyen Vu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: main
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+        
+        <dl>
+            <dt>Languages</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">en</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        <dl>
+            <dt>Versions</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">main</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        
+        <hr/>
+        Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

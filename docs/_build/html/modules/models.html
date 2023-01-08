@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Models &mdash; hpsOpenMM v1.3 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Dynamics" href="dynamics.html" />
+    <link rel="prev" title="System" href="system.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> hpsOpenMM
+            <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                main
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/simulation_control.html">Simulation control options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#general-information">General information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#run-control">Run control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#model-parameter">Model parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#temperature-coupling">Temperature coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#pressure-coupling">Pressure coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#periodic-boundary-condition">Periodic boundary condition:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#file-input-output">File input/output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#simulation-platform">Simulation platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#restart-simulation">Restart simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html#note-on-hps-lambda-in-urry-scale">Note on hps (lambda) in urry scale:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">System</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#coarse-grained-alpha-carbon-ca-model">Coarse grained, alpha-carbon (CA), model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-bonded-potential">The Bonded potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#angle-potential">Angle Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#torsion-potential">Torsion Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-pairwise-potential">The Pairwise potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-debye-huckle-potential-has-following-form">The Debye-Huckle potential has following form:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamics.html">Dynamics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">hpsOpenMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Models</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/qvv5013/rtd-github-pages/blob/mainmodules/models.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="models">
+<h1>Models<a class="headerlink" href="#models" title="Permalink to this heading"></a></h1>
+<p>The models class contains three methods for automatic setting up predefined potentials.</p>
+<p>It works by initializing a system class with the necessary force field parameters.</p>
+<section id="coarse-grained-alpha-carbon-ca-model">
+<h2>Coarse grained, alpha-carbon (CA), model<a class="headerlink" href="#coarse-grained-alpha-carbon-ca-model" title="Permalink to this heading"></a></h2>
+<p>The coarse grained method represents the protein system as beads centered at the alpha carbons of each residue in the protein.</p>
+<p>It uses harmonic potentials to hold the covalent connectivity and geometry of the beads.</p>
+<p>Torsional geometries are modeled with a periodic torsion potential.</p>
+<p>Native contacts are represented through the use of Lennard-Jones potentials that allow to form and break non-bonded interactions, permitting complete and local unfolding of the structures.</p>
+<p>To create a CA model, call:
+<code class="code docutils literal notranslate"><span class="pre">hps.models.getCAModel(pdb_file,</span> <span class="pre">hps_scale)</span></code></p>
+<p>Here, pdb_file is the path to the PDB format structure of the protein.
+hps_scale is hydropathy scale that are going to be used. <code class="code docutils literal notranslate"><span class="pre">urry</span></code> or <code class="code docutils literal notranslate"><span class="pre">kr</span></code></p>
+<p>The force field equations are:</p>
+<div class="math notranslate nohighlight">
+\[H_A = \sum_{bonds}V_{bond}+\sum_{i,j}\Phi_{ij}^{vdw}+\sum_{i,j}\Phi_{i,j}^{el}\]</div>
+<p>If hps_ss model is used, the Hamiltonian is:</p>
+<div class="math notranslate nohighlight">
+\[H_{hps-ss} = \sum_{bonds}V_{bond}+\sum_{angle}V_{angle}+\sum_{torsion}V_{torsion}+\sum_{i,j}\Phi_{ij}^{vdw}+\sum_{i,j}\Phi_{i,j}^{el}\]</div>
+</section>
+<section id="the-bonded-potential">
+<h2>The Bonded potential:<a class="headerlink" href="#the-bonded-potential" title="Permalink to this heading"></a></h2>
+<div class="math notranslate nohighlight">
+\[V_{bond} = \frac{k_b}{2}(r-r_0)^2\]</div>
+<p>Here the default values are:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(k_b= 8368 kJ/(mol \times nm^2),\\
+r_0=0.382 nm\)</span></p>
+</div></blockquote>
+</section>
+<section id="angle-potential">
+<h2>Angle Potential<a class="headerlink" href="#angle-potential" title="Permalink to this heading"></a></h2>
+<div class="math notranslate nohighlight">
+\[U_{angle}(\theta) = \frac{-1}{\gamma}
+\ln \left[ e^{ -\gamma[ k_{\alpha} (\theta-\theta_{\alpha})^2+\epsilon_{\alpha} ]} +e^{ -\gamma k_{\beta} (\theta-\theta_{\beta})^2 } \right]\]</div>
+<p>Parameters:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(\gamma = 0.1 mol/kcal,\\
+\epsilon_{\alpha}=4.3 kcal/mol,\\
+\theta_{\alpha}=1.6 rad, \\
+\theta_{\beta}=2.27 rad\)</span></p>
+</div></blockquote>
+</section>
+<section id="torsion-potential">
+<h2>Torsion Potential<a class="headerlink" href="#torsion-potential" title="Permalink to this heading"></a></h2>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}U_{torsion}(\theta) = -\ln\left[ U_{torsion, \alpha}(\theta, \epsilon_d) + U_{torsion, \beta}(\theta, \epsilon_d)\right]\\U_{torsion, \alpha}(\theta, \epsilon_d)  = e^{-k_{\alpha, 1}(\theta-\theta_{\alpha,1})^2-\epsilon_d}
+                                            + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2})^4 + e_0}
+                                            + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2}+2\pi)^4 + e_0}\\\begin{split}U_{torsion, \beta}(\theta, \epsilon_d) = e^{-k_{\beta,1}(\theta-\theta_{\beta,1})^2+e_1+\epsilon_d}
+                                       + e^{-k_{\beta,1}(\theta-\theta_{\beta,1}-2\pi)^2+e_1+\epsilon_d} \\
+                                       + e^{-k_{\beta,2}(\theta-\theta_{\beta,2})^4+e_2}
+                                       + e^{-k_{\beta,2}(\theta-\theta_{\beta,2}-2\pi)^4+e_2}\end{split}\end{aligned}\end{align} \]</div>
+<p>Parameters:</p>
+<blockquote>
+<div><p><span class="math notranslate nohighlight">\(k_{\alpha,1}=11.4 kcal/(mol \times rad^2),\\
+k_{\alpha,2}=0.15 kcal/(mol\times rad^4),\\
+\theta_{\alpha,1} = 0.9 rad,\\
+\theta_{\alpha,2}=1.02 rad,\\
+e_0 = 0.27 kcal/mol,\\
+k_{\beta,1}=1.8kcal/(mol \times rad^2),\\
+k_{\beta,2}=0.65kcal/(mol\times rad^4),\\
+\theta_{\beta,1}=-1.55 rad,\\
+\theta_{\beta,2}=-2.5 rad,\\
+e_1 = 0.14 kcal/mol,\\
+e_2 = 0.4 kcal/mol\)</span></p>
+</div></blockquote>
+</section>
+<section id="the-pairwise-potential">
+<h2>The Pairwise potential:<a class="headerlink" href="#the-pairwise-potential" title="Permalink to this heading"></a></h2>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\Phi_{i,j}^{vdw}(r) = step(2^{1/6}\sigma_{ij}-r) \times \left( 4\epsilon\left[\left(\frac{\sigma_{ij}}{r}\right)^{12}- \left(\frac{\sigma_{ij}}{r}\right)^{6}\right]+(1-\mu\times\lambda_{ij}^{0}+\Delta)\times\epsilon\right)\\+ \left[1-step(2^{1/6}\sigma_{ij}-r)\right]\times\left[(\mu \lambda_{ij}^{0}-\Delta)\times 4\epsilon \left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-\left(\frac{\sigma_{ij}}{r}\right)^6\right]\right]\end{aligned}\end{align} \]</div>
+<p>Since the step function behaves like: <code class="code docutils literal notranslate"><span class="pre">step(x)</span> <span class="pre">=</span> <span class="pre">0</span> <span class="pre">if</span> <span class="pre">x</span> <span class="pre">&lt;</span> <span class="pre">0,and</span> <span class="pre">=1</span> <span class="pre">otherwise</span></code>, we can separate in multiple cases for short likes following:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\Phi_{i,j}^{vdw}(r) =  4\epsilon \left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-\left(\frac{\sigma_{ij}}{r}\right)^{6}\right]+(1-\mu     \times\lambda_{ij}^{0}+\Delta)  \times\epsilon, r\le 2^{1/6}\sigma_{ij}\\\Phi_{i,j}^{vdw}(r) = (\mu\times\lambda_{ij}^{0}-\Delta) \times \left( 4\epsilon \left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-\left(\frac{\sigma_{ij}}{r}\right)^{6}\right]\right), r &gt; 2^{1/6}\sigma_{ij}\end{aligned}\end{align} \]</div>
+<p>where, <span class="math notranslate nohighlight">\(\sigma_{i,j}=\frac{\sigma_i+\sigma_j}{2}\)</span>: is the vdW radius interaction of interacting beads</p>
+<p><span class="math notranslate nohighlight">\(\lambda_{ij}^{0}=\frac{\lambda_i+\lambda_j}{2}\)</span>: hydropathy scale interaction of residues</p>
+<p><span class="math notranslate nohighlight">\(\mu, \Delta\)</span>: are the only free parameters in the model. In Jeetain Mittal(2021) Protein Science, he simulated for 42 IDP proteins and fit Rg vs experimental values.</p>
+<p>In the current implementation, hydropathy scales are taken from Urry model, <span class="math notranslate nohighlight">\((\mu, \Delta) = (1, 0.08)\)</span></p>
+<p>Nonbonded exclusion rule is <code class="code docutils literal notranslate"><span class="pre">1-2</span></code>, for hps_kr and hps_urry which we only exclude pair of atoms in bonded.
+while it is <code class="code docutils literal notranslate"><span class="pre">1-4</span></code> for hps-ss, which we exclude 3 bonds.</p>
+<p>The cut-off distance for Lennard-Jone potential: <span class="math notranslate nohighlight">\(2.0 nm\)</span></p>
+</section>
+<section id="the-debye-huckle-potential-has-following-form">
+<h2>The Debye-Huckle potential has following form:<a class="headerlink" href="#the-debye-huckle-potential-has-following-form" title="Permalink to this heading"></a></h2>
+<div class="math notranslate nohighlight">
+\[\Phi_{ij}^{el}(r) = \frac{q_{i}q_{j}}{4\pi\epsilon_0 D r}e^{-\kappa r}\]</div>
+<p>where, <span class="math notranslate nohighlight">\(q_i, q_j\)</span> are charge of residues <span class="math notranslate nohighlight">\(i, j\)</span></p>
+<p><span class="math notranslate nohighlight">\(\epsilon_0\)</span>: Vacuum permitivity. For convenient, we precalculated the electric conversion factor
+<span class="math notranslate nohighlight">\(\frac{1}{4\pi\epsilon_0}= 138.935 485(9) kJ \times mol^{−1} \times nm \times e^{−2}\)</span>.</p>
+<p><span class="math notranslate nohighlight">\(D\)</span>: dielectric constant, at 100mM mono-valence salt (NaCl), it takes values of 80.
+The dielectric constant here is fixed, but it can be temperature dependent as the function:
+<span class="math notranslate nohighlight">\(\frac{5321}{T}+233.76-0.9297T+0.1417\times 10^{-2}\times T^2 - 0.8292\times 10^{-6}\times T^3\)</span></p>
+<p><span class="math notranslate nohighlight">\(\kappa\)</span>: inverse Debye length, at 100mM NaCl has values of <span class="math notranslate nohighlight">\(1 nm^{-1}\)</span></p>
+<p>The cut-off distance for Electrostatics interactions: <span class="math notranslate nohighlight">\(3.5 nm\)</span></p>
+<dl class="py class">
+<dt class="sig sig-object py" id="hps.core.models">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hps.core.</span></span><span class="sig-name descname"><span class="pre">models</span></span><a class="reference internal" href="../_modules/hps/core/models.html#models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.models" title="Permalink to this definition"></a></dt>
+<dd><p>A class to hold functions for the automated generation of default hps models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.models.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hps.core.models.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.models.buildHPSModel">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildHPSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hps_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hps_urry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_dimension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hps/core/models.html#models.buildHPSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.models.buildHPSModel" title="Permalink to this definition"></a></dt>
+<dd><p>Creates an alpha-carbon only <code class="code docutils literal notranslate"><span class="pre">hpsOpenMM</span></code> system class object with default
+initialized parameters.</p>
+<p>Initializes a coarse-grained, carbon alpha (CA), hpsOpenMM system class
+from a structure and a contact file defining the native contacts for the
+coarse grained model.</p>
+<p>The system creation steps are:</p>
+<ol class="arabic simple">
+<li><p>Add the geometrical parameters for the model.</p></li>
+<li><p>Add the default force field parameters for the model.</p></li>
+<li><p>Create the default force objects.</p></li>
+<li><p>Create the OpenMM system class.</p></li>
+</ol>
+<p>The method can be used to generate an initialized hpsOpenMM system class, that only
+contains the geometrical parameters, by passing the option default_parameters as False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure_file</strong> (<em>string</em><em> [</em><em>requires</em><em>]</em>) – Path to the input structure file.</p></li>
+<li><p><strong>minimize</strong> (<em>boolean</em><em> (</em><em>False</em><em>)</em>) – If True the initial structure will undergo the energy minimization.</p></li>
+<li><p><strong>hps_scale</strong> (<em>string</em><em> [</em><em>Optional</em><em>, </em><em>hps_urry</em><em>]</em>) – <dl class="simple">
+<dt>HPS scale. There are three options correspond to two scale:</dt><dd><ul>
+<li><p>’hps_urry’: using Urry scale (default).</p></li>
+<li><p>’hps_ss’: hps_urry with angle and torsion potential.</p></li>
+<li><p>’hps_kr’: using Kapcha-Rossy scale.</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>box_dimension</strong> (<em>float</em><em> or </em><em>array</em><em> (</em><em>None</em><em>)</em>) – If box_dimension is supplied, then will use PBC.
+if float is given, then use cubic box
+if an array of (3,1) is given, then use rectangular box with the given dimension
+if not specify: do not use PBC</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>hps</strong> – Initialized hpsOpenMM.system class with default options for defining
+a coarse-grained CA force field.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">hpsOpenMM.system</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="system.html" class="btn btn-neutral float-left" title="System" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="dynamics.html" class="btn btn-neutral float-right" title="Dynamics" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Quyen Vu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: main
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+        
+        <dl>
+            <dt>Languages</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">en</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        <dl>
+            <dt>Versions</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">main</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        
+        <hr/>
+        Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

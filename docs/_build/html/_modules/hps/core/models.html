@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hps.core.models &mdash; hpsOpenMM v1.3 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> hpsOpenMM
+            <img src="../../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                main
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/simulation_control.html">Simulation control options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#general-information">General information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#run-control">Run control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#model-parameter">Model parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#temperature-coupling">Temperature coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#pressure-coupling">Pressure coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#periodic-boundary-condition">Periodic boundary condition:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#file-input-output">File input/output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#simulation-platform">Simulation platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#restart-simulation">Restart simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/parameters.html#note-on-hps-lambda-in-urry-scale">Note on hps (lambda) in urry scale:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#coarse-grained-alpha-carbon-ca-model">Coarse grained, alpha-carbon (CA), model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#the-bonded-potential">The Bonded potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#angle-potential">Angle Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#torsion-potential">Torsion Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#the-pairwise-potential">The Pairwise potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#the-debye-huckle-potential-has-following-form">The Debye-Huckle potential has following form:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/dynamics.html">Dynamics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">hpsOpenMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>hps.core.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hps.core.models</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># coding: utf-8</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span> <span class="nn">.system</span> <span class="kn">import</span> <span class="n">system</span>
+
+
+<div class="viewcode-block" id="models"><a class="viewcode-back" href="../../../modules/models.html#hps.core.models.models">[docs]</a><span class="k">class</span> <span class="nc">models</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class to hold functions for the automated generation of default hps models.</span>
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="models.buildHPSModel"><a class="viewcode-back" href="../../../modules/models.html#hps.core.models.models.buildHPSModel">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">buildHPSModel</span><span class="p">(</span><span class="n">structure_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                      <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                      <span class="n">hps_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hps_urry&#39;</span><span class="p">,</span>
+                      <span class="n">box_dimension</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default</span>
+<span class="sd">        initialized parameters.</span>
+
+<span class="sd">        Initializes a coarse-grained, carbon alpha (CA), hpsOpenMM system class</span>
+<span class="sd">        from a structure and a contact file defining the native contacts for the</span>
+<span class="sd">        coarse grained model.</span>
+
+<span class="sd">        The system creation steps are:</span>
+
+<span class="sd">        1) Add the geometrical parameters for the model.</span>
+<span class="sd">        2) Add the default force field parameters for the model.</span>
+<span class="sd">        3) Create the default force objects.</span>
+<span class="sd">        4) Create the OpenMM system class.</span>
+
+<span class="sd">        The method can be used to generate an initialized hpsOpenMM system class, that only</span>
+<span class="sd">        contains the geometrical parameters, by passing the option default_parameters as False.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_file : string [requires]</span>
+<span class="sd">            Path to the input structure file.</span>
+<span class="sd">        minimize : boolean (False)</span>
+<span class="sd">            If True the initial structure will undergo the energy minimization.</span>
+<span class="sd">        hps_scale : string [Optional, hps_urry]</span>
+<span class="sd">            HPS scale. There are three options correspond to two scale:</span>
+<span class="sd">                * &#39;hps_urry&#39;: using Urry scale (default).</span>
+<span class="sd">                * &#39;hps_ss&#39;: hps_urry with angle and torsion potential.</span>
+<span class="sd">                * &#39;hps_kr&#39;: using Kapcha-Rossy scale.</span>
+<span class="sd">        box_dimension : float or array (None)</span>
+<span class="sd">            If box_dimension is supplied, then will use PBC.</span>
+<span class="sd">            if float is given, then use cubic box</span>
+<span class="sd">            if an array of (3,1) is given, then use rectangular box with the given dimension</span>
+<span class="sd">            if not specify: do not use PBC</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        hps : :code:`hpsOpenMM.system`</span>
+<span class="sd">            Initialized hpsOpenMM.system class with default options for defining</span>
+<span class="sd">            a coarse-grained CA force field.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Generating CA hps for structure file &#39;</span> <span class="o">+</span> <span class="n">structure_file</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">hps</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">structure_file</span><span class="p">,</span> <span class="n">hps_scale</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checking input structure file:&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set up geometric parameters of the model</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Setting up geometrical parameters:&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Keeping only alpha carbon atoms in topology&#39;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">getCAlphaOnly</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_chains</span><span class="si">}</span><span class="s1"> chain(s) in the input file.&#39;</span><span class="p">)</span>
+
+        <span class="n">hps</span><span class="o">.</span><span class="n">getAtoms</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">hps</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; CA atoms&#39;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon masses to their average residue mass.&quot;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setCAMassPerResidueType</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon atoms radii to their statistical residue radius.&quot;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setCARadiusPerResidueType</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon charge to their residue charge.&quot;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setCAChargePerResidueType</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting hydropathy scale to their residue, Using </span><span class="si">{</span><span class="n">hps_scale</span><span class="si">}</span><span class="s2"> scale.&quot;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setCAHPSPerResidueType</span><span class="p">()</span>
+
+        <span class="n">hps</span><span class="o">.</span><span class="n">getBonds</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">hps</span><span class="o">.</span><span class="n">n_bonds</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; bonds&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hps_scale</span> <span class="o">==</span> <span class="s2">&quot;hps_ss&quot;</span><span class="p">:</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">getAngles</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_angles</span><span class="si">}</span><span class="s1"> angles &#39;</span><span class="p">)</span>
+
+            <span class="n">hps</span><span class="o">.</span><span class="n">getTorsions</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_torsions</span><span class="si">}</span><span class="s1"> torsion angles &#39;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Adding default bond force constant...&#39;</span><span class="p">)</span>
+        <span class="c1"># measured in unit of kj/mol/nm^2 (k_bond is set to 20kcal/mol/A^2)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setBondForceConstants</span><span class="p">(</span><span class="mf">8368.0</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Adding Forces:&#39;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">addHarmonicBondForces</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added Harmonic Bond Forces&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hps_scale</span> <span class="o">==</span> <span class="s2">&quot;hps_ss&quot;</span><span class="p">:</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">addGaussianAngleForces</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added Gaussian Angle Forces&#39;</span><span class="p">)</span>
+
+            <span class="n">hps</span><span class="o">.</span><span class="n">addGaussianTorsionForces</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Add Gaussian Torsion Forces&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">box_dimension</span><span class="p">:</span>
+            <span class="n">use_pbc</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">box_dimension</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                OpenMM use this to write dimension in PDB and dcd file. Require one-argument, so zip box dimension into </span>
+<span class="sd">                one variable.</span>
+<span class="sd">                Rectangular box, given parameter is array of three number</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="n">hps</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">setPeriodicBoxVectors</span><span class="p">(</span>
+                    <span class="p">((</span><span class="n">box_dimension</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">box_dimension</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">box_dimension</span><span class="p">[</span><span class="mi">2</span><span class="p">])))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># cubic box, given parameter is single float</span>
+                <span class="n">hps</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">setPeriodicBoxVectors</span><span class="p">(</span>
+                    <span class="p">((</span><span class="n">box_dimension</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">box_dimension</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">box_dimension</span><span class="p">)))</span>
+
+            <span class="n">unit_cell</span> <span class="o">=</span> <span class="n">hps</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">getPeriodicBoxVectors</span><span class="p">()</span>
+            <span class="c1"># use this to write coordinate in PBC box. requires 3 numbers, unzip to 3</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">setDefaultPeriodicBoxVectors</span><span class="p">(</span><span class="o">*</span><span class="n">unit_cell</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">use_pbc</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">hps</span><span class="o">.</span><span class="n">addYukawaForces</span><span class="p">(</span><span class="n">use_pbc</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added Yukawa Force&#39;</span><span class="p">)</span>
+
+        <span class="n">hps</span><span class="o">.</span><span class="n">addAshbaughHatchForces</span><span class="p">(</span><span class="n">use_pbc</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added PairWise Force&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Generate the system object and add previously generated forces</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Creating System Object:&#39;</span><span class="p">)</span>
+        <span class="c1"># print(&#39;______________________&#39;)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">createSystemObject</span><span class="p">(</span><span class="n">minimize</span><span class="o">=</span><span class="n">minimize</span><span class="p">,</span> <span class="n">check_bond_distances</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;OpenMM system Object created&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">hps</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Quyen Vu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: main
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+        
+        <dl>
+            <dt>Languages</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">en</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        <dl>
+            <dt>Versions</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">main</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        
+        <hr/>
+        Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hps.core.system &mdash; hpsOpenMM v1.3 documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../../index.html" class="icon icon-home"> hpsOpenMM
+            <img src="../../../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                main
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage/simulation_control.html">Simulation control options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#general-information">General information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#run-control">Run control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#model-parameter">Model parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#temperature-coupling">Temperature coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#pressure-coupling">Pressure coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#periodic-boundary-condition">Periodic boundary condition:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#file-input-output">File input/output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#simulation-platform">Simulation platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../usage/simulation_control.html#restart-simulation">Restart simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/parameters.html#note-on-hps-lambda-in-urry-scale">Note on hps (lambda) in urry scale:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#coarse-grained-alpha-carbon-ca-model">Coarse grained, alpha-carbon (CA), model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#the-bonded-potential">The Bonded potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#angle-potential">Angle Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#torsion-potential">Torsion Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#the-pairwise-potential">The Pairwise potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../modules/models.html#the-debye-huckle-potential-has-following-form">The Debye-Huckle potential has following form:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules/dynamics.html">Dynamics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">hpsOpenMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+      <li>hps.core.system</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for hps.core.system</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="c1"># coding: utf-8</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">import</span> <span class="nn">parmed</span> <span class="k">as</span> <span class="nn">pmd</span>
+
+<span class="kn">from</span> <span class="nn">..parameters</span> <span class="kn">import</span> <span class="n">model_parameters</span>
+
+
+<span class="c1"># from openmm import *</span>
+<span class="c1"># from openmm.app import *</span>
+
+
+<div class="viewcode-block" id="system"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system">[docs]</a><span class="k">class</span> <span class="nc">system</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A class containing methods and parameters for generating CG systems to be simulated using the OpenMM interface.</span>
+<span class="sd">    It offers flexibility to create default and custom CG systems and to easily modify their parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">        structure_path : string [requires]</span>
+<span class="sd">            Name of the input PDB or CIF file</span>
+<span class="sd">        hps_scale: &#39;hps_kr&#39;,&#39;hps_urry&#39; [optional, default=&#39;hps_urry&#39;]</span>
+<span class="sd">            Hydropathy scale. Currently, there are two models are supported.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    structure : :code:`openmm.app.pdbfile.PDBFile or openmm.app.pdbxfile.PDBxFile`</span>
+<span class="sd">        Object that holds the information of OpenMM PDB or CIF parsing methods.</span>
+<span class="sd">    topology : :code:`openmm.app.topology.Topology`</span>
+<span class="sd">        OpenMM topology of the model.</span>
+<span class="sd">    positions : :code:`unit.quantity.Quantity`</span>
+<span class="sd">        Atomic positions of the model.</span>
+<span class="sd">    particles_mass : :code:`float or list`</span>
+<span class="sd">        Mass of each particle. If float then uniform masses are given to all</span>
+<span class="sd">        particles. If list per-particle masses are assigned.</span>
+<span class="sd">    particles_charge : :code:`list`</span>
+<span class="sd">        Charge of each particle.</span>
+<span class="sd">    rf_sigma : :code:`float`</span>
+<span class="sd">        Sigma parameter used in the pairwise force object.</span>
+<span class="sd">        This is vdw Radius of beads</span>
+<span class="sd">    atoms : :code:`list`</span>
+<span class="sd">        A list of the current atoms in the model. The items are :code:`openmm.app.topology.atoms`</span>
+<span class="sd">        initialised classes.</span>
+<span class="sd">    n_atoms : :code:`int`</span>
+<span class="sd">        Total numer of atoms in the model.</span>
+<span class="sd">    bonds : :code:`collections.OrderedDict`</span>
+<span class="sd">        A dict that uses bonds (2-tuple of :code:`openmm.app.topology.bonds` objects)</span>
+<span class="sd">        present in the model as keys and their forcefield properties as values.</span>
+<span class="sd">    bonds_indexes : :code:`list`</span>
+<span class="sd">        A list containing the zero-based indexes of the atoms defining the bonds in the model.</span>
+<span class="sd">    n_bonds : :code:`int`</span>
+<span class="sd">        Total number of bonds in the model.</span>
+<span class="sd">    bonded_exclusions_index : :code:`int`</span>
+<span class="sd">        Exclusion rule for nonbonded force. =1 for hps_kr and hps_urry, =3 for hps_ss</span>
+<span class="sd">    harmonicBondForce : :code:`openmm.HarmonicBondForce`</span>
+<span class="sd">        Stores the OpenMM :code:`HarmonicBondForce` initialised-class. Implements</span>
+<span class="sd">        a harmonic bond potential between pairs of particles, that depends</span>
+<span class="sd">        quadratically on their distance.</span>
+<span class="sd">    n_angles : :code:`int`</span>
+<span class="sd">        Total number of angles in the model.</span>
+<span class="sd">    gaussianAngleForce : :code:`openmm.CustomAngleForce`</span>
+<span class="sd">        Stores the OpenMM :code:`CustomAngleForce` initialised-class. Implements</span>
+<span class="sd">        a Gaussian angle bond potential between pairs of three particles.</span>
+<span class="sd">    n_torsions : :code:`int`</span>
+<span class="sd">        Total number of torsion angles in the model.</span>
+<span class="sd">    gaussianTorsionForce : :code:`openmm.CustomTorsionForce`</span>
+<span class="sd">        Stores the OpenMM :code:`CustomTorsionForce` initialised-class. Implements</span>
+<span class="sd">        a Gaussian torsion angle bond potential between pairs of four particles.</span>
+<span class="sd">    yukawaForce : :code:`openmm.CustomNonbondedForce`</span>
+<span class="sd">        Stores the OpenMM :code:`CustomNonbondedForce` initialized-class.</span>
+<span class="sd">        Implements the Debye-Huckle potential.</span>
+<span class="sd">    ashbaugh_HatchForce : :code:`openmm.CustomNonbondedForce`</span>
+<span class="sd">        Stores the OpenMM :code:`CustomNonbondedForce` initialized-class. Implements the pairwise short-range</span>
+<span class="sd">        potential.</span>
+<span class="sd">    forceGroups : :code:`collections.OrderedDict`</span>
+<span class="sd">        A dict that uses force names as keys and their corresponding force</span>
+<span class="sd">        as values.</span>
+<span class="sd">    system : :code:`openmm.System`</span>
+<span class="sd">        Stores the OpenMM System initialised class. It stores all the forcefield</span>
+<span class="sd">        information for the hps model.</span>
+
+
+<span class="sd">    Methods</span>
+<span class="sd">    -------</span>
+
+
+<span class="sd">    loadForcefieldFromFile()</span>
+<span class="sd">        Loads forcefield parameters from a force field file written with</span>
+<span class="sd">        the :code:`dumpForceFieldData()` method.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="system.__init__"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">structure_path</span><span class="p">,</span> <span class="n">hps_scale</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialises the hps OpenMM system class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        structure_path : string [requires]</span>
+<span class="sd">            Name of the input PDB or CIF file</span>
+<span class="sd">        hps_scale: &#39;hps_kr&#39;,&#39;hps_urry&#39;, or &#39;hps_ss&#39; [optional, default=&#39;hps_urry&#39;]</span>
+<span class="sd">            Hydropathy scale. Currently, there are three models are supported.</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Define structure object attributes</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure_path</span> <span class="o">=</span> <span class="n">structure_path</span>
+        <span class="c1"># Recognize format of input structure file</span>
+        <span class="k">if</span> <span class="n">structure_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.pdb&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">PDBFile</span><span class="p">(</span><span class="n">structure_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">structure_path</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.cif&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">structure</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">pdbxfile</span><span class="o">.</span><span class="n">PDBxFile</span><span class="p">(</span><span class="n">structure_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Structure file extension not recognized. It must end with .pdb or .cif accordingly.&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topology</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">topology</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">positions</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">hps_scale</span> <span class="o">=</span> <span class="n">hps_scale</span>
+        <span class="c1"># particle properties</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># particle vdw radius</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># hydropathy scale of particles</span>
+
+        <span class="c1"># Define geometric attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_chains</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonds_indexes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_bonds</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bond_length</span> <span class="o">=</span> <span class="n">model_parameters</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">hps_scale</span><span class="p">][</span><span class="s2">&quot;bond_length&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">harmonicBondForce</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">angles</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">angles_indexes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_angles</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">torsions</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">torsions_indexes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_torsions</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Exclusion rule for nonbonded forces</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bonded_exclusions_index</span> <span class="o">=</span> <span class="n">model_parameters</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">hps_scale</span><span class="p">][</span><span class="s2">&quot;bonded_exclusions_index&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Parameters for PairWise potential Force</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Define parameters for DH potential Force</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="c1"># Initialise an OpenMM system class instance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">System</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="system.getCAlphaOnly"><a class="viewcode-back" href="../../../hps.core.html#hps.core.system.system.getCAlphaOnly">[docs]</a>    <span class="k">def</span> <span class="nf">getCAlphaOnly</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filter in only alpha carbon atoms from the input structure and updates</span>
+<span class="sd">        the topology object to add new bonds between them. Used specially for</span>
+<span class="sd">        creating alpha-carbon (CA) coarse-grained models.</span>
+
+<span class="sd">        Keeps in the :code:`hps system` only the alpha carbon atoms from the :code:`OpenMM topology`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># save all non C-alpha atoms</span>
+        <span class="n">atoms_to_remove</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># oldIndex = []</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s1">&#39;CA&#39;</span><span class="p">:</span>
+                <span class="n">atoms_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+
+        <span class="c1"># Remove all non C-alpha atoms</span>
+        <span class="n">modeller_topology</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">modeller</span><span class="o">.</span><span class="n">Modeller</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+        <span class="n">modeller_topology</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">atoms_to_remove</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topology</span> <span class="o">=</span> <span class="n">modeller_topology</span><span class="o">.</span><span class="n">getTopology</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">modeller_topology</span><span class="o">.</span><span class="n">getPositions</span><span class="p">()</span>
+
+        <span class="n">chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">chains</span><span class="p">():</span>
+            <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+            <span class="c1"># self.n_chains += 1</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_chains</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_chains</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Update system atoms, then add bonds between C-alpha atoms of the same chain.</span>
+<span class="sd">            openMM load input PDB file and separate chain if encounter TER instruction. It doesn&#39;t matter if two chains</span>
+<span class="sd">            have the same chain name.</span>
+<span class="sd">            This may have a vulnerable is that if two CA atom on the same chain not consecutive, like residue</span>
+<span class="sd">            8 and 10 are listed consecutively on input file but residue 9 was missing. The code will add bond between</span>
+<span class="sd">            residue 8 and 10 which cause large bond. The better solution is check the input file carefully and the logic</span>
+<span class="sd">            condition in code has nothing to do.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">atoms</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span> <span class="o">==</span> <span class="n">atoms</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">atoms</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">],</span> <span class="n">atoms</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="system.getAtoms"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.getAtoms">[docs]</a>    <span class="k">def</span> <span class="nf">getAtoms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads atoms from topology, adds them to the main class and sorts them</span>
+<span class="sd">        into a dictionary to store their forcefield properties.</span>
+
+<span class="sd">        After getCAlphaOnly, C-alpha atoms are stored on :code:`self.topology only`.</span>
+<span class="sd">        We need to add them to atoms attribute and system also.</span>
+<span class="sd">        Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Get Atoms From Topology</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
+            <span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+
+        <span class="c1"># Sort atoms by index</span>
+        <span class="n">atoms</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># Add atoms to hps object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">atoms</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">atom</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="system.getBonds"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.getBonds">[docs]</a>    <span class="k">def</span> <span class="nf">getBonds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">except_chains</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads bonds from topology, adds them to the main class and sorts them</span>
+<span class="sd">        into a dictionary to store their forcefield properties.</span>
+
+<span class="sd">        Adds :code:`bonds` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        except_chains: String [optional]</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">except_chains</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">except_chains</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">except_chains</span><span class="p">)</span>
+
+        <span class="c1"># Get Bonds From Topology</span>
+        <span class="n">bonds</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">bonds</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">except_chains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">except_chains</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">except_chains</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                            <span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                    <span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">bonds</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+        <span class="c1"># Sort bonds by index of first atom</span>
+        <span class="n">bonds</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">bonds</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># Add bonds to hps object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_bonds</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="n">bonds</span><span class="p">:</span>
+            <span class="n">bond_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bond_length</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">bond</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">bond_length</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_bonds</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Store bond indexes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bonds_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                                       <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+
+        <span class="c1"># Record which atoms are bonded to each other</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">atoms</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">atom</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">bonds</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="system.getAngles"><a class="viewcode-back" href="../../../hps.core.html#hps.core.system.system.getAngles">[docs]</a>    <span class="k">def</span> <span class="nf">getAngles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads bonds from topology, adds them to the main class and sorts them</span>
+<span class="sd">        into a dictionary to store their forcefield properties.</span>
+
+<span class="sd">        Angles are built from bond (bondedTo instance).</span>
+<span class="sd">        This function modify :code:`self.angles`, :code:`self.angles_indexes` and :code:`self.n_angles`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_angles</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+                <span class="k">if</span> <span class="n">atom</span> <span class="o">!=</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                        <span class="n">unique_angles</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">atom</span><span class="p">,</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">unique_angles</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">atom</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]]:</span>
+                <span class="k">if</span> <span class="n">atom</span> <span class="o">!=</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                        <span class="n">unique_angles</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">atom</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">unique_angles</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">atom</span><span class="p">,</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="c1"># sort angles by index of first atom</span>
+        <span class="n">unique_angles</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">unique_angles</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># add angles to hps object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_angles</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="n">unique_angles</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">[</span><span class="n">angle</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_angles</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">angles_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">angle</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="system.getTorsions"><a class="viewcode-back" href="../../../hps.core.html#hps.core.system.system.getTorsions">[docs]</a>    <span class="k">def</span> <span class="nf">getTorsions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads bonds from topology, adds them to the main class and sorts them</span>
+<span class="sd">        into a dictionary to store their forcefield properties.</span>
+
+<span class="sd">        Torsion Angles are built from angles and bondedTo instance.</span>
+<span class="sd">        This function modify :code:`self.torsions`, :code:`self.torsions_indexes` and :code:`self.n_torsions`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">unique_torsions</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+                <span class="k">if</span> <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">angle</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                        <span class="n">unique_torsions</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">atom</span><span class="p">,</span> <span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">unique_torsions</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">atom</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">]]:</span>
+                <span class="k">if</span> <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">angle</span><span class="p">:</span>
+                    <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">                        it is stupid for checking atom.index as following line but it happens in all-atom model, when</span>
+<span class="sd">                        chain of atoms my be branched. just keep it here.</span>
+<span class="sd">                    &quot;&quot;&quot;</span>
+                    <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                        <span class="n">unique_torsions</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">atom</span><span class="p">))</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">unique_torsions</span><span class="o">.</span><span class="n">add</span><span class="p">((</span><span class="n">atom</span><span class="p">,</span> <span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+        <span class="c1"># sort dihedral angles by the first atom index</span>
+        <span class="n">unique_torsions</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">unique_torsions</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="c1"># load parameter eps_di from parameter file</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">model_parameters</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hps_scale</span><span class="p">]</span>
+        <span class="c1"># add dihedral angle to hps object</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_torsions</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">torsion</span> <span class="ow">in</span> <span class="n">unique_torsions</span><span class="p">:</span>
+            <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            when there are two residues bonded to first atom of torsion mean that this torsion angle is not the first</span>
+<span class="sd">            angle. One residues will be in list of torsion atoms and the other is out of the list.</span>
+<span class="sd">            Atom not in the list of torsion atom is preceding of residue (i).</span>
+<span class="sd">            </span>
+<span class="sd">            Same as last atom of torsion angle, atom not in torsion atom list is succeeding atom, (i+4)</span>
+<span class="sd">            </span>
+<span class="sd">            When there is only one atom bonded to first or last atom in torsion angle, means this is the first or </span>
+<span class="sd">            the last torsion angle.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">torsion</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">torsion</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+                    <span class="k">if</span> <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">torsion</span><span class="p">:</span>
+                        <span class="n">eps_di_preceding</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;eps_di&#39;</span><span class="p">]</span>
+                        <span class="n">weight_preceding</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">eps_di_preceding</span><span class="p">,</span> <span class="n">weight_preceding</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">torsion</span><span class="p">[</span><span class="mi">3</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bondedTo</span><span class="p">[</span><span class="n">torsion</span><span class="p">[</span><span class="mi">3</span><span class="p">]]:</span>
+                    <span class="k">if</span> <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">torsion</span><span class="p">:</span>
+                        <span class="n">eps_di_succeeding</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;eps_di&#39;</span><span class="p">]</span>
+                        <span class="n">weight_succeeding</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">eps_di_succeeding</span><span class="p">,</span> <span class="n">weight_succeeding</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+
+            <span class="c1"># using weighting rule 1-1001-1: (i-1), i, (i+3), (i+4) are 1 and (i+1), (i+2) are 0</span>
+            <span class="n">eps_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">eps_di_preceding</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="n">torsion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;eps_di&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">params</span><span class="p">[</span><span class="n">torsion</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="p">][</span>
+                <span class="s1">&#39;eps_di&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">eps_di_succeeding</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">weight_succeeding</span> <span class="o">+</span> <span class="n">weight_preceding</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">torsions</span><span class="p">[</span><span class="n">torsion</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">eps_d</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># add torsion angle parameters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">n_torsions</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">torsions_indexes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">torsion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">torsion</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">torsion</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">torsion</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">))</span></div>
+
+    <span class="sd">&quot;&quot;&quot; Functions for setting force specific parameters &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="system.setBondForceConstants"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setBondForceConstants">[docs]</a>    <span class="k">def</span> <span class="nf">setBondForceConstants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bond_force_constant</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the forcefield parameters for bonded terms.</span>
+
+<span class="sd">        Set the harmonic bond constant force parameters. The input can be</span>
+<span class="sd">        a float, to set the same parameter for all force interactions, or</span>
+<span class="sd">        a list, to define a unique parameter for each force interaction.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        bond_force_constant : float or list</span>
+<span class="sd">            Parameter(s) to set up for the harmonic bond forces.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">system</span><span class="o">.</span><span class="n">_setParameters</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">,</span> <span class="n">bond_force_constant</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.setParticlesMass"><a class="viewcode-back" href="../../../hps.core.html#hps.core.system.system.setParticlesMass">[docs]</a>    <span class="k">def</span> <span class="nf">setParticlesMass</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particles_mass</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the mass parameter for each atom in the system.</span>
+
+<span class="sd">        Set the masses of the particles in the system. The input can be a</span>
+<span class="sd">        float, to set the same mass for all particles, or a list, to define</span>
+<span class="sd">        a unique mass for each particle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        particles_mass : float or list</span>
+<span class="sd">            Mass(es) values to add for the particles in the hpsOpenMM system class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span> <span class="o">=</span> <span class="n">particles_mass</span></div>
+
+<div class="viewcode-block" id="system.setParticlesRadii"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setParticlesRadii">[docs]</a>    <span class="k">def</span> <span class="nf">setParticlesRadii</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particles_radii</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Change the excluded volume radius parameter for each atom in the system.</span>
+
+<span class="sd">        Set the radii of the particles in the system. The input can be a</span>
+<span class="sd">        float, to set the same radius for all particles, or a list, to define</span>
+<span class="sd">        a unique radius for each particle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        particles_radii : float or list</span>
+<span class="sd">            Radii values to add for the particles in the hpsOpenMM system class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span> <span class="o">=</span> <span class="n">particles_radii</span></div>
+
+<div class="viewcode-block" id="system.setParticlesCharge"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setParticlesCharge">[docs]</a>    <span class="k">def</span> <span class="nf">setParticlesCharge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particles_charge</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the charge of the particles in the system. The input can be a</span>
+<span class="sd">        float, to set the same charge for all particles, or a list, to define</span>
+<span class="sd">        a unique charge for each particle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        particles_charge : float or list</span>
+<span class="sd">            Charge values to add for the particles in the hpsOpenMM system class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span> <span class="o">=</span> <span class="n">particles_charge</span></div>
+
+<div class="viewcode-block" id="system.setParticlesHPS"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setParticlesHPS">[docs]</a>    <span class="k">def</span> <span class="nf">setParticlesHPS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">particles_hps</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the hydropathy scale of the particles in the system. The input can be a</span>
+<span class="sd">        float, to set the same hydropathy for all particles, or a list, to define</span>
+<span class="sd">        a unique hydropathy for each particle.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        particles_hps : float or list</span>
+<span class="sd">            HPS scale values to add for the particles in the hpsOpenMM system class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span> <span class="o">=</span> <span class="n">particles_hps</span></div>
+
+    <span class="sd">&quot;&quot;&quot; Functions for creating force objects with defined parameters &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="system.addHarmonicBondForces"><a class="viewcode-back" href="../../../hps.core.html#hps.core.system.system.addHarmonicBondForces">[docs]</a>    <span class="k">def</span> <span class="nf">addHarmonicBondForces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a harmonic bonded force term for each bond in the main</span>
+<span class="sd">        class using their defined forcefield parameters.</span>
+
+<span class="sd">        Creates an :code:`openmm.HarmonicBondForce()` object with the bonds and</span>
+<span class="sd">        parameters set up in the &quot;bonds&quot; dictionary attribute. The force object</span>
+<span class="sd">        is stored at the :code:`harmonicBondForce` attribute.</span>
+
+<span class="sd">        openMM uses harmonic bond that has energy term of form:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            E= \\frac{1}{2}k(r-r_0)^2</span>
+
+<span class="sd">        The force parameters must be contained in self.bonds as follows:</span>
+
+<span class="sd">        self.bonds is a dictionary:</span>
+<span class="sd">            - The keys are 2-tuples for two atom items in :code:`self.topology.atoms` attribute.</span>
+<span class="sd">            - The values are a 2-tuple of parameters in the following order:</span>
+<span class="sd">                - first  -&gt; bond0 (quantity)</span>
+<span class="sd">                - second -&gt; k (float) (measured in unit of kj/mol/nm^2)</span>
+
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">harmonicBondForce</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">HarmonicBondForce</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">harmonicBondForce</span><span class="o">.</span><span class="n">addBond</span><span class="p">(</span><span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                                           <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">bond</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                                           <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">bond</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="system.addGaussianAngleForces"><a class="viewcode-back" href="../../../hps.core.html#hps.core.system.system.addGaussianAngleForces">[docs]</a>    <span class="k">def</span> <span class="nf">addGaussianAngleForces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add Gaussian functional form of angle.</span>
+<span class="sd">        Note that in openMM log is neutral logarithm.</span>
+
+<span class="sd">        Angle potential take Gaussian functional form in hps-ss model.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            U_{angle}(\\theta) = \\frac{-1}{\gamma}</span>
+<span class="sd">                \\ln{[e^{-\gamma[k_\\alpha( \\theta-\\theta_\\alpha)^2+\\epsilon_\\alpha]}</span>
+<span class="sd">                +e^{-\\gamma k_\\beta(\\theta-\\theta_\\beta)^2}]}</span>
+
+<span class="sd">        Angle potential is taken from reference:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">gamma</span> <span class="o">=</span> <span class="mf">0.0239</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>  <span class="c1"># 0.1 mol/kcal</span>
+        <span class="n">eps_alpha</span> <span class="o">=</span> <span class="mf">17.9912</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>  <span class="c1"># 4.3 kcal/mol</span>
+        <span class="n">theta_alpha</span> <span class="o">=</span> <span class="mf">1.6</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span>
+        <span class="n">theta_beta</span> <span class="o">=</span> <span class="mf">2.27</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span>
+        <span class="n">k_alpha</span> <span class="o">=</span> <span class="mf">445.1776</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">k_beta</span> <span class="o">=</span> <span class="mf">110.0392</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span> <span class="o">**</span> <span class="mi">2</span>
+
+        <span class="n">energy_function</span> <span class="o">=</span> <span class="s1">&#39;(-1 / gamma) * log(exp(-gamma * (k_alpha * (theta - theta_alpha) ^ 2 + eps_alpha)) &#39;</span> \
+                          <span class="s1">&#39;+ exp(-gamma * k_beta * (theta - theta_beta) ^ 2))&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomAngleForce</span><span class="p">(</span><span class="n">energy_function</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;gamma&#39;</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;eps_alpha&#39;</span><span class="p">,</span> <span class="n">eps_alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;theta_alpha&#39;</span><span class="p">,</span> <span class="n">theta_alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;theta_beta&#39;</span><span class="p">,</span> <span class="n">theta_beta</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;k_alpha&#39;</span><span class="p">,</span> <span class="n">k_alpha</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;k_beta&#39;</span><span class="p">,</span> <span class="n">k_beta</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">angle</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">angles</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="o">.</span><span class="n">addAngle</span><span class="p">(</span><span class="n">angle</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">angle</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">angle</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.addGaussianTorsionForces"><a class="viewcode-back" href="../../../hps.core.html#hps.core.system.system.addGaussianTorsionForces">[docs]</a>    <span class="k">def</span> <span class="nf">addGaussianTorsionForces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Torsion potential in hps-ss model takes the form:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            U_{torsion}(\\theta) = -\\ln\\left[ U_{torsion, \\alpha}(\\theta, \\epsilon_d) + U_{torsion, \\beta}(\\theta, \\epsilon_d)\\right]</span>
+
+<span class="sd">        where,</span>
+
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            U_{torsion, \\alpha}(\\theta, \\epsilon_d)  &amp;= e^{-k_{\\alpha, 1}(\\theta-\\theta_{\\alpha,1})^2-\\epsilon_d}</span>
+<span class="sd">                                                        + e^{-k_{\\alpha, 2}(\\theta-\\theta_{\\alpha,2})^4 + e_0}</span>
+<span class="sd">                                                        + e^{-k_{\\alpha, 2}(\\theta-\\theta_{\\alpha,2}+2\\pi)^4 + e_0} \\</span>
+
+
+<span class="sd">            U_{torsion, \\beta}(\\theta, \\epsilon_d) &amp;= e^{-k_{\\beta,1}(\\theta-\\theta_{\\beta,1})^2+e_1+\\epsilon_d}</span>
+<span class="sd">                                                    + e^{-k_{\\beta,1}(\\theta-\\theta_{\\beta,1}-2\\pi)^2+e_1+\\epsilon_d} \\</span>
+
+<span class="sd">                                                    &amp;+ e^{-k_{\\beta,2}(\\theta-\\theta_{\\beta,2})^4+e_2}</span>
+<span class="sd">                                                    + e^{-k_{\\beta,2}(\\theta-\\theta_{\\beta,2}-2\\pi)^4+e_2}</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">k_alpha1</span> <span class="o">=</span> <span class="mf">47.6976</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># 11.4 kcal/mol/rad^2</span>
+        <span class="n">k_alpha2</span> <span class="o">=</span> <span class="mf">0.6276</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span> <span class="o">**</span> <span class="mi">4</span>  <span class="c1"># 0.15 kcal/mol/rad^4</span>
+        <span class="n">theta_alpha1</span> <span class="o">=</span> <span class="mf">0.9</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span>
+        <span class="n">theta_alpha2</span> <span class="o">=</span> <span class="mf">1.02</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span>
+        <span class="n">e_0</span> <span class="o">=</span> <span class="mf">1.12968</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>  <span class="c1"># 0.27 kcal/mol</span>
+
+        <span class="n">k_beta1</span> <span class="o">=</span> <span class="mf">7.5312</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span> <span class="o">**</span> <span class="mi">2</span>  <span class="c1"># 1.8 kcal/mol/rad^2</span>
+        <span class="n">k_beta2</span> <span class="o">=</span> <span class="mf">2.7196</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span> <span class="o">**</span> <span class="mi">4</span>  <span class="c1"># 0.65 kcal/mol/rad^4</span>
+        <span class="n">theta_beta1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.55</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span>
+        <span class="n">theta_beta2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">radian</span>
+        <span class="n">e_1</span> <span class="o">=</span> <span class="mf">0.58576</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>  <span class="c1"># 0.14 kcal/mol</span>
+        <span class="n">e_2</span> <span class="o">=</span> <span class="mf">1.6736</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>  <span class="c1"># 0.4 kcal/mol</span>
+        <span class="c1"># pi = np.pi</span>
+
+        <span class="n">energy_function_alpha</span> <span class="o">=</span> <span class="s1">&#39;exp(-k_alpha1*(theta-theta_alpha1)^2 - esp_d)&#39;</span>
+        <span class="n">energy_function_alpha</span> <span class="o">+=</span> <span class="s1">&#39;+exp(-k_alpha2*(theta-theta_alpha2)^4 + e_0)&#39;</span>
+        <span class="n">energy_function_alpha</span> <span class="o">+=</span> <span class="s1">&#39;+exp(-k_alpha2*(theta-theta_alpha2+2*pi)^4 + e_0)&#39;</span>
+
+        <span class="n">energy_function_beta</span> <span class="o">=</span> <span class="s1">&#39;+exp(-k_beta1*(theta-theta_beta1)^2 + e_1 + esp_d)&#39;</span>
+        <span class="n">energy_function_beta</span> <span class="o">+=</span> <span class="s1">&#39;+exp(-k_beta1*(theta-theta_beta1-2*pi)^2 + e_1 + esp_d)&#39;</span>
+        <span class="n">energy_function_beta</span> <span class="o">+=</span> <span class="s1">&#39;+exp(-k_beta2*(theta-theta_beta2)^4 + e_2)&#39;</span>
+        <span class="n">energy_function_beta</span> <span class="o">+=</span> <span class="s1">&#39;+exp(-k_beta2*(theta-theta_beta2-2*pi)^4 + e_2)&#39;</span>
+
+        <span class="n">energy_function</span> <span class="o">=</span> <span class="s1">&#39;-log(&#39;</span> <span class="o">+</span> <span class="n">energy_function_alpha</span> <span class="o">+</span> <span class="n">energy_function_beta</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomTorsionForce</span><span class="p">(</span><span class="n">energy_function</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;k_alpha1&quot;</span><span class="p">,</span> <span class="n">k_alpha1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;theta_alpha1&quot;</span><span class="p">,</span> <span class="n">theta_alpha1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;k_alpha2&quot;</span><span class="p">,</span> <span class="n">k_alpha2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;theta_alpha2&quot;</span><span class="p">,</span> <span class="n">theta_alpha2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;e_0&quot;</span><span class="p">,</span> <span class="n">e_0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;k_beta1&quot;</span><span class="p">,</span> <span class="n">k_beta1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;theta_beta1&quot;</span><span class="p">,</span> <span class="n">theta_beta1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;k_beta2&quot;</span><span class="p">,</span> <span class="n">k_beta2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;theta_beta2&quot;</span><span class="p">,</span> <span class="n">theta_beta2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;e_1&quot;</span><span class="p">,</span> <span class="n">e_1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;e_2&quot;</span><span class="p">,</span> <span class="n">e_2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s2">&quot;pi&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addPerTorsionParameter</span><span class="p">(</span><span class="s2">&quot;esp_d&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">torsion</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">torsions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="o">.</span><span class="n">addTorsion</span><span class="p">(</span><span class="n">torsion</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">torsion</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">torsion</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">torsion</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+                                                 <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">torsions</span><span class="p">[</span><span class="n">torsion</span><span class="p">][</span><span class="mi">0</span><span class="p">],))</span></div>
+
+<div class="viewcode-block" id="system.addYukawaForces"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.addYukawaForces">[docs]</a>    <span class="k">def</span> <span class="nf">addYukawaForces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_pbc</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a nonbonded force term for electrostatic interaction DH potential.</span>
+
+<span class="sd">        Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters</span>
+<span class="sd">        sigma and epsilon given to this method. The custom non-bonded force</span>
+<span class="sd">        is initialized with the formula:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            energy = f \\times \\frac{q_1q_2}{\epsilon_r \\times r}\\times e^{(-r/lD)}</span>
+
+
+<span class="sd">        where :math:`f=\\frac{1}{4\\pi\\epsilon_0}=138.935458` is the factor for short to convert dimensionless</span>
+<span class="sd">        in calculation to :math:`kj.nm/(mol\\times e^2)` unit.</span>
+
+<span class="sd">        :math:`\\epsilon_r=80`: Dielectric constant of water at 100mM mono-valent ion</span>
+
+<span class="sd">        The force object is stored at the :code:`yukawaForce` attribute.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        use_pbc: (bool) whether use PBC, cutoff periodic boundary condition</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">lD</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span>
+        <span class="n">electric_factor</span> <span class="o">=</span> <span class="mf">138.935458</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">elementary_charge</span> <span class="o">**</span> <span class="mi">2</span>
+        <span class="n">yukawa_cutoff</span> <span class="o">=</span> <span class="mf">3.5</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span>
+        <span class="n">epsilon_r</span> <span class="o">=</span> <span class="mf">80.0</span>
+
+        <span class="n">energy_function</span> <span class="o">=</span> <span class="s1">&#39;factor*charge1*charge2/epsilon_r/r*exp(-r/lD)&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="n">energy_function</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;factor&#39;</span><span class="p">,</span> <span class="n">electric_factor</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;epsilon_r&#39;</span><span class="p">,</span> <span class="n">epsilon_r</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;lD&#39;</span><span class="p">,</span> <span class="n">lD</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">addPerParticleParameter</span><span class="p">(</span><span class="s1">&#39;charge&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">use_pbc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">yukawa_cutoff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">addParticle</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">,))</span>
+
+        <span class="c1"># in the case each atom has different sigma para.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">addParticle</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">[</span><span class="n">i</span><span class="p">],))</span>
+
+        <span class="c1"># set exclusions rule</span>
+        <span class="n">bonded_exclusions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">bonds</span><span class="p">())]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="o">.</span><span class="n">createExclusionsFromBonds</span><span class="p">(</span><span class="n">bonded_exclusions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonded_exclusions_index</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.addAshbaughHatchForces"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.addAshbaughHatchForces">[docs]</a>    <span class="k">def</span> <span class="nf">addAshbaughHatchForces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">use_pbc</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).</span>
+
+<span class="sd">        Creates an :code:`openmm.CustomNonbondedForce()` object with the parameters</span>
+<span class="sd">        sigma and epsilon given to this method. The custom non-bonded force</span>
+<span class="sd">        is initialized with the formula: (note: hps here is :math:`\lambda_{ij}^{0}` in the paper)</span>
+
+<span class="sd">        Unlike :code:`BondForce` class, where we specify index for atoms pair to add bond, it means</span>
+<span class="sd">        that number of bondForces may differ from number of particle.</span>
+<span class="sd">        :code:`NonBondedForce` is added to all particles, hence we don&#39;t need to pass the :code:`atom index`.</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">            \\Phi_{i,j}^{vdw}(r) = step(2^{1/6}\\sigma_{ij}-r) \\times</span>
+<span class="sd">            \\left( 4\\epsilon\\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-</span>
+<span class="sd">            \\left(\\frac{\\sigma_{ij}}{r}\\right)^{6}\\right]+(1-\\lambda_{ij})\\epsilon\\right)</span>
+
+<span class="sd">            + \\left[1-step(2^{1/6}\\sigma_{ij}-r)\\right]\\times\\left[(\\lambda_{ij})\\times 4\\epsilon</span>
+<span class="sd">            \\left[\\left(\\frac{\\sigma_{ij}}{r}\\right)^{12}-\\left(\\frac{\\sigma_{ij}}{r}\\right)^6\\right]\\right]</span>
+
+
+
+<span class="sd">        Here, :math:`\\sigma= \\frac{(\\sigma_1+\\sigma_2)}{2}; \\lambda_{ij}^{0}=\\frac{(\\lambda_i+\\lambda_j)}{2};</span>
+<span class="sd">        \\epsilon = 0.8368 kj/mol`</span>
+
+<span class="sd">        The force object is stored at the :code:`ashbaugh_HatchForce` attribute.</span>
+
+<span class="sd">        epsilon : float</span>
+<span class="sd">            Value of the epsilon constant in the energy function.</span>
+<span class="sd">        sigma : float or list</span>
+<span class="sd">            Value of the sigma constant (in nm) in the energy function. If float the</span>
+<span class="sd">            same sigma value is used for every particle. If list a unique</span>
+<span class="sd">            parameter is given for each particle.</span>
+<span class="sd">        cutoff : float</span>
+<span class="sd">            The cutoff distance (in nm) being used for the non-bonded interactions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        use_pbc : bool. Whether use PBC, cutoff periodic boundary condition</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">0.8368</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule_per_mole</span>
+        <span class="n">ashbaugh_Hatch_cutoff</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span>
+
+        <span class="n">energy_function</span> <span class="o">=</span> <span class="s1">&#39;step(2^(1/6)*sigma - r) *&#39;</span>
+        <span class="n">energy_function</span> <span class="o">+=</span> <span class="s1">&#39;(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-hps)*epsilon )&#39;</span>
+        <span class="n">energy_function</span> <span class="o">+=</span> <span class="s1">&#39;+(1-step(2^(1/6)*sigma-r)) * (hps*4*epsilon*((sigma/r)^12-(sigma/r)^6));&#39;</span>
+        <span class="n">energy_function</span> <span class="o">+=</span> <span class="s1">&#39;sigma=0.5*(sigma1+sigma2);&#39;</span>
+        <span class="n">energy_function</span> <span class="o">+=</span> <span class="s1">&#39;hps=0.5*(hps1+hps2)&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">CustomNonbondedForce</span><span class="p">(</span><span class="n">energy_function</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">addGlobalParameter</span><span class="p">(</span><span class="s1">&#39;epsilon&#39;</span><span class="p">,</span> <span class="n">epsilon</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">addPerParticleParameter</span><span class="p">(</span><span class="s1">&#39;sigma&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">addPerParticleParameter</span><span class="p">(</span><span class="s1">&#39;hps&#39;</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="n">use_pbc</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="o">.</span><span class="n">CutoffPeriodic</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">setNonbondedMethod</span><span class="p">(</span><span class="n">openmm</span><span class="o">.</span><span class="n">NonbondedForce</span><span class="o">.</span><span class="n">CutoffNonPeriodic</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">setCutoffDistance</span><span class="p">(</span><span class="n">ashbaugh_Hatch_cutoff</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">addParticle</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span><span class="p">[</span><span class="n">i</span><span class="p">],))</span>
+
+        <span class="c1"># in the case each atom has different sigma para.</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">addParticle</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span><span class="p">[</span><span class="n">i</span><span class="p">],))</span>
+
+        <span class="c1"># set exclusions rule</span>
+        <span class="n">bonded_exclusions</span> <span class="o">=</span> <span class="p">[(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">bonds</span><span class="p">())]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="o">.</span><span class="n">createExclusionsFromBonds</span><span class="p">(</span><span class="n">bonded_exclusions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonded_exclusions_index</span><span class="p">)</span></div>
+
+    <span class="sd">&quot;&quot;&quot; Functions for creating OpenMM system object &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="system.createSystemObject"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.createSystemObject">[docs]</a>    <span class="k">def</span> <span class="nf">createSystemObject</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">check_bond_distances</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                           <span class="n">check_large_forces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">force_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span><span class="p">,</span>
+                           <span class="n">bond_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates OpenMM system object adding particles, masses and forces.</span>
+<span class="sd">        It also groups the added forces into Force-Groups for the hpsReporter</span>
+<span class="sd">        class.</span>
+
+<span class="sd">        Creates an :code:`openmm.System()` object using the force field parameters</span>
+<span class="sd">        given to the &#39;system&#39; class. It adds particles, forces and</span>
+<span class="sd">        creates a force group for each force object. Optionally the method</span>
+<span class="sd">        can check for large bond distances (default) and minimize the atomic</span>
+<span class="sd">        positions if large forces are found in any atom (default False).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        minimize : boolean (False)</span>
+<span class="sd">            Whether to minimize the system if large forces are found.</span>
+<span class="sd">        check_bond_distances : boolean (True)</span>
+<span class="sd">            Whether to check for large bond distances.</span>
+<span class="sd">        check_large_forces : boolean (False)</span>
+<span class="sd">            Whether to print force summary of force groups</span>
+<span class="sd">        force_threshold : float (10.0)</span>
+<span class="sd">            Threshold to check for large forces.</span>
+<span class="sd">        bond_threshold : float (0.5)</span>
+<span class="sd">            Threshold to check for large bond distances.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">check_bond_distances</span><span class="p">:</span>
+            <span class="c1"># Check for large bond_distances</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkBondDistances</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="n">bond_threshold</span><span class="p">)</span>
+
+        <span class="c1"># Add particles to system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addParticles</span><span class="p">()</span>
+
+        <span class="c1"># Add created forces into the system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addSystemForces</span><span class="p">()</span>
+
+        <span class="c1"># Create force group for each added force</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">setForceGroup</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">minimize</span><span class="p">:</span>
+            <span class="n">check_large_forces</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">check_large_forces</span><span class="p">:</span>
+            <span class="c1"># Check for high forces in atoms and minimize the system if necessary</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">checkLargeForces</span><span class="p">(</span><span class="n">minimize</span><span class="o">=</span><span class="n">minimize</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="n">force_threshold</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.checkBondDistances"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.checkBondDistances">[docs]</a>    <span class="k">def</span> <span class="nf">checkBondDistances</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Searches for large bond distances for the atom pairs defined in</span>
+<span class="sd">        the &#39;bonds&#39; attribute. It raises an error when large bonds are found.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        threshold : (float, default=0.5 nm)</span>
+<span class="sd">            Threshold to check for large bond distances.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Checking large bonds ...&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">threshold</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="n">threshold</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span>
+
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Problem with distance between atoms: &#39;</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; and &#39;</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">r1</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span> <span class="o">==</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;of residue: &#39;</span> <span class="o">+</span> <span class="n">r1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">r2</span> <span class="o">=</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">residue</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;of residues: &#39;</span> <span class="o">+</span> <span class="n">r1</span> <span class="o">+</span> <span class="s1">&#39; and &#39;</span> <span class="o">+</span> <span class="n">r2</span> <span class="o">+</span> <span class="s1">&#39;, respectively.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The bond distance between them &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">b</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span>
+                                 <span class="s1">&#39;nm is larger than &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">threshold</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; nm. Please check your input structure.&#39;</span><span class="p">)</span>
+            <span class="c1"># else:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;All bonds seem to be OK (less than threshold: </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.checkLargeForces"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.checkLargeForces">[docs]</a>    <span class="k">def</span> <span class="nf">checkLargeForces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prints the hps system energies of the input configuration of the</span>
+<span class="sd">        system. It optionally checks for large forces acting upon all</span>
+<span class="sd">        particles in the hps system and iteratively minimizes the system</span>
+<span class="sd">        configuration until no forces larger than a threshold are found.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        threshold : (float, default=10)</span>
+<span class="sd">            Threshold to check for large forces.</span>
+<span class="sd">        minimize : (bool, default= False)</span>
+<span class="sd">            Whether to iteratively minimize the system until all forces are lower or equal to</span>
+<span class="sd">            the threshold value.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># minimized = False</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Potential Energy from initial structure (input structure):&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Define test simulation to extract forces</span>
+        <span class="n">integrator</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">LangevinIntegrator</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kelvin</span><span class="p">,</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">picosecond</span><span class="p">,</span>
+                                               <span class="mf">0.0005</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">picoseconds</span><span class="p">)</span>
+        <span class="n">sim</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">,</span> <span class="n">integrator</span><span class="p">)</span>
+        <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getForces</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Print initial state of the system</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The Potential Energy of the system is : </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">):</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="p">{</span><span class="n">i</span><span class="p">})</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span>
+                <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The &#39;</span> <span class="o">+</span> <span class="n">n</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Force&#39;</span><span class="p">,</span> <span class="s1">&#39;Energy&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; is: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; kJ/mol&#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">minimize</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Perform energy minimization ...&#39;</span><span class="p">)</span>
+            <span class="c1"># Find if there is an acting force larger than threshold</span>
+            <span class="c1"># minimize the system until forces have converged</span>
+            <span class="n">forces</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">([</span><span class="n">f</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span> <span class="n">f</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">_value</span><span class="p">])</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">getForces</span><span class="p">()]</span>
+            <span class="n">prev_force</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">tolerance</span> <span class="o">=</span> <span class="mi">10</span>
+
+            <span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">threshold</span><span class="p">:</span>
+
+                <span class="c1"># Write atom with the largest force if not reported before</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span> <span class="o">!=</span> <span class="n">prev_force</span><span class="p">:</span>
+                    <span class="n">atom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">forces</span><span class="p">)]</span>
+                    <span class="n">residue</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Large force </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> kJ/(mol nm) found in:&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Atom: </span><span class="si">{</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">atom</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Residue: </span><span class="si">{</span><span class="n">residue</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">residue</span><span class="o">.</span><span class="n">index</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Minimising system with energy tolerance of </span><span class="si">{</span><span class="n">tolerance</span><span class="si">:</span><span class="s1">.1f</span><span class="si">}</span><span class="s1"> kJ/mol&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;_______________________&#39;</span><span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+                <span class="n">sim</span><span class="o">.</span><span class="n">minimizeEnergy</span><span class="p">(</span><span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span> <span class="o">*</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoule</span> <span class="o">/</span> <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">mole</span><span class="p">)</span>
+                <span class="c1"># minimized = True</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getForces</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">prev_force</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">forces</span><span class="p">)</span>
+                <span class="n">forces</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">([</span><span class="n">f</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">z</span><span class="p">])</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">getForces</span><span class="p">()]</span>
+                <span class="k">if</span> <span class="n">tolerance</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">tolerance</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">tolerance</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                    <span class="n">tolerance</span> <span class="o">-=</span> <span class="mf">0.1</span>
+                <span class="k">elif</span> <span class="n">tolerance</span> <span class="o">==</span> <span class="mf">0.1</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The system could not be minimized at the requested convergence</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                                     <span class="s1">&#39;Try to increase the force threshold value to achieve convergence.&#39;</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;All forces are less than </span><span class="si">{</span><span class="n">threshold</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> kJ/mol/nm&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;______________________&#39;</span><span class="p">)</span>
+            <span class="n">state</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getPositions</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Potential Energy After minimisation:&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;The Potential Energy of the system (after minimized) is : </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">):</span>
+                <span class="n">energy</span> <span class="o">=</span> <span class="n">sim</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">getState</span><span class="p">(</span><span class="n">getEnergy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="p">{</span><span class="n">i</span><span class="p">})</span><span class="o">.</span><span class="n">getPotentialEnergy</span><span class="p">()</span><span class="o">.</span><span class="n">value_in_unit</span><span class="p">(</span>
+                    <span class="n">openmm</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">kilojoules_per_mole</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The &#39;</span> <span class="o">+</span> <span class="n">n</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Force&#39;</span><span class="p">,</span> <span class="s1">&#39;Energy&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; is: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; kJ/mol&#39;</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">getPositions</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Saving minimized positions&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.addParticles"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.addParticles">[docs]</a>    <span class="k">def</span> <span class="nf">addParticles</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add particles to the system OpenMM class instance.</span>
+
+<span class="sd">        Add a particle to the system for each atom in it. The mass</span>
+<span class="sd">        of each particle is set up with the values in the :code:`particles_mass`</span>
+<span class="sd">        attribute.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Set same mass for each atom</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">)</span>
+
+        <span class="c1"># Set unique masses for each atom</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addParticle</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="system.addSystemForces"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.addSystemForces">[docs]</a>    <span class="k">def</span> <span class="nf">addSystemForces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add forces to the system OpenMM class instance. It also save</span>
+<span class="sd">        names for the added forces to include them in the reporter class.</span>
+
+<span class="sd">        Adds generated forces to the system, also adding</span>
+<span class="sd">        a force group to the :code:`forceGroups` attribute dictionary.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonicBondForce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">harmonicBondForce</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">[</span><span class="s1">&#39;Harmonic Bond Energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">harmonicBondForce</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">[</span><span class="s1">&#39;Gaussian Angle Energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussianAngleForce</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">[</span><span class="s1">&#39;Gaussian Torsion Energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gaussianTorsionForce</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">[</span><span class="s1">&#39;Yukawa Energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">yukawaForce</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">forceGroups</span><span class="p">[</span><span class="s1">&#39;PairWise Energy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ashbaugh_HatchForce</span></div>
+
+<div class="viewcode-block" id="system.dumpStructure"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.dumpStructure">[docs]</a>    <span class="k">def</span> <span class="nf">dumpStructure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes a structure file of the system in its current state.</span>
+
+<span class="sd">        Writes a PDB file containing the currently defined CG system atoms and its positions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_file : string</span>
+<span class="sd">            name of the PDB output file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">structure</span><span class="o">.</span><span class="n">writeFile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="system.dumpTopology"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.dumpTopology">[docs]</a>    <span class="k">def</span> <span class="nf">dumpTopology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes a topology file of the system in PSF format, this is used for visualization and post-analysis.</span>
+
+<span class="sd">        Writes a file containing the current topology in the</span>
+<span class="sd">        hpsOpenMM system. This file contains topology of system, used in visualization and analysis.</span>
+
+<span class="sd">        Here, we used :code:`parmed` to load :code:`openMM topology` and :code:`openMM system` to create</span>
+<span class="sd">        :code:`Structure` object in :code:`parmed`.</span>
+<span class="sd">        Because parmed doesn&#39;t automatically recognize :code:`charge`, :code:`mass` of atoms by their name.</span>
+<span class="sd">        We need to set :code:`charge`, :code:`mass` back to residues properties.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_file : string [requires]</span>
+<span class="sd">            name of the output PSF file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">top</span> <span class="o">=</span> <span class="n">pmd</span><span class="o">.</span><span class="n">openmm</span><span class="o">.</span><span class="n">load_topology</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">top</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">mass</span><span class="p">,</span> <span class="n">a</span><span class="o">.</span><span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parmed know exactly what chain is but it doesn&#39;t use to write psf. Instead, it writes segid (1-letter)</span>
+<span class="sd">        to distinguish between segment, and PSF file does not has chain identifier.</span>
+<span class="sd">        What we will do here is copy chain ID to segID so that Parmed can write a meaningful psf.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">top</span><span class="o">.</span><span class="n">residues</span><span class="p">:</span>
+            <span class="n">r</span><span class="o">.</span><span class="n">segid</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">chain</span>
+        <span class="n">top</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.dumpForceFieldData"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.dumpForceFieldData">[docs]</a>    <span class="k">def</span> <span class="nf">dumpForceFieldData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes to a file the parameters of the forcefield.</span>
+
+<span class="sd">        Writes a file containing the current forcefield parameters in the</span>
+<span class="sd">        CG system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_file : string [requires]</span>
+<span class="sd">            name of the output file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">ff</span><span class="p">:</span>
+
+            <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;#### CG Force Field Parameters ####</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atoms</span> <span class="o">!=</span> <span class="n">OrderedDict</span><span class="p">():</span>
+                <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[atoms]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="s1">&#39;# </span><span class="si">%2s</span><span class="s1"> </span><span class="si">%3s</span><span class="s1"> </span><span class="si">%9s</span><span class="s1"> </span><span class="si">%9s</span><span class="s1"> </span><span class="si">%9s</span><span class="s1"> </span><span class="se">\t</span><span class="s1"> </span><span class="si">%14s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;atom&#39;</span><span class="p">,</span> <span class="s1">&#39;mass&#39;</span><span class="p">,</span> <span class="s1">&#39;exc_radius&#39;</span><span class="p">,</span> <span class="s1">&#39;charge&#39;</span><span class="p">,</span> <span class="s1">&#39;hps&#39;</span><span class="p">,</span> <span class="s1">&#39;atom_name&#39;</span><span class="p">))</span>
+
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">atom</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">atoms</span><span class="p">):</span>
+
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                        <span class="n">mass</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_mass</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                        <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rf_sigma</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                        <span class="n">charge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_charge</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                        <span class="n">hps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                        <span class="n">hps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">particles_hps</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">residue</span>
+
+                    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%4s</span><span class="s1"> </span><span class="si">%5s</span><span class="s1"> </span><span class="si">%9.3f</span><span class="s1"> </span><span class="si">%9.3f</span><span class="s1"> </span><span class="si">%9.3f</span><span class="se">\t</span><span class="s1"># </span><span class="si">%12s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                                                      <span class="n">mass</span><span class="p">,</span>
+                                                                      <span class="n">sigma</span><span class="p">,</span>
+                                                                      <span class="n">charge</span><span class="p">,</span>
+                                                                      <span class="n">hps</span><span class="p">,</span>
+                                                                      <span class="n">atom</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">res</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                                                                          <span class="n">res</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span> <span class="o">!=</span> <span class="n">OrderedDict</span><span class="p">():</span>
+                <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[bonds]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;# </span><span class="si">%2s</span><span class="s1"> </span><span class="si">%3s</span><span class="s1"> </span><span class="si">%-6s</span><span class="s1"> </span><span class="si">%-s</span><span class="s1"> </span><span class="se">\t\t</span><span class="s1"> self.bonds[bond][1] </span><span class="si">%12s</span><span class="s1"> </span><span class="si">%12s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+                    <span class="s1">&#39;at1&#39;</span><span class="p">,</span> <span class="s1">&#39;at2&#39;</span><span class="p">,</span> <span class="s1">&#39;b0&#39;</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="s1">&#39;at1_name&#39;</span><span class="p">,</span> <span class="s1">&#39;at2_name&#39;</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">bond</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">:</span>
+                    <span class="n">atom1</span> <span class="o">=</span> <span class="n">bond</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">atom2</span> <span class="o">=</span> <span class="n">bond</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">res1</span> <span class="o">=</span> <span class="n">atom1</span><span class="o">.</span><span class="n">residue</span>
+                    <span class="n">res2</span> <span class="o">=</span> <span class="n">atom2</span><span class="o">.</span><span class="n">residue</span>
+                    <span class="n">ff</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%4s</span><span class="s1"> </span><span class="si">%4s</span><span class="s1"> </span><span class="si">%.4f</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="se">\t</span><span class="s1"># </span><span class="si">%12s</span><span class="s1"> </span><span class="si">%12s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">atom1</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                                                  <span class="n">atom2</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">bond</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">_value</span><span class="p">,</span>
+                                                                  <span class="bp">self</span><span class="o">.</span><span class="n">bonds</span><span class="p">[</span><span class="n">bond</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                                                                  <span class="n">atom1</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">res1</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                                                                      <span class="n">res1</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                                                                  <span class="n">atom2</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">res2</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span>
+                                                                      <span class="n">res2</span><span class="o">.</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span></div>
+
+<div class="viewcode-block" id="system.setCAMassPerResidueType"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setCAMassPerResidueType">[docs]</a>    <span class="k">def</span> <span class="nf">setCAMassPerResidueType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets alpha carbon atoms to their average residue mass. Used specially for</span>
+<span class="sd">        modifying alpha-carbon (CA) coarse-grained models.</span>
+
+<span class="sd">        Sets the masses of the alpha carbon atoms to the average mass</span>
+<span class="sd">        of its amino acid residue.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Load mass parameters from parameters package</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">model_parameters</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hps_scale</span><span class="p">]</span>
+        <span class="n">masses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="n">masses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;mass&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Residue &#39;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; not found in masses dictionary.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setParticlesMass</span><span class="p">(</span><span class="n">masses</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.setCARadiusPerResidueType"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setCARadiusPerResidueType">[docs]</a>    <span class="k">def</span> <span class="nf">setCARadiusPerResidueType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets alpha carbon atoms to their average residue mass. Used specially for</span>
+<span class="sd">        modifying alpha-carbon (CA) coarse-grained models.</span>
+
+<span class="sd">        Sets the excluded volume radii of the alpha carbon atoms</span>
+<span class="sd">        to characteristic radii of their corresponding amino acid</span>
+<span class="sd">        residue.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Load radii from parameters package</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">model_parameters</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hps_scale</span><span class="p">]</span>
+
+        <span class="n">radii</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="n">radii</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;radii&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Residue &#39;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; not found in radii dictionary.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setParticlesRadii</span><span class="p">(</span><span class="n">radii</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.setCAChargePerResidueType"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setCAChargePerResidueType">[docs]</a>    <span class="k">def</span> <span class="nf">setCAChargePerResidueType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the charge of the alpha carbon atoms</span>
+<span class="sd">        to characteristic charge of their corresponding amino acid</span>
+<span class="sd">        residue.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Load charge from parameters package</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">model_parameters</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hps_scale</span><span class="p">]</span>
+        <span class="n">charge</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="n">charge</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;charge&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Residue &#39;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; not found in charge dictionary.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setParticlesCharge</span><span class="p">(</span><span class="n">charge</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="system.setCAHPSPerResidueType"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system.setCAHPSPerResidueType">[docs]</a>    <span class="k">def</span> <span class="nf">setCAHPSPerResidueType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets alpha carbon atoms to their residue hydropathy scale. Used specially for</span>
+<span class="sd">        modifying alpha-carbon (CA) coarse-grained models.</span>
+
+<span class="sd">        Sets the HPS model of the alpha carbon atoms using corresponding scale.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Load hydropathy scale from parameters package</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">model_parameters</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hps_scale</span><span class="p">]</span>
+
+        <span class="n">hps</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">residues</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                <span class="n">hps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">][</span><span class="s1">&#39;hps&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Residue &#39;</span> <span class="o">+</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39; not found in hps dictionary.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setParticlesHPS</span><span class="p">(</span><span class="n">hps</span><span class="p">)</span></div>
+
+    <span class="c1"># User-hidden functions #</span>
+<div class="viewcode-block" id="system._setParameters"><a class="viewcode-back" href="../../../modules/system.html#hps.core.system.system._setParameters">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_setParameters</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        General function to set up or change force field parameters.</span>
+<span class="sd">        protected method, can be called only inside class system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        term : dict</span>
+<span class="sd">            Dictionary object containing the set of degrees of freedom</span>
+<span class="sd">            (DOF) to set up attributes to (e.g. :code:`bonds` attribute)</span>
+
+<span class="sd">        parameters : integer or float or list</span>
+<span class="sd">            Value(s) for the specific forcefield parameters. If integer</span>
+<span class="sd">            or float, sets up the same value for all the DOF in terms.</span>
+<span class="sd">            If a list is given, sets a unique parameter for each DOF.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span>
+
+        <span class="c1"># Set constant parameter for each item in FF term</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">term</span><span class="p">:</span>
+                <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                For example, use in set bond force constant:</span>
+<span class="sd">                in the :code:`getBond()`, we set :code:`bond_length` to the first item of tuple, </span>
+<span class="sd">                so lack of bond force constant.</span>
+<span class="sd">                In :code:`setBondForceConstants(8368.0)`: parameter passed is 8368.0, </span>
+<span class="sd">                :code:`setBondForceConstants(param)` calls to this function. Term is self.bonds, item looks like: </span>
+<span class="sd">                :code:`item: (&lt;Atom 0 (CA) of chain 0 residue 0 (MET)&gt;, &lt;Atom 1 (CA) of chain 0 residue 1 (ASP)&gt;)`</span>
+<span class="sd">                :code:`term[item]` (before calling this function): :code:`(Quantity(value=0.382, unit=nanometer), None)`</span>
+<span class="sd">                we take all values except the last (bond force constant which is currently :code:`None` = no parameters:</span>
+<span class="sd">                :code:`(Quantity(value=0.382, unit=nanometer),)`: a tuple</span>
+<span class="sd">                after calling this function:</span>
+<span class="sd">                :code:`term[item]: (Quantity(value=0.382, unit=nanometer), 8368.0)`</span>
+<span class="sd">                :code:`[tuple+tuple = tuple]`</span>
+<span class="sd">                &quot;&quot;&quot;</span>
+                <span class="n">term</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">term</span><span class="p">[</span><span class="n">item</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">parameters</span><span class="p">,)</span>
+
+        <span class="c1"># Set unique parameter for each item in FF term</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">term</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">term</span><span class="p">):</span>
+                <span class="n">term</span><span class="p">[</span><span class="n">item</span><span class="p">]</span> <span class="o">=</span> <span class="n">term</span><span class="p">[</span><span class="n">item</span><span class="p">][:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">parameters</span><span class="p">[</span><span class="n">i</span><span class="p">],)</span></div></div>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">End of class system. Happy simulating ...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Quyen Vu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: main
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+        
+        <dl>
+            <dt>Languages</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">en</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        <dl>
+            <dt>Versions</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">main</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        
+        <hr/>
+        Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

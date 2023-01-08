@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hps.reporter package &mdash; hpsOpenMM v1.3 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../index.html" class="icon icon-home"> hpsOpenMM
+            <img src="../_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                main
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage/simulation_control.html">Simulation control options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#general-information">General information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#run-control">Run control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#model-parameter">Model parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#temperature-coupling">Temperature coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#pressure-coupling">Pressure coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#periodic-boundary-condition">Periodic boundary condition:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#file-input-output">File input/output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#simulation-platform">Simulation platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../usage/simulation_control.html#restart-simulation">Restart simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="parameters.html#note-on-hps-lambda-in-urry-scale">Note on hps (lambda) in urry scale:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#coarse-grained-alpha-carbon-ca-model">Coarse grained, alpha-carbon (CA), model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#the-bonded-potential">The Bonded potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#angle-potential">Angle Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#torsion-potential">Torsion Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#the-pairwise-potential">The Pairwise potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#the-debye-huckle-potential-has-following-form">The Debye-Huckle potential has following form:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dynamics.html">Dynamics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">hpsOpenMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>hps.reporter package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/qvv5013/rtd-github-pages/blob/mainmodules/hps.reporter.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hps-reporter-package">
+<h1>hps.reporter package<a class="headerlink" href="#hps-reporter-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-hps.reporter.hps_reporter">
+<span id="hps-reporter-hps-reporter-module"></span><h2>hps.reporter.hps_reporter module<a class="headerlink" href="#module-hps.reporter.hps_reporter" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hps.reporter.hps_reporter.hpsReporter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hps.reporter.hps_reporter.</span></span><span class="sig-name descname"><span class="pre">hpsReporter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reportInterval</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sbmObject</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hps/reporter/hps_reporter.html#hpsReporter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.reporter.hps_reporter.hpsReporter" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">StateDataReporter</span></code></p>
+<p>A special case of the StateDataReporter class that outputs information about a simulation,
+such as energy and temperature, etc. to a file. This special reporter outputs the hpsOpenMM
+force group energies inside the sbmOpenMM system object.</p>
+<p>It is used in the same way as the OpenMM StateDataReporter class, but it takes as additional
+input an instance of the sbmOpenMM object with the option ‘sbmObject’.</p>
+<p>For more customization reporter, check this:
+<a class="reference external" href="http://docs.openmm.org/latest/userguide/application/04_advanced_sim_examples.html#extracting-and-reporting-forces-and-other-data">http://docs.openmm.org/latest/userguide/application/04_advanced_sim_examples.html#extracting-and-reporting-forces-and-other-data</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.reporter.hps_reporter.hpsReporter._constructHeaders">
+<span class="sig-name descname"><span class="pre">_constructHeaders</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hps/reporter/hps_reporter.html#hpsReporter._constructHeaders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.reporter.hps_reporter.hpsReporter._constructHeaders" title="Permalink to this definition"></a></dt>
+<dd><p>Build headers for the StateDataReporter class.</p>
+<p>Build headers for the StateDataReporter class. It builds the headers
+for the force groups contained in the sbmOpenMM system instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>headers</strong> – List with strings representing the headers to be written to the report file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.reporter.hps_reporter.hpsReporter._constructReportValues">
+<span class="sig-name descname"><span class="pre">_constructReportValues</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">simulation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hps/reporter/hps_reporter.html#hpsReporter._constructReportValues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.reporter.hps_reporter.hpsReporter._constructReportValues" title="Permalink to this definition"></a></dt>
+<dd><p>Calculates the energies for the force groups in the hpsOpenMM system instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>None</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>values</strong> – List with floats representing the values to be written to the report file.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="hps.reporter.hps_reporter.readOpenMMReporterFile">
+<span class="sig-prename descclassname"><span class="pre">hps.reporter.hps_reporter.</span></span><span class="sig-name descname"><span class="pre">readOpenMMReporterFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reporter_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hps/reporter/hps_reporter.html#readOpenMMReporterFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.reporter.hps_reporter.readOpenMMReporterFile" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a dictionary containing all the entries in the reported data reporter_file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>reporter_file</strong> (<em>str</em>) – Path to the reporter output file</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-hps.reporter">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hps.reporter" title="Permalink to this heading"></a></h2>
+<p>reporter package of the sbmOpenMM package that contains the sbmReporter class.</p>
+<p>The sbmOpenMM.reproter package contains the sbmReporter class.</p>
+<p>sbmReporter is a special class of the OpenMM StateDataReporter class, that additionally
+accepts a sbmobject to print the SBM forcefield energies.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Quyen Vu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: main
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+        
+        <dl>
+            <dt>Languages</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">en</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        <dl>
+            <dt>Versions</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">main</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        
+        <hr/>
+        Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

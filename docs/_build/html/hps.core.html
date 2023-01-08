@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hps.core package &mdash; hpsOpenMM v1.3 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> hpsOpenMM
+            <img src="_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                main
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/simulation_control.html">Simulation control options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#general-information">General information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#run-control">Run control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#model-parameter">Model parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#temperature-coupling">Temperature coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#pressure-coupling">Pressure coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#periodic-boundary-condition">Periodic boundary condition:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#file-input-output">File input/output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#simulation-platform">Simulation platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#restart-simulation">Restart simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/parameters.html#note-on-hps-lambda-in-urry-scale">Note on hps (lambda) in urry scale:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#coarse-grained-alpha-carbon-ca-model">Coarse grained, alpha-carbon (CA), model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#the-bonded-potential">The Bonded potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#angle-potential">Angle Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#torsion-potential">Torsion Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#the-pairwise-potential">The Pairwise potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#the-debye-huckle-potential-has-following-form">The Debye-Huckle potential has following form:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/dynamics.html">Dynamics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hpsOpenMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>hps.core package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/qvv5013/rtd-github-pages/blob/mainhps.core.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hps-core-package">
+<h1>hps.core package<a class="headerlink" href="#hps-core-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-hps.core.geometry">
+<span id="hps-core-geometry-module"></span><h2>hps.core.geometry module<a class="headerlink" href="#module-hps.core.geometry" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hps.core.geometry.geometry">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hps.core.geometry.</span></span><span class="sig-name descname"><span class="pre">geometry</span></span><a class="reference internal" href="_modules/hps/core/geometry.html#geometry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.geometry.geometry" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to hold methods for calculating geometrical values
+given sets of atom coordinates.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.geometry.geometry.bond">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">bond</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">coord1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coord2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/geometry.html#geometry.bond"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.geometry.geometry.bond" title="Permalink to this definition"></a></dt>
+<dd><p>Calculate the distance length between two (x,y,z) quantity coordinates.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coord1</strong> (<em>openmm.unit.quantity.Quantity array</em>) – Vector for the first coordinate.</p></li>
+<li><p><strong>coord2</strong> (<em>openmm.unit.quantity.Quantity array</em>) – Vector for the second coordinate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Quantity (value and unit) of the distance length in nanometers.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>simtk.unit.quantity.Quantity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.geometry.geometry.position2Array">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">position2Array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Quantity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_unit</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/geometry.html#geometry.position2Array"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.geometry.geometry.position2Array" title="Permalink to this definition"></a></dt>
+<dd><p>Converts an OpenMM position object quantity into a numpy array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>position</strong> (<em>openmm.unit.quantity.Quantity</em>) – Array containing quantity objects [e.g. (x,y,z) array returned
+from positions].</p></li>
+<li><p><strong>output_unit</strong> (<em>openmm.unit.nanometer</em>) – Unit in which to return the items of the array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A numpy array containing the quantity values in unit of nm, converted to float.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hps.core.models">
+<span id="hps-core-models-module"></span><h2>hps.core.models module<a class="headerlink" href="#module-hps.core.models" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hps.core.models.models">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hps.core.models.</span></span><span class="sig-name descname"><span class="pre">models</span></span><a class="reference internal" href="_modules/hps/core/models.html#models"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.models.models" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class to hold functions for the automated generation of default hps models.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.models.models.buildHPSModel">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">buildHPSModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hps_scale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'hps_urry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">box_dimension</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Any</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/models.html#models.buildHPSModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.models.models.buildHPSModel" title="Permalink to this definition"></a></dt>
+<dd><p>Creates an alpha-carbon only <code class="code docutils literal notranslate"><span class="pre">hpsOpenMM</span></code> system class object with default
+initialized parameters.</p>
+<p>Initializes a coarse-grained, carbon alpha (CA), hpsOpenMM system class
+from a structure and a contact file defining the native contacts for the
+coarse grained model.</p>
+<p>The system creation steps are:</p>
+<ol class="arabic simple">
+<li><p>Add the geometrical parameters for the model.</p></li>
+<li><p>Add the default force field parameters for the model.</p></li>
+<li><p>Create the default force objects.</p></li>
+<li><p>Create the OpenMM system class.</p></li>
+</ol>
+<p>The method can be used to generate an initialized hpsOpenMM system class, that only
+contains the geometrical parameters, by passing the option default_parameters as False.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure_file</strong> (<em>string</em><em> [</em><em>requires</em><em>]</em>) – Path to the input structure file.</p></li>
+<li><p><strong>minimize</strong> (<em>boolean</em><em> (</em><em>False</em><em>)</em>) – If True the initial structure will undergo the energy minimization.</p></li>
+<li><p><strong>hps_scale</strong> (<em>string</em><em> [</em><em>Optional</em><em>, </em><em>hps_urry</em><em>]</em>) – <dl class="simple">
+<dt>HPS scale. There are three options correspond to two scale:</dt><dd><ul>
+<li><p>’hps_urry’: using Urry scale (default).</p></li>
+<li><p>’hps_ss’: hps_urry with angle and torsion potential.</p></li>
+<li><p>’hps_kr’: using Kapcha-Rossy scale.</p></li>
+</ul>
+</dd>
+</dl>
+</p></li>
+<li><p><strong>box_dimension</strong> (<em>float</em><em> or </em><em>array</em><em> (</em><em>None</em><em>)</em>) – If box_dimension is supplied, then will use PBC.
+if float is given, then use cubic box
+if an array of (3,1) is given, then use rectangular box with the given dimension
+if not specify: do not use PBC</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>hps</strong> – Initialized hpsOpenMM.system class with default options for defining
+a coarse-grained CA force field.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">hpsOpenMM.system</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hps.core.system">
+<span id="hps-core-system-module"></span><h2>hps.core.system module<a class="headerlink" href="#module-hps.core.system" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="hps.core.system.system">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hps.core.system.</span></span><span class="sig-name descname"><span class="pre">system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">structure_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hps_scale</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A class containing methods and parameters for generating CG systems to be simulated using the OpenMM interface.
+It offers flexibility to create default and custom CG systems and to easily modify their parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>structure_path</strong> (<em>string</em><em> [</em><em>requires</em><em>]</em>) – Name of the input PDB or CIF file</p></li>
+<li><p><strong>hps_scale</strong> (<em>'hps_kr'</em><em>,</em><em>'hps_urry'</em><em> [</em><em>optional</em><em>, </em><em>default='hps_urry'</em><em>]</em>) – Hydropathy scale. Currently, there are two models are supported.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.structure">
+<span class="sig-name descname"><span class="pre">structure</span></span><a class="headerlink" href="#hps.core.system.system.structure" title="Permalink to this definition"></a></dt>
+<dd><p>Object that holds the information of OpenMM PDB or CIF parsing methods.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.app.pdbfile.PDBFile</span> <span class="pre">or</span> <span class="pre">openmm.app.pdbxfile.PDBxFile</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.topology">
+<span class="sig-name descname"><span class="pre">topology</span></span><a class="headerlink" href="#hps.core.system.system.topology" title="Permalink to this definition"></a></dt>
+<dd><p>OpenMM topology of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.app.topology.Topology</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.positions">
+<span class="sig-name descname"><span class="pre">positions</span></span><a class="headerlink" href="#hps.core.system.system.positions" title="Permalink to this definition"></a></dt>
+<dd><p>Atomic positions of the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">unit.quantity.Quantity</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.particles_mass">
+<span class="sig-name descname"><span class="pre">particles_mass</span></span><a class="headerlink" href="#hps.core.system.system.particles_mass" title="Permalink to this definition"></a></dt>
+<dd><p>Mass of each particle. If float then uniform masses are given to all
+particles. If list per-particle masses are assigned.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">float</span> <span class="pre">or</span> <span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.particles_charge">
+<span class="sig-name descname"><span class="pre">particles_charge</span></span><a class="headerlink" href="#hps.core.system.system.particles_charge" title="Permalink to this definition"></a></dt>
+<dd><p>Charge of each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.rf_sigma">
+<span class="sig-name descname"><span class="pre">rf_sigma</span></span><a class="headerlink" href="#hps.core.system.system.rf_sigma" title="Permalink to this definition"></a></dt>
+<dd><p>Sigma parameter used in the pairwise force object.
+This is vdw Radius of beads</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.atoms">
+<span class="sig-name descname"><span class="pre">atoms</span></span><a class="headerlink" href="#hps.core.system.system.atoms" title="Permalink to this definition"></a></dt>
+<dd><p>A list of the current atoms in the model. The items are <code class="code docutils literal notranslate"><span class="pre">openmm.app.topology.atoms</span></code>
+initialised classes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.n_atoms">
+<span class="sig-name descname"><span class="pre">n_atoms</span></span><a class="headerlink" href="#hps.core.system.system.n_atoms" title="Permalink to this definition"></a></dt>
+<dd><p>Total numer of atoms in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.bonds">
+<span class="sig-name descname"><span class="pre">bonds</span></span><a class="headerlink" href="#hps.core.system.system.bonds" title="Permalink to this definition"></a></dt>
+<dd><p>A dict that uses bonds (2-tuple of <code class="code docutils literal notranslate"><span class="pre">openmm.app.topology.bonds</span></code> objects)
+present in the model as keys and their forcefield properties as values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.bonds_indexes">
+<span class="sig-name descname"><span class="pre">bonds_indexes</span></span><a class="headerlink" href="#hps.core.system.system.bonds_indexes" title="Permalink to this definition"></a></dt>
+<dd><p>A list containing the zero-based indexes of the atoms defining the bonds in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.n_bonds">
+<span class="sig-name descname"><span class="pre">n_bonds</span></span><a class="headerlink" href="#hps.core.system.system.n_bonds" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of bonds in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.bonded_exclusions_index">
+<span class="sig-name descname"><span class="pre">bonded_exclusions_index</span></span><a class="headerlink" href="#hps.core.system.system.bonded_exclusions_index" title="Permalink to this definition"></a></dt>
+<dd><p>Exclusion rule for nonbonded force. =1 for hps_kr and hps_urry, =3 for hps_ss</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.harmonicBondForce">
+<span class="sig-name descname"><span class="pre">harmonicBondForce</span></span><a class="headerlink" href="#hps.core.system.system.harmonicBondForce" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the OpenMM <code class="code docutils literal notranslate"><span class="pre">HarmonicBondForce</span></code> initialised-class. Implements
+a harmonic bond potential between pairs of particles, that depends
+quadratically on their distance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.HarmonicBondForce</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.n_angles">
+<span class="sig-name descname"><span class="pre">n_angles</span></span><a class="headerlink" href="#hps.core.system.system.n_angles" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of angles in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.gaussianAngleForce">
+<span class="sig-name descname"><span class="pre">gaussianAngleForce</span></span><a class="headerlink" href="#hps.core.system.system.gaussianAngleForce" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the OpenMM <code class="code docutils literal notranslate"><span class="pre">CustomAngleForce</span></code> initialised-class. Implements
+a Gaussian angle bond potential between pairs of three particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.CustomAngleForce</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.n_torsions">
+<span class="sig-name descname"><span class="pre">n_torsions</span></span><a class="headerlink" href="#hps.core.system.system.n_torsions" title="Permalink to this definition"></a></dt>
+<dd><p>Total number of torsion angles in the model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">int</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.gaussianTorsionForce">
+<span class="sig-name descname"><span class="pre">gaussianTorsionForce</span></span><a class="headerlink" href="#hps.core.system.system.gaussianTorsionForce" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the OpenMM <code class="code docutils literal notranslate"><span class="pre">CustomTorsionForce</span></code> initialised-class. Implements
+a Gaussian torsion angle bond potential between pairs of four particles.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.CustomTorsionForce</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.yukawaForce">
+<span class="sig-name descname"><span class="pre">yukawaForce</span></span><a class="headerlink" href="#hps.core.system.system.yukawaForce" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the OpenMM <code class="code docutils literal notranslate"><span class="pre">CustomNonbondedForce</span></code> initialized-class.
+Implements the Debye-Huckle potential.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.CustomNonbondedForce</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.ashbaugh_HatchForce">
+<span class="sig-name descname"><span class="pre">ashbaugh_HatchForce</span></span><a class="headerlink" href="#hps.core.system.system.ashbaugh_HatchForce" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the OpenMM <code class="code docutils literal notranslate"><span class="pre">CustomNonbondedForce</span></code> initialized-class. Implements the pairwise short-range
+potential.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.CustomNonbondedForce</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.forceGroups">
+<span class="sig-name descname"><span class="pre">forceGroups</span></span><a class="headerlink" href="#hps.core.system.system.forceGroups" title="Permalink to this definition"></a></dt>
+<dd><p>A dict that uses force names as keys and their corresponding force
+as values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">collections.OrderedDict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.core.system.system.system">
+<span class="sig-name descname"><span class="pre">system</span></span><a class="headerlink" href="#hps.core.system.system.system" title="Permalink to this definition"></a></dt>
+<dd><p>Stores the OpenMM System initialised class. It stores all the forcefield
+information for the hps model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><code class="code docutils literal notranslate"><span class="pre">openmm.System</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.loadForcefieldFromFile">
+<span class="sig-name descname"><span class="pre">loadForcefieldFromFile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#hps.core.system.system.loadForcefieldFromFile" title="Permalink to this definition"></a></dt>
+<dd><p>Loads forcefield parameters from a force field file written with
+the <code class="code docutils literal notranslate"><span class="pre">dumpForceFieldData()</span></code> method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system._setParameters">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">_setParameters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">term</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parameters</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system._setParameters"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system._setParameters" title="Permalink to this definition"></a></dt>
+<dd><p>General function to set up or change force field parameters.
+protected method, can be called only inside class system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>term</strong> (<em>dict</em>) – Dictionary object containing the set of degrees of freedom
+(DOF) to set up attributes to (e.g. <code class="code docutils literal notranslate"><span class="pre">bonds</span></code> attribute)</p></li>
+<li><p><strong>parameters</strong> (<em>integer</em><em> or </em><em>float</em><em> or </em><em>list</em>) – Value(s) for the specific forcefield parameters. If integer
+or float, sets up the same value for all the DOF in terms.
+If a list is given, sets a unique parameter for each DOF.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.addAshbaughHatchForces">
+<span class="sig-name descname"><span class="pre">addAshbaughHatchForces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_pbc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.addAshbaughHatchForces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.addAshbaughHatchForces" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).</p>
+<p>Creates an <code class="code docutils literal notranslate"><span class="pre">openmm.CustomNonbondedForce()</span></code> object with the parameters
+sigma and epsilon given to this method. The custom non-bonded force
+is initialized with the formula: (note: hps here is <span class="math notranslate nohighlight">\(\lambda_{ij}^{0}\)</span> in the paper)</p>
+<p>Unlike <code class="code docutils literal notranslate"><span class="pre">BondForce</span></code> class, where we specify index for atoms pair to add bond, it means
+that number of bondForces may differ from number of particle.
+<code class="code docutils literal notranslate"><span class="pre">NonBondedForce</span></code> is added to all particles, hence we don’t need to pass the <code class="code docutils literal notranslate"><span class="pre">atom</span> <span class="pre">index</span></code>.</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\Phi_{i,j}^{vdw}(r) = step(2^{1/6}\sigma_{ij}-r) \times
+\left( 4\epsilon\left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-
+\left(\frac{\sigma_{ij}}{r}\right)^{6}\right]+(1-\lambda_{ij})\epsilon\right)\\+ \left[1-step(2^{1/6}\sigma_{ij}-r)\right]\times\left[(\lambda_{ij})\times 4\epsilon
+\left[\left(\frac{\sigma_{ij}}{r}\right)^{12}-\left(\frac{\sigma_{ij}}{r}\right)^6\right]\right]\end{aligned}\end{align} \]</div>
+<p>Here, <span class="math notranslate nohighlight">\(\sigma= \frac{(\sigma_1+\sigma_2)}{2}; \lambda_{ij}^{0}=\frac{(\lambda_i+\lambda_j)}{2};
+\epsilon = 0.8368 kj/mol\)</span></p>
+<p>The force object is stored at the <code class="code docutils literal notranslate"><span class="pre">ashbaugh_HatchForce</span></code> attribute.</p>
+<dl class="simple">
+<dt>epsilon<span class="classifier">float</span></dt><dd><p>Value of the epsilon constant in the energy function.</p>
+</dd>
+<dt>sigma<span class="classifier">float or list</span></dt><dd><p>Value of the sigma constant (in nm) in the energy function. If float the
+same sigma value is used for every particle. If list a unique
+parameter is given for each particle.</p>
+</dd>
+<dt>cutoff<span class="classifier">float</span></dt><dd><p>The cutoff distance (in nm) being used for the non-bonded interactions.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>use_pbc</strong> (<em>bool. Whether use PBC</em><em>, </em><em>cutoff periodic boundary condition</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.addGaussianAngleForces">
+<span class="sig-name descname"><span class="pre">addGaussianAngleForces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.addGaussianAngleForces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.addGaussianAngleForces" title="Permalink to this definition"></a></dt>
+<dd><p>Add Gaussian functional form of angle.
+Note that in openMM log is neutral logarithm.</p>
+<p>Angle potential take Gaussian functional form in hps-ss model.</p>
+<div class="math notranslate nohighlight">
+\[U_{angle}(\theta) = \frac{-1}{\gamma}
+    \ln{[e^{-\gamma[k_\alpha( \theta-\theta_\alpha)^2+\epsilon_\alpha]}
+    +e^{-\gamma k_\beta(\theta-\theta_\beta)^2}]}\]</div>
+<p>Angle potential is taken from reference:</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.addGaussianTorsionForces">
+<span class="sig-name descname"><span class="pre">addGaussianTorsionForces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.addGaussianTorsionForces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.addGaussianTorsionForces" title="Permalink to this definition"></a></dt>
+<dd><p>Torsion potential in hps-ss model takes the form:</p>
+<div class="math notranslate nohighlight">
+\[U_{torsion}(\theta) = -\ln\left[ U_{torsion, \alpha}(\theta, \epsilon_d) + U_{torsion, \beta}(\theta, \epsilon_d)\right]\]</div>
+<p>where,</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}U_{torsion, \alpha}(\theta, \epsilon_d)  &amp;= e^{-k_{\alpha, 1}(\theta-\theta_{\alpha,1})^2-\epsilon_d}
+                                            + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2})^4 + e_0}
+                                            + e^{-k_{\alpha, 2}(\theta-\theta_{\alpha,2}+2\pi)^4 + e_0} \\\
+U_{torsion, \beta}(\theta, \epsilon_d) &amp;= e^{-k_{\beta,1}(\theta-\theta_{\beta,1})^2+e_1+\epsilon_d}
+                                        + e^{-k_{\beta,1}(\theta-\theta_{\beta,1}-2\pi)^2+e_1+\epsilon_d} \\\                                        &amp;+ e^{-k_{\beta,2}(\theta-\theta_{\beta,2})^4+e_2}
+                                        + e^{-k_{\beta,2}(\theta-\theta_{\beta,2}-2\pi)^4+e_2}\end{aligned}\end{align} \]</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.addHarmonicBondForces">
+<span class="sig-name descname"><span class="pre">addHarmonicBondForces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.addHarmonicBondForces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.addHarmonicBondForces" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a harmonic bonded force term for each bond in the main
+class using their defined forcefield parameters.</p>
+<p>Creates an <code class="code docutils literal notranslate"><span class="pre">openmm.HarmonicBondForce()</span></code> object with the bonds and
+parameters set up in the “bonds” dictionary attribute. The force object
+is stored at the <code class="code docutils literal notranslate"><span class="pre">harmonicBondForce</span></code> attribute.</p>
+<p>openMM uses harmonic bond that has energy term of form:</p>
+<div class="math notranslate nohighlight">
+\[E= \frac{1}{2}k(r-r_0)^2\]</div>
+<p>The force parameters must be contained in self.bonds as follows:</p>
+<dl class="simple">
+<dt>self.bonds is a dictionary:</dt><dd><ul class="simple">
+<li><p>The keys are 2-tuples for two atom items in <code class="code docutils literal notranslate"><span class="pre">self.topology.atoms</span></code> attribute.</p></li>
+<li><dl class="simple">
+<dt>The values are a 2-tuple of parameters in the following order:</dt><dd><ul>
+<li><p>first  -&gt; bond0 (quantity)</p></li>
+<li><p>second -&gt; k (float) (measured in unit of kj/mol/nm^2)</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.addParticles">
+<span class="sig-name descname"><span class="pre">addParticles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.addParticles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.addParticles" title="Permalink to this definition"></a></dt>
+<dd><p>Add particles to the system OpenMM class instance.</p>
+<p>Add a particle to the system for each atom in it. The mass
+of each particle is set up with the values in the <code class="code docutils literal notranslate"><span class="pre">particles_mass</span></code>
+attribute.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.addSystemForces">
+<span class="sig-name descname"><span class="pre">addSystemForces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.addSystemForces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.addSystemForces" title="Permalink to this definition"></a></dt>
+<dd><p>Add forces to the system OpenMM class instance. It also save
+names for the added forces to include them in the reporter class.</p>
+<p>Adds generated forces to the system, also adding
+a force group to the <code class="code docutils literal notranslate"><span class="pre">forceGroups</span></code> attribute dictionary.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.addYukawaForces">
+<span class="sig-name descname"><span class="pre">addYukawaForces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">use_pbc</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.addYukawaForces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.addYukawaForces" title="Permalink to this definition"></a></dt>
+<dd><p>Creates a nonbonded force term for electrostatic interaction DH potential.</p>
+<p>Creates an <code class="code docutils literal notranslate"><span class="pre">openmm.CustomNonbondedForce()</span></code> object with the parameters
+sigma and epsilon given to this method. The custom non-bonded force
+is initialized with the formula:</p>
+<div class="math notranslate nohighlight">
+\[energy = f \times \frac{q_1q_2}{\epsilon_r \times r}\times e^{(-r/lD)}\]</div>
+<p>where <span class="math notranslate nohighlight">\(f=\frac{1}{4\pi\epsilon_0}=138.935458\)</span> is the factor for short to convert dimensionless
+in calculation to <span class="math notranslate nohighlight">\(kj.nm/(mol\times e^2)\)</span> unit.</p>
+<p><span class="math notranslate nohighlight">\(\epsilon_r=80\)</span>: Dielectric constant of water at 100mM mono-valent ion</p>
+<p>The force object is stored at the <code class="code docutils literal notranslate"><span class="pre">yukawaForce</span></code> attribute.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>use_pbc</strong> (<em>(</em><em>bool</em><em>) </em><em>whether use PBC</em><em>, </em><em>cutoff periodic boundary condition</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.checkBondDistances">
+<span class="sig-name descname"><span class="pre">checkBondDistances</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.checkBondDistances"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.checkBondDistances" title="Permalink to this definition"></a></dt>
+<dd><p>Searches for large bond distances for the atom pairs defined in
+the ‘bonds’ attribute. It raises an error when large bonds are found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>threshold</strong> (<em>(</em><em>float</em><em>, </em><em>default=0.5 nm</em><em>)</em>) – Threshold to check for large bond distances.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.checkLargeForces">
+<span class="sig-name descname"><span class="pre">checkLargeForces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.checkLargeForces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.checkLargeForces" title="Permalink to this definition"></a></dt>
+<dd><p>Prints the hps system energies of the input configuration of the
+system. It optionally checks for large forces acting upon all
+particles in the hps system and iteratively minimizes the system
+configuration until no forces larger than a threshold are found.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>threshold</strong> (<em>(</em><em>float</em><em>, </em><em>default=10</em><em>)</em>) – Threshold to check for large forces.</p></li>
+<li><p><strong>minimize</strong> (<em>(</em><em>bool</em><em>, </em><em>default= False</em><em>)</em>) – Whether to iteratively minimize the system until all forces are lower or equal to
+the threshold value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.createSystemObject">
+<span class="sig-name descname"><span class="pre">createSystemObject</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">check_bond_distances</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">check_large_forces</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bond_threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.createSystemObject"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.createSystemObject" title="Permalink to this definition"></a></dt>
+<dd><p>Creates OpenMM system object adding particles, masses and forces.
+It also groups the added forces into Force-Groups for the hpsReporter
+class.</p>
+<p>Creates an <code class="code docutils literal notranslate"><span class="pre">openmm.System()</span></code> object using the force field parameters
+given to the ‘system’ class. It adds particles, forces and
+creates a force group for each force object. Optionally the method
+can check for large bond distances (default) and minimize the atomic
+positions if large forces are found in any atom (default False).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>minimize</strong> (<em>boolean</em><em> (</em><em>False</em><em>)</em>) – Whether to minimize the system if large forces are found.</p></li>
+<li><p><strong>check_bond_distances</strong> (<em>boolean</em><em> (</em><em>True</em><em>)</em>) – Whether to check for large bond distances.</p></li>
+<li><p><strong>check_large_forces</strong> (<em>boolean</em><em> (</em><em>False</em><em>)</em>) – Whether to print force summary of force groups</p></li>
+<li><p><strong>force_threshold</strong> (<em>float</em><em> (</em><em>10.0</em><em>)</em>) – Threshold to check for large forces.</p></li>
+<li><p><strong>bond_threshold</strong> (<em>float</em><em> (</em><em>0.5</em><em>)</em>) – Threshold to check for large bond distances.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.dumpForceFieldData">
+<span class="sig-name descname"><span class="pre">dumpForceFieldData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.dumpForceFieldData"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.dumpForceFieldData" title="Permalink to this definition"></a></dt>
+<dd><p>Writes to a file the parameters of the forcefield.</p>
+<p>Writes a file containing the current forcefield parameters in the
+CG system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_file</strong> (<em>string</em><em> [</em><em>requires</em><em>]</em>) – name of the output file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.dumpStructure">
+<span class="sig-name descname"><span class="pre">dumpStructure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.dumpStructure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.dumpStructure" title="Permalink to this definition"></a></dt>
+<dd><p>Writes a structure file of the system in its current state.</p>
+<p>Writes a PDB file containing the currently defined CG system atoms and its positions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_file</strong> (<em>string</em>) – name of the PDB output file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.dumpTopology">
+<span class="sig-name descname"><span class="pre">dumpTopology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.dumpTopology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.dumpTopology" title="Permalink to this definition"></a></dt>
+<dd><p>Writes a topology file of the system in PSF format, this is used for visualization and post-analysis.</p>
+<p>Writes a file containing the current topology in the
+hpsOpenMM system. This file contains topology of system, used in visualization and analysis.</p>
+<p>Here, we used <code class="code docutils literal notranslate"><span class="pre">parmed</span></code> to load <code class="code docutils literal notranslate"><span class="pre">openMM</span> <span class="pre">topology</span></code> and <code class="code docutils literal notranslate"><span class="pre">openMM</span> <span class="pre">system</span></code> to create
+<code class="code docutils literal notranslate"><span class="pre">Structure</span></code> object in <code class="code docutils literal notranslate"><span class="pre">parmed</span></code>.
+Because parmed doesn’t automatically recognize <code class="code docutils literal notranslate"><span class="pre">charge</span></code>, <code class="code docutils literal notranslate"><span class="pre">mass</span></code> of atoms by their name.
+We need to set <code class="code docutils literal notranslate"><span class="pre">charge</span></code>, <code class="code docutils literal notranslate"><span class="pre">mass</span></code> back to residues properties.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>output_file</strong> (<em>string</em><em> [</em><em>requires</em><em>]</em>) – name of the output PSF file.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.getAngles">
+<span class="sig-name descname"><span class="pre">getAngles</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.getAngles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.getAngles" title="Permalink to this definition"></a></dt>
+<dd><p>Reads bonds from topology, adds them to the main class and sorts them
+into a dictionary to store their forcefield properties.</p>
+<p>Angles are built from bond (bondedTo instance).
+This function modify <code class="code docutils literal notranslate"><span class="pre">self.angles</span></code>, <code class="code docutils literal notranslate"><span class="pre">self.angles_indexes</span></code> and <code class="code docutils literal notranslate"><span class="pre">self.n_angles</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.getAtoms">
+<span class="sig-name descname"><span class="pre">getAtoms</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.getAtoms"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.getAtoms" title="Permalink to this definition"></a></dt>
+<dd><p>Reads atoms from topology, adds them to the main class and sorts them
+into a dictionary to store their forcefield properties.</p>
+<p>After getCAlphaOnly, C-alpha atoms are stored on <code class="code docutils literal notranslate"><span class="pre">self.topology</span> <span class="pre">only</span></code>.
+We need to add them to atoms attribute and system also.
+Adds <code class="code docutils literal notranslate"><span class="pre">atoms</span></code> in the <code class="code docutils literal notranslate"><span class="pre">OpenMM</span> <span class="pre">topology</span></code> instance to the <code class="code docutils literal notranslate"><span class="pre">hpsOpenMM</span> <span class="pre">system</span></code> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.getBonds">
+<span class="sig-name descname"><span class="pre">getBonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">except_chains</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.getBonds"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.getBonds" title="Permalink to this definition"></a></dt>
+<dd><p>Reads bonds from topology, adds them to the main class and sorts them
+into a dictionary to store their forcefield properties.</p>
+<p>Adds <code class="code docutils literal notranslate"><span class="pre">bonds</span></code> in the <code class="code docutils literal notranslate"><span class="pre">OpenMM</span> <span class="pre">topology</span></code> instance to the <code class="code docutils literal notranslate"><span class="pre">hpsOpenMM</span> <span class="pre">system</span></code> class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>except_chains</strong> (<em>String</em><em> [</em><em>optional</em><em>]</em>) – </p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.getCAlphaOnly">
+<span class="sig-name descname"><span class="pre">getCAlphaOnly</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="_modules/hps/core/system.html#system.getCAlphaOnly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.getCAlphaOnly" title="Permalink to this definition"></a></dt>
+<dd><p>Filter in only alpha carbon atoms from the input structure and updates
+the topology object to add new bonds between them. Used specially for
+creating alpha-carbon (CA) coarse-grained models.</p>
+<p>Keeps in the <code class="code docutils literal notranslate"><span class="pre">hps</span> <span class="pre">system</span></code> only the alpha carbon atoms from the <code class="code docutils literal notranslate"><span class="pre">OpenMM</span> <span class="pre">topology</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.getTorsions">
+<span class="sig-name descname"><span class="pre">getTorsions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.getTorsions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.getTorsions" title="Permalink to this definition"></a></dt>
+<dd><p>Reads bonds from topology, adds them to the main class and sorts them
+into a dictionary to store their forcefield properties.</p>
+<p>Torsion Angles are built from angles and bondedTo instance.
+This function modify <code class="code docutils literal notranslate"><span class="pre">self.torsions</span></code>, <code class="code docutils literal notranslate"><span class="pre">self.torsions_indexes</span></code> and <code class="code docutils literal notranslate"><span class="pre">self.n_torsions</span></code></p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setBondForceConstants">
+<span class="sig-name descname"><span class="pre">setBondForceConstants</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bond_force_constant</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setBondForceConstants"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setBondForceConstants" title="Permalink to this definition"></a></dt>
+<dd><p>Change the forcefield parameters for bonded terms.</p>
+<p>Set the harmonic bond constant force parameters. The input can be
+a float, to set the same parameter for all force interactions, or
+a list, to define a unique parameter for each force interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>bond_force_constant</strong> (<em>float</em><em> or </em><em>list</em>) – Parameter(s) to set up for the harmonic bond forces.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setCAChargePerResidueType">
+<span class="sig-name descname"><span class="pre">setCAChargePerResidueType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setCAChargePerResidueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setCAChargePerResidueType" title="Permalink to this definition"></a></dt>
+<dd><p>Sets the charge of the alpha carbon atoms
+to characteristic charge of their corresponding amino acid
+residue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setCAHPSPerResidueType">
+<span class="sig-name descname"><span class="pre">setCAHPSPerResidueType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setCAHPSPerResidueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setCAHPSPerResidueType" title="Permalink to this definition"></a></dt>
+<dd><p>Sets alpha carbon atoms to their residue hydropathy scale. Used specially for
+modifying alpha-carbon (CA) coarse-grained models.</p>
+<p>Sets the HPS model of the alpha carbon atoms using corresponding scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setCAMassPerResidueType">
+<span class="sig-name descname"><span class="pre">setCAMassPerResidueType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setCAMassPerResidueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setCAMassPerResidueType" title="Permalink to this definition"></a></dt>
+<dd><p>Sets alpha carbon atoms to their average residue mass. Used specially for
+modifying alpha-carbon (CA) coarse-grained models.</p>
+<p>Sets the masses of the alpha carbon atoms to the average mass
+of its amino acid residue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setCARadiusPerResidueType">
+<span class="sig-name descname"><span class="pre">setCARadiusPerResidueType</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setCARadiusPerResidueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setCARadiusPerResidueType" title="Permalink to this definition"></a></dt>
+<dd><p>Sets alpha carbon atoms to their average residue mass. Used specially for
+modifying alpha-carbon (CA) coarse-grained models.</p>
+<p>Sets the excluded volume radii of the alpha carbon atoms
+to characteristic radii of their corresponding amino acid
+residue.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setParticlesCharge">
+<span class="sig-name descname"><span class="pre">setParticlesCharge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particles_charge</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setParticlesCharge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setParticlesCharge" title="Permalink to this definition"></a></dt>
+<dd><p>Set the charge of the particles in the system. The input can be a
+float, to set the same charge for all particles, or a list, to define
+a unique charge for each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particles_charge</strong> (<em>float</em><em> or </em><em>list</em>) – Charge values to add for the particles in the hpsOpenMM system class.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setParticlesHPS">
+<span class="sig-name descname"><span class="pre">setParticlesHPS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particles_hps</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setParticlesHPS"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setParticlesHPS" title="Permalink to this definition"></a></dt>
+<dd><p>Set the hydropathy scale of the particles in the system. The input can be a
+float, to set the same hydropathy for all particles, or a list, to define
+a unique hydropathy for each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particles_hps</strong> (<em>float</em><em> or </em><em>list</em>) – HPS scale values to add for the particles in the hpsOpenMM system class.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setParticlesMass">
+<span class="sig-name descname"><span class="pre">setParticlesMass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particles_mass</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setParticlesMass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setParticlesMass" title="Permalink to this definition"></a></dt>
+<dd><p>Change the mass parameter for each atom in the system.</p>
+<p>Set the masses of the particles in the system. The input can be a
+float, to set the same mass for all particles, or a list, to define
+a unique mass for each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particles_mass</strong> (<em>float</em><em> or </em><em>list</em>) – Mass(es) values to add for the particles in the hpsOpenMM system class.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="hps.core.system.system.setParticlesRadii">
+<span class="sig-name descname"><span class="pre">setParticlesRadii</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">particles_radii</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/hps/core/system.html#system.setParticlesRadii"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.core.system.system.setParticlesRadii" title="Permalink to this definition"></a></dt>
+<dd><p>Change the excluded volume radius parameter for each atom in the system.</p>
+<p>Set the radii of the particles in the system. The input can be a
+float, to set the same radius for all particles, or a list, to define
+a unique radius for each particle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>particles_radii</strong> (<em>float</em><em> or </em><em>list</em>) – Radii values to add for the particles in the hpsOpenMM system class.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-hps.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hps.core" title="Permalink to this heading"></a></h2>
+<p>core package of the hpsOpenMM package that contains the main hpsOpenMM classes.</p>
+<p>The hpsOpenMM.core package contains the three hpsOpenMM main classes:</p>
+<blockquote>
+<div><ol class="arabic simple">
+<li><p>geometry</p></li>
+<li><p>models</p></li>
+<li><p>system</p></li>
+</ol>
+</div></blockquote>
+<p>The first class, geometry, contains methods to calculate the geometrical parameters from the input structures.</p>
+<p>The second class, models, allows to easily set up predefined CG models.
+The final class, system, is the main class that holds all the methods to define, modify and create CG to be simulated
+with OpenMM.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Quyen Vu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: main
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+        
+        <dl>
+            <dt>Languages</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">en</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        <dl>
+            <dt>Versions</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">main</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        
+        <hr/>
+        Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>

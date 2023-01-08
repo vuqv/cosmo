@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hps.parameters package &mdash; hpsOpenMM v1.3 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> hpsOpenMM
+            <img src="_static/logo.svg" class="logo" alt="Logo"/>
+          </a>
+              <div class="version">
+                main
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules/introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage/simulation_control.html">Simulation control options</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#general-information">General information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#run-control">Run control</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#model-parameter">Model parameter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#temperature-coupling">Temperature coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#pressure-coupling">Pressure coupling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#periodic-boundary-condition">Periodic boundary condition:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#file-input-output">File input/output</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#simulation-platform">Simulation platform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usage/simulation_control.html#restart-simulation">Restart simulation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/parameters.html">Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/parameters.html#note-on-hps-lambda-in-urry-scale">Note on hps (lambda) in urry scale:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/system.html">System</a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/models.html">Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#coarse-grained-alpha-carbon-ca-model">Coarse grained, alpha-carbon (CA), model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#the-bonded-potential">The Bonded potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#angle-potential">Angle Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#torsion-potential">Torsion Potential</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#the-pairwise-potential">The Pairwise potential:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules/models.html#the-debye-huckle-potential-has-following-form">The Debye-Huckle potential has following form:</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/dynamics.html">Dynamics</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">hpsOpenMM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>hps.parameters package</li>
+      <li class="wy-breadcrumbs-aside">
+              <a href="https://github.com/qvv5013/rtd-github-pages/blob/mainhps.parameters.rst" class="fa fa-github"> Edit on GitHub</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="hps-parameters-package">
+<h1>hps.parameters package<a class="headerlink" href="#hps-parameters-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-hps.parameters.model_parameters">
+<span id="hps-parameters-model-parameters-module"></span><h2>hps.parameters.model_parameters module<a class="headerlink" href="#module-hps.parameters.model_parameters" title="Permalink to this heading"></a></h2>
+<p>Dictionary contains parameters for hps model.
+First level is the model name</p>
+<ul class="simple">
+<li><p>HPS-Kr scale was taken from:</p></li>
+</ul>
+<p>Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018).
+Sequence determinants of protein phase behavior from a coarse-grained model.
+PLoS Computational Biology, 1–23.
+<a class="reference external" href="https://doi.org/10.1101/238170">https://doi.org/10.1101/238170</a></p>
+<ul class="simple">
+<li><p>Parameter for Nucleic acids (KR scale):</p></li>
+</ul>
+<p>Regy, R. M., Dignon, G. L., Zheng, W., Kim, Y. C., Mittal, J. (2020).
+Sequence dependent phase separation of protein-polynucleotide mixtures elucidated using molecular simulations.
+Nucleic Acids Research, 48(22), 12593–12603.
+<a class="reference external" href="https://doi.org/10.1093/nar/gkaa1099">https://doi.org/10.1093/nar/gkaa1099</a></p>
+<ul class="simple">
+<li><p>Phosphorylation version of some residues for KR scale are taken from:</p></li>
+</ul>
+<p>Perdikari, T. M., Jovic, N., Dignon, G. L., Kim, Y. C., Fawzi, N. L.,  Mittal, J. (2021).
+A predictive coarse-grained model for position-specific effects of post-translational modifications.
+Biophysical Journal, 120(7), 1187–1197.
+<a class="reference external" href="https://doi.org/10.1016/j.bpj.2021.01.034">https://doi.org/10.1016/j.bpj.2021.01.034</a></p>
+<section id="note-on-hps-lambda-in-urry-scale">
+<h3>Note on hps (lambda) in urry scale:<a class="headerlink" href="#note-on-hps-lambda-in-urry-scale" title="Permalink to this heading"></a></h3>
+<p># These parameters were shifted by 0.08 from original parameters directly.</p>
+<p>in the original paper:
+Regy, R. M., Thompson, J., Kim, Y. C., ; Mittal, J. (2021).
+Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins.
+Protein Science, 30(7), 1371–1379. <a class="reference external" href="https://doi.org/10.1002/pro.4094">https://doi.org/10.1002/pro.4094</a></p>
+<dl>
+<dt>..math::</dt><dd><p>lambda_{ij} = muy lambda_0_ij - delta</p>
+<p>muy=1, delta= 0.08 is the optimal set for the set of 42 proteins they studied.
+lambda_{ij} = lambda0_{ij} - 0.08 = 0.5*(lambda_i+lambda_j) - 0.08 = 0.5(lambda_i -0.08 + lambda_j-0.08)</p>
+</dd>
+</dl>
+<p>In both version, KR and Urry, we can tune directly lambda parameter in Urry by 0.08 so we can use only one equation for
+two model (choose parameter when passing hps_scale parameter)</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="hps.parameters.model_parameters.parameters">
+<span class="sig-prename descclassname"><span class="pre">hps.parameters.model_parameters.</span></span><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#hps.parameters.model_parameters.parameters" title="Permalink to this definition"></a></dt>
+<dd><p>dictionary contains model parameters.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="id0">
+<span class="sig-prename descclassname"><span class="pre">hps.parameters.model_parameters.</span></span><span class="sig-name descname"><span class="pre">parameters</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'hps_kr':</span> <span class="pre">{'A':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">-0.054,</span> <span class="pre">'mass':</span> <span class="pre">329.2,</span> <span class="pre">'radii':</span> <span class="pre">0.844},</span> <span class="pre">'ALA':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.73,</span> <span class="pre">'mass':</span> <span class="pre">71.08,</span> <span class="pre">'radii':</span> <span class="pre">0.504},</span> <span class="pre">'ALY':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.7567,</span> <span class="pre">'mass':</span> <span class="pre">170.2,</span> <span class="pre">'radii':</span> <span class="pre">0.681},</span> <span class="pre">'ARG':</span> <span class="pre">{'charge':</span> <span class="pre">1.0,</span> <span class="pre">'hps':</span> <span class="pre">0.0,</span> <span class="pre">'mass':</span> <span class="pre">156.2,</span> <span class="pre">'radii':</span> <span class="pre">0.656},</span> <span class="pre">'ASN':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.432,</span> <span class="pre">'mass':</span> <span class="pre">114.1,</span> <span class="pre">'radii':</span> <span class="pre">0.568},</span> <span class="pre">'ASP':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">0.378,</span> <span class="pre">'mass':</span> <span class="pre">115.1,</span> <span class="pre">'radii':</span> <span class="pre">0.558},</span> <span class="pre">'C':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">-0.027,</span> <span class="pre">'mass':</span> <span class="pre">305.2,</span> <span class="pre">'radii':</span> <span class="pre">0.822},</span> <span class="pre">'CYS':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.595,</span> <span class="pre">'mass':</span> <span class="pre">103.1,</span> <span class="pre">'radii':</span> <span class="pre">0.548},</span> <span class="pre">'G':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">-0.189,</span> <span class="pre">'mass':</span> <span class="pre">345.2,</span> <span class="pre">'radii':</span> <span class="pre">0.851},</span> <span class="pre">'GLN':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.514,</span> <span class="pre">'mass':</span> <span class="pre">128.1,</span> <span class="pre">'radii':</span> <span class="pre">0.602},</span> <span class="pre">'GLU':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">0.459,</span> <span class="pre">'mass':</span> <span class="pre">129.1,</span> <span class="pre">'radii':</span> <span class="pre">0.592},</span> <span class="pre">'GLY':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.649,</span> <span class="pre">'mass':</span> <span class="pre">57.05,</span> <span class="pre">'radii':</span> <span class="pre">0.45},</span> <span class="pre">'HIS':</span> <span class="pre">{'charge':</span> <span class="pre">0.5,</span> <span class="pre">'hps':</span> <span class="pre">0.514,</span> <span class="pre">'mass':</span> <span class="pre">137.1,</span> <span class="pre">'radii':</span> <span class="pre">0.608},</span> <span class="pre">'ILE':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.973,</span> <span class="pre">'mass':</span> <span class="pre">113.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'LEU':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.973,</span> <span class="pre">'mass':</span> <span class="pre">113.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'LYS':</span> <span class="pre">{'charge':</span> <span class="pre">1.0,</span> <span class="pre">'hps':</span> <span class="pre">0.514,</span> <span class="pre">'mass':</span> <span class="pre">128.2,</span> <span class="pre">'radii':</span> <span class="pre">0.636},</span> <span class="pre">'MET':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.838,</span> <span class="pre">'mass':</span> <span class="pre">131.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'PHE':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">1.0,</span> <span class="pre">'mass':</span> <span class="pre">147.2,</span> <span class="pre">'radii':</span> <span class="pre">0.636},</span> <span class="pre">'PRO':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">1.0,</span> <span class="pre">'mass':</span> <span class="pre">97.12,</span> <span class="pre">'radii':</span> <span class="pre">0.556},</span> <span class="pre">'PTR':</span> <span class="pre">{'charge':</span> <span class="pre">-2.0,</span> <span class="pre">'hps':</span> <span class="pre">0.189,</span> <span class="pre">'mass':</span> <span class="pre">241.15,</span> <span class="pre">'radii':</span> <span class="pre">0.738},</span> <span class="pre">'SEP':</span> <span class="pre">{'charge':</span> <span class="pre">-2.0,</span> <span class="pre">'hps':</span> <span class="pre">0.162,</span> <span class="pre">'mass':</span> <span class="pre">165.03,</span> <span class="pre">'radii':</span> <span class="pre">0.636},</span> <span class="pre">'SER':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.595,</span> <span class="pre">'mass':</span> <span class="pre">87.08,</span> <span class="pre">'radii':</span> <span class="pre">0.518},</span> <span class="pre">'THR':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.676,</span> <span class="pre">'mass':</span> <span class="pre">101.1,</span> <span class="pre">'radii':</span> <span class="pre">0.562},</span> <span class="pre">'TPO':</span> <span class="pre">{'charge':</span> <span class="pre">-2.0,</span> <span class="pre">'hps':</span> <span class="pre">0.0081,</span> <span class="pre">'mass':</span> <span class="pre">179.05,</span> <span class="pre">'radii':</span> <span class="pre">0.662},</span> <span class="pre">'TRP':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.946,</span> <span class="pre">'mass':</span> <span class="pre">186.2,</span> <span class="pre">'radii':</span> <span class="pre">0.678},</span> <span class="pre">'TYR':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.865,</span> <span class="pre">'mass':</span> <span class="pre">163.2,</span> <span class="pre">'radii':</span> <span class="pre">0.646},</span> <span class="pre">'U':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">-0.027,</span> <span class="pre">'mass':</span> <span class="pre">306.2,</span> <span class="pre">'radii':</span> <span class="pre">0.817},</span> <span class="pre">'VAL':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.892,</span> <span class="pre">'mass':</span> <span class="pre">99.07,</span> <span class="pre">'radii':</span> <span class="pre">0.586},</span> <span class="pre">'bond_length':</span> <span class="pre">0.38,</span> <span class="pre">'bonded_exclusions_index':</span> <span class="pre">1},</span> <span class="pre">'hps_ss':</span> <span class="pre">{'ALA':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-2.59,</span> <span class="pre">'hps':</span> <span class="pre">0.522942,</span> <span class="pre">'mass':</span> <span class="pre">71.08,</span> <span class="pre">'radii':</span> <span class="pre">0.504},</span> <span class="pre">'ARG':</span> <span class="pre">{'charge':</span> <span class="pre">1.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-1.37,</span> <span class="pre">'hps':</span> <span class="pre">0.478824,</span> <span class="pre">'mass':</span> <span class="pre">156.2,</span> <span class="pre">'radii':</span> <span class="pre">0.656},</span> <span class="pre">'ASN':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.42,</span> <span class="pre">'hps':</span> <span class="pre">0.508236,</span> <span class="pre">'mass':</span> <span class="pre">114.1,</span> <span class="pre">'radii':</span> <span class="pre">0.568},</span> <span class="pre">'ASP':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.8,</span> <span class="pre">'hps':</span> <span class="pre">0.214119,</span> <span class="pre">'mass':</span> <span class="pre">115.1,</span> <span class="pre">'radii':</span> <span class="pre">0.558},</span> <span class="pre">'CYS':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.15,</span> <span class="pre">'hps':</span> <span class="pre">0.56706,</span> <span class="pre">'mass':</span> <span class="pre">103.1,</span> <span class="pre">'radii':</span> <span class="pre">0.548},</span> <span class="pre">'GLN':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-1.25,</span> <span class="pre">'hps':</span> <span class="pre">0.478824,</span> <span class="pre">'mass':</span> <span class="pre">128.1,</span> <span class="pre">'radii':</span> <span class="pre">0.602},</span> <span class="pre">'GLU':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-1.8,</span> <span class="pre">'hps':</span> <span class="pre">-0.08,</span> <span class="pre">'mass':</span> <span class="pre">129.1,</span> <span class="pre">'radii':</span> <span class="pre">0.592},</span> <span class="pre">'GLY':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">0.65,</span> <span class="pre">'hps':</span> <span class="pre">0.49353,</span> <span class="pre">'mass':</span> <span class="pre">57.05,</span> <span class="pre">'radii':</span> <span class="pre">0.45},</span> <span class="pre">'HIS':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">0.8,</span> <span class="pre">'hps':</span> <span class="pre">0.684707,</span> <span class="pre">'mass':</span> <span class="pre">137.1,</span> <span class="pre">'radii':</span> <span class="pre">0.608},</span> <span class="pre">'ILE':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-1.39,</span> <span class="pre">'hps':</span> <span class="pre">0.625883,</span> <span class="pre">'mass':</span> <span class="pre">113.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'LEU':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-2.05,</span> <span class="pre">'hps':</span> <span class="pre">0.640589,</span> <span class="pre">'mass':</span> <span class="pre">113.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'LYS':</span> <span class="pre">{'charge':</span> <span class="pre">1.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.95,</span> <span class="pre">'hps':</span> <span class="pre">0.302354,</span> <span class="pre">'mass':</span> <span class="pre">128.2,</span> <span class="pre">'radii':</span> <span class="pre">0.636},</span> <span class="pre">'MET':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-1.6,</span> <span class="pre">'hps':</span> <span class="pre">0.596471,</span> <span class="pre">'mass':</span> <span class="pre">131.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'PHE':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.68,</span> <span class="pre">'hps':</span> <span class="pre">0.74353,</span> <span class="pre">'mass':</span> <span class="pre">147.2,</span> <span class="pre">'radii':</span> <span class="pre">0.636},</span> <span class="pre">'PRO':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">3.7,</span> <span class="pre">'hps':</span> <span class="pre">0.678824,</span> <span class="pre">'mass':</span> <span class="pre">97.12,</span> <span class="pre">'radii':</span> <span class="pre">0.556},</span> <span class="pre">'SER':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.69,</span> <span class="pre">'hps':</span> <span class="pre">0.508236,</span> <span class="pre">'mass':</span> <span class="pre">87.08,</span> <span class="pre">'radii':</span> <span class="pre">0.518},</span> <span class="pre">'THR':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.3,</span> <span class="pre">'hps':</span> <span class="pre">0.508236,</span> <span class="pre">'mass':</span> <span class="pre">101.1,</span> <span class="pre">'radii':</span> <span class="pre">0.562},</span> <span class="pre">'TRP':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-1.15,</span> <span class="pre">'hps':</span> <span class="pre">0.92,</span> <span class="pre">'mass':</span> <span class="pre">186.2,</span> <span class="pre">'radii':</span> <span class="pre">0.678},</span> <span class="pre">'TYR':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.68,</span> <span class="pre">'hps':</span> <span class="pre">0.817059,</span> <span class="pre">'mass':</span> <span class="pre">163.2,</span> <span class="pre">'radii':</span> <span class="pre">0.646},</span> <span class="pre">'VAL':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'eps_di':</span> <span class="pre">-0.75,</span> <span class="pre">'hps':</span> <span class="pre">0.584707,</span> <span class="pre">'mass':</span> <span class="pre">99.07,</span> <span class="pre">'radii':</span> <span class="pre">0.586},</span> <span class="pre">'bond_length':</span> <span class="pre">0.382,</span> <span class="pre">'bonded_exclusions_index':</span> <span class="pre">3},</span> <span class="pre">'hps_urry':</span> <span class="pre">{'ALA':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.522942,</span> <span class="pre">'mass':</span> <span class="pre">71.08,</span> <span class="pre">'radii':</span> <span class="pre">0.504},</span> <span class="pre">'ARG':</span> <span class="pre">{'charge':</span> <span class="pre">1.0,</span> <span class="pre">'hps':</span> <span class="pre">0.478824,</span> <span class="pre">'mass':</span> <span class="pre">156.2,</span> <span class="pre">'radii':</span> <span class="pre">0.656},</span> <span class="pre">'ASN':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.508236,</span> <span class="pre">'mass':</span> <span class="pre">114.1,</span> <span class="pre">'radii':</span> <span class="pre">0.568},</span> <span class="pre">'ASP':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">0.214119,</span> <span class="pre">'mass':</span> <span class="pre">115.1,</span> <span class="pre">'radii':</span> <span class="pre">0.558},</span> <span class="pre">'CYS':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.56706,</span> <span class="pre">'mass':</span> <span class="pre">103.1,</span> <span class="pre">'radii':</span> <span class="pre">0.548},</span> <span class="pre">'GLN':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.478824,</span> <span class="pre">'mass':</span> <span class="pre">128.1,</span> <span class="pre">'radii':</span> <span class="pre">0.602},</span> <span class="pre">'GLU':</span> <span class="pre">{'charge':</span> <span class="pre">-1.0,</span> <span class="pre">'hps':</span> <span class="pre">-0.08,</span> <span class="pre">'mass':</span> <span class="pre">129.1,</span> <span class="pre">'radii':</span> <span class="pre">0.592},</span> <span class="pre">'GLY':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.49353,</span> <span class="pre">'mass':</span> <span class="pre">57.05,</span> <span class="pre">'radii':</span> <span class="pre">0.45},</span> <span class="pre">'HIS':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.684707,</span> <span class="pre">'mass':</span> <span class="pre">137.1,</span> <span class="pre">'radii':</span> <span class="pre">0.608},</span> <span class="pre">'ILE':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.625883,</span> <span class="pre">'mass':</span> <span class="pre">113.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'LEU':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.640589,</span> <span class="pre">'mass':</span> <span class="pre">113.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'LYS':</span> <span class="pre">{'charge':</span> <span class="pre">1.0,</span> <span class="pre">'hps':</span> <span class="pre">0.302354,</span> <span class="pre">'mass':</span> <span class="pre">128.2,</span> <span class="pre">'radii':</span> <span class="pre">0.636},</span> <span class="pre">'MET':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.596471,</span> <span class="pre">'mass':</span> <span class="pre">131.2,</span> <span class="pre">'radii':</span> <span class="pre">0.618},</span> <span class="pre">'PHE':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.74353,</span> <span class="pre">'mass':</span> <span class="pre">147.2,</span> <span class="pre">'radii':</span> <span class="pre">0.636},</span> <span class="pre">'PRO':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.678824,</span> <span class="pre">'mass':</span> <span class="pre">97.12,</span> <span class="pre">'radii':</span> <span class="pre">0.556},</span> <span class="pre">'SER':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.508236,</span> <span class="pre">'mass':</span> <span class="pre">87.08,</span> <span class="pre">'radii':</span> <span class="pre">0.518},</span> <span class="pre">'THR':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.508236,</span> <span class="pre">'mass':</span> <span class="pre">101.1,</span> <span class="pre">'radii':</span> <span class="pre">0.562},</span> <span class="pre">'TRP':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.92,</span> <span class="pre">'mass':</span> <span class="pre">186.2,</span> <span class="pre">'radii':</span> <span class="pre">0.678},</span> <span class="pre">'TYR':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.817059,</span> <span class="pre">'mass':</span> <span class="pre">163.2,</span> <span class="pre">'radii':</span> <span class="pre">0.646},</span> <span class="pre">'VAL':</span> <span class="pre">{'charge':</span> <span class="pre">0.0,</span> <span class="pre">'hps':</span> <span class="pre">0.584707,</span> <span class="pre">'mass':</span> <span class="pre">99.07,</span> <span class="pre">'radii':</span> <span class="pre">0.586},</span> <span class="pre">'bond_length':</span> <span class="pre">0.382,</span> <span class="pre">'bonded_exclusions_index':</span> <span class="pre">1}}</span></em><a class="headerlink" href="#id0" title="Permalink to this definition"></a></dt>
+<dd><p>HPS_SS = HPS-Urry with angle and torsion potential.
+eps_di is parameter control the dihedral potential. Here we implemented the (i,i+4) assignment and 1-1001-1
+mixing rule.
+torsion angle made by residue (i, i+3)
+residue (i-1) and (i+4) are preceding and succeeding residues
+1-1001-1 means:</p>
+<blockquote>
+<div><p>weight of residues (i-1), (i), (i+3) and (i+4) are 1
+weight of residues (i+1), (i+2) are 0</p>
+</div></blockquote>
+</dd></dl>
+
+</section>
+</section>
+<section id="module-hps.parameters">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-hps.parameters" title="Permalink to this heading"></a></h2>
+<p>Module defines model parameters.
+At the moment, two main models are supported:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>hps-kr</p></li>
+</ul>
+<p><a href="#id1"><span class="problematic" id="id2">*</span></a>hps-urry.</p>
+</div></blockquote>
+<p>Other model parameter can be easily defined here such as M2 from Lindorff-larsen</p>
+<p>Tesei, G., Schulze, T. K., Crehuet, R., &amp; Lindorff-larsen, K. (2021).
+Accurate model of liquid-liquid phase behaviour of intrinsically-disordered proteins from data-driven optimization of
+single-chain properties. BioRxiv, 1–9.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Quyen Vu.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  
+
+<div class="rst-versions" data-toggle="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      <span class="fa fa-book"> Read the Docs</span>
+      v: main
+      <span class="fa fa-caret-down"></span>
+    </span>
+    <div class="rst-other-versions">
+        
+        <dl>
+            <dt>Languages</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">en</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        <dl>
+            <dt>Versions</dt>
+            
+             <strong> 
+            <dd><a href="/hpsOpenMM/en/main/">main</a></dd>
+             </strong> 
+            
+        </dl>
+        
+        
+        
+        <hr/>
+        Free document hosting provided by <a href="http://www.readthedocs.org">Read the Docs</a>.
+
+    </div>
+</div>
+<script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(false);
+      });
+  </script>
+    <!-- Theme Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-XXXXXXXXXX', {
+          'anonymize_ip': false,
+      });
+    </script> 
+
+</body>
+</html>
