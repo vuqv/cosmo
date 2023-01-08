@@ -3,7 +3,7 @@
 **/*.chk
 */__pycache__/*
 */*/__pycache__/*
-docs/_build
+#docs/_build
 **/.ipynb_checkpoints/*
 **/*.xml
 **/*.iml
