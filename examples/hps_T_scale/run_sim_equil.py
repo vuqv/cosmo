@@ -55,7 +55,7 @@ else:
 End of reading parameters
 """
 
-cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, hps_scale=model, box_dimension=box_dimension)
+cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
 
 # ashbaugh force has 1 global parameter: epsilon
 """

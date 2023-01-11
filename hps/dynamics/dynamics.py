@@ -232,7 +232,7 @@ class Dynamics:
         """
 
         # Initialize model
-        self.hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, hps_scale=self.model,
+        self.hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, model=self.model,
                                               box_dimension=self.box_dimension)
         # dump topology PSF file and initial coordinate pdb file
         self.hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
