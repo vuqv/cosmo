@@ -40,7 +40,7 @@ Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
     \\lambda_{ij} = \\lambda0_{ij} - 0.08 = 0.5*(\\lambda_i+\\lambda_j) - 0.08 = 0.5(\\lambda_i -0.08 + \\lambda_j-0.08)
 
 In both version, KR and Urry, we can tune directly lambda parameter in Urry by 0.08 so we can use only one equation for
-two model (choose parameter when passing hps_scale parameter)
+two model (choose parameter when passing model parameter)
 
 Attributes
 ----------
@@ -349,6 +349,9 @@ parameters = {
 
     },
     "hps_ss": {
+        """
+        @eps_di: parameter control torsion angle.
+        """
         "bond_length": 0.382,
         "bonded_exclusions_index": 3,
         "ALA": {
@@ -491,6 +494,111 @@ parameters = {
             "hps": 0.584707,
             "eps_di": -0.75
         }
+    },
+    "mpipi": {
+        "bond_length": 0.381,
+        "bonded_exclusions_index": 2,
+        "MET": {
+            "mass": 131.20,
+            "charge": 0.0,
+            "id": 0
+        },
+        "GLY": {
+            "mass": 57.05,
+            "charge": 0.0,
+            "id": 1
+        },
+        "LYS": {
+            "mass": 128.20,
+            "charge": 0.75,
+            "id": 2
+        },
+        "THR": {
+            "mass": 101.10,
+            "charge": 0.0,
+            "id": 3
+        },
+        "ARG": {
+            "mass": 156.20,
+            "charge": 0.75,
+            "id": 4
+        },
+        "ALA": {
+            "mass": 71.08,
+            "charge": 0.0,
+            "id": 5
+        },
+        "ASP": {
+            "mass": 115.10,
+            "charge": -0.75,
+            "id": 6
+        },
+        "GLU": {
+            "mass": 129.10,
+            "charge": -0.75,
+            "id": 7
+        },
+        "TYR": {
+            "mass": 163.20,
+            "charge": 0.0,
+            "id": 8
+        },
+        "VAL": {
+            "mass": 99.07,
+            "charge": 0.0,
+            "id": 9
+        },
+        "LEU": {
+            "mass": 113.20,
+            "charge": 0.0,
+            "id": 10
+        },
+        "GLN": {
+            "mass": 128.10,
+            "charge": 0.0,
+            "id": 11
+        },
+        "TRP": {
+            "mass": 186.20,
+            "charge": 0.0,
+            "id": 12
+        },
+        "PHE": {
+            "mass": 147.20,
+            "charge": 0.0,
+            "id": 13
+        },
+        "SER": {
+            "mass": 87.08,
+            "charge": 0.0,
+            "id": 14
+        },
+        "HIS": {
+            "mass": 137.10,
+            "charge": 0.375,
+            "id": 15
+        },
+        "ASN": {
+            "mass": 114.10,
+            "charge": 0.0,
+            "id": 16
+        },
+        "PRO": {
+            "mass": 97.12,
+            "charge": 0.0,
+            "id": 17
+        },
+        "CYS": {
+            "mass": 103.10,
+            "charge": 0.0,
+            "id": 18
+        },
+        "ILE": {
+            "mass": 113.20,
+            "charge": 0.0,
+            "id": 19
+        }
+
     }
 }
 """
@@ -504,3 +612,11 @@ parameters = {
             weight of residues (i+1), (i+2) are 0
 
 """
+
+"""
+mpipi model from paper: 
+      Physics-driven coarse-grained model for biomolecular phase separation with near-quantitative accuracy.
+      Mass of residues is similar to other model.
+      id: residue id type, used in tabulated function in WF potential
+      change: all charge residues have charge +/- 0.75e, H is 0.375e. charge unit is e.
+  """

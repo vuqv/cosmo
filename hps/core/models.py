@@ -17,7 +17,7 @@ class models:
     @staticmethod
     def buildHPSModel(structure_file: str,
                       minimize: bool = False,
-                      hps_scale: str = 'hps_urry',
+                      model: str = 'hps_urry',
                       box_dimension: Any = None):
         """
         Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
@@ -44,7 +44,7 @@ class models:
             Path to the input structure file.
         minimize : boolean (False)
             If True the initial structure will undergo the energy minimization.
-        hps_scale : string [Optional, hps_urry]
+        model : string [Optional, hps_urry]
             HPS scale. There are three options correspond to two scale:
                 * 'hps_urry': using Urry scale (default).
                 * 'hps_ss': hps_urry with angle and torsion potential.
@@ -62,9 +62,10 @@ class models:
             a coarse-grained CA force field.
         """
 
+        # common for all model:
         print('Generating CA hps for structure file ' + structure_file)
         print('')
-        hps = system(structure_file, hps_scale)
+        hps = system(structure_file, model)
         print("Checking input structure file:")
 
         # Set up geometric parameters of the model
@@ -81,24 +82,25 @@ class models:
         print("Setting alpha-carbon masses to their average residue mass.")
         hps.setCAMassPerResidueType()
 
-        print("Setting alpha-carbon atoms radii to their statistical residue radius.")
-        hps.setCARadiusPerResidueType()
-
         print("Setting alpha-carbon charge to their residue charge.")
         hps.setCAChargePerResidueType()
 
-        print(f"Setting hydropathy scale to their residue, Using {hps_scale} scale.")
-        hps.setCAHPSPerResidueType()
+        # difference for each model
+        if model in ['hps_kr', 'hps_urry', 'hps_ss']:
+            print("Setting alpha-carbon atoms radii to their statistical residue radius.")
+            hps.setCARadiusPerResidueType()
 
+            print(f"Setting hydropathy scale to their residue, Using {model} scale.")
+            hps.setCAHPSPerResidueType()
+
+        elif model in ['mpipi']:
+            print(f"Setting atom type to their residue type, using {model} model.")
+            hps.setCAIDPerResidueType()
+
+        # add forces to system
+        # Common for all
         hps.getBonds()
         print('Added ' + str(hps.n_bonds) + ' bonds')
-
-        if hps_scale == "hps_ss":
-            hps.getAngles()
-            print(f'Added {hps.n_angles} angles ')
-
-            hps.getTorsions()
-            print(f'Added {hps.n_torsions} torsion angles ')
 
         print('Adding default bond force constant...')
         # measured in unit of kj/mol/nm^2 (k_bond is set to 20kcal/mol/A^2)
@@ -110,7 +112,14 @@ class models:
         hps.addHarmonicBondForces()
         print('Added Harmonic Bond Forces')
 
-        if hps_scale == "hps_ss":
+        if model == "hps_ss":
+            hps.getAngles()
+            print(f'Added {hps.n_angles} angles ')
+
+            hps.getTorsions()
+            print(f'Added {hps.n_torsions} torsion angles ')
+
+        if model == "hps_ss":
             hps.addGaussianAngleForces()
             print('Added Gaussian Angle Forces')
 
@@ -142,8 +151,12 @@ class models:
         hps.addYukawaForces(use_pbc)
         print('Added Yukawa Force')
 
-        hps.addAshbaughHatchForces(use_pbc)
-        print('Added PairWise Force')
+        if model in ['hps_kr', 'hps_urry', 'hps_ss']:
+            hps.addAshbaughHatchForces(use_pbc)
+            print('Added PairWise Force')
+        elif model in ['mpipi']:
+            hps.add_Wang_Frenkel_Forces(use_pbc)
+            print('Added Wang-Frenkel Force')
         print('')
         print('__________________________________________________________________')
 
