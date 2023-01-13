@@ -299,7 +299,13 @@ class system:
         # Add bonds to hps object
         self.n_bonds = 0
         for bond in bonds:
-            # TODO: Currently this is bond length for protein. Need to deal with system of Protein+DNA+RNA complexes.
+            """
+            TODO: Currently this is bond length for protein. Need to deal with system of Protein+DNA+RNA complexes.
+            if bond[0].name in protein_list and bond[1] in protein_list:
+                self.bonds[bond] = (bond_length_protein, None)
+            elif bond[0].name in nucleic_list and bond[1] in nucleic_list:
+                self.bonds[bond] = (bond_length_nucleic, None)
+            """
             bond_length_protein = self.bond_length_protein * openmm.unit.nanometer
             self.bonds[bond] = (bond_length_protein, None)
             self.n_bonds += 1
