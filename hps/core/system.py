@@ -834,6 +834,9 @@ class system:
         table_sigma = model_parameters.parameters[self.model]['sigma_ij']
         table_sigma_ravel = table_sigma.ravel().tolist()
 
+        table_nu = model_parameters.parameters[self.model]['nu_ij']
+        table_nu_ravel = table_nu.ravel().tolist()
+
         table_mu = model_parameters.parameters[self.model]['mu_ij']
         table_mu_ravel = table_mu.ravel().tolist()
 
@@ -845,13 +848,13 @@ class system:
 
         # eps, sigma, nu, mu, rc: load from tabular table
         """
-        Note: the original Wang-Frenkel potential has parameter \nu but I don't know why OpenMM in my local machine does
-        not understand and give NaN potential energy if \nu is parameter. In the original paper, Authors used nu=1 so
-        I explicitly set nu=1 here. 
+        Note: here we use abs function in ((rc/r)^(2*mu)-1)^(2*nu) because otherwise, nu added by parameters is float.
+        when r>rc, produces this is negative and non-integer power of float is nan.
         """
-        energy_function = 'eps * 2*(rc/sigma)^(2*mu) * (3/(2*((rc/sigma)^(2*mu)-1)))^3'
-        energy_function += '* ((sigma/r)^(2*mu)-1 )* ((rc/r)^(2*mu)-1)^2;'
+        energy_function = 'eps * 2*nu*(rc/sigma)^(2*mu) * ((2*nu+1)/(2*nu*((rc/sigma)^(2*mu)-1)))^(2*nu+1)'
+        energy_function += '* ((sigma/r)^(2*mu)-1 )* abs((rc/r)^(2*mu)-1)^(2*nu);'
         energy_function += 'eps = eps_table(id1, id2); sigma = sigma_table(id1, id2);'
+        energy_function += 'nu = nu_table(id1, id2);'
         energy_function += 'mu = mu_table(id1, id2);'
         energy_function += 'rc=rc_table(id1, id2)'
 
@@ -861,6 +864,8 @@ class system:
         self.wang_Frenkel_Force.addTabulatedFunction('sigma_table',
                                                      openmm.Discrete2DFunction(n_atom_types, n_atom_types,
                                                                                table_sigma_ravel))
+        self.wang_Frenkel_Force.addTabulatedFunction('nu_table', openmm.Discrete2DFunction(n_atom_types, n_atom_types,
+                                                                                           table_nu_ravel))
         self.wang_Frenkel_Force.addTabulatedFunction('mu_table', openmm.Discrete2DFunction(n_atom_types, n_atom_types,
                                                                                            table_mu_ravel))
         self.wang_Frenkel_Force.addTabulatedFunction('rc_table', openmm.Discrete2DFunction(n_atom_types, n_atom_types,
@@ -1094,32 +1099,26 @@ class system:
         """
 
         if self.harmonicBondForce is not None:
-            print("harmonicBondForce is not None and then Added it...")
             self.system.addForce(self.harmonicBondForce)
             self.forceGroups['Harmonic Bond Energy'] = self.harmonicBondForce
 
         if self.gaussianAngleForce is not None:
-            print("gaussianAngleForce is not None and then Added it...")
             self.system.addForce(self.gaussianAngleForce)
             self.forceGroups['Gaussian Angle Energy'] = self.gaussianAngleForce
 
         if self.gaussianTorsionForce is not None:
-            print("gaussianTorsionForce is not None and then Added it...")
             self.system.addForce(self.gaussianTorsionForce)
             self.forceGroups['Gaussian Torsion Energy'] = self.gaussianTorsionForce
 
         if self.yukawaForce is not None:
-            print("yukawaForce is not None and then Added it...")
             self.system.addForce(self.yukawaForce)
             self.forceGroups['Yukawa Energy'] = self.yukawaForce
 
         if self.ashbaugh_HatchForce is not None:
-            print("ashbaugh_HatchForce is not None and then Added it...")
             self.system.addForce(self.ashbaugh_HatchForce)
             self.forceGroups['PairWise Energy'] = self.ashbaugh_HatchForce
 
         if self.wang_Frenkel_Force is not None:
-            print("Wang-Frenkel is not None and then Added it...")
             self.system.addForce(self.wang_Frenkel_Force)
             self.forceGroups['PairWire Energy'] = self.wang_Frenkel_Force
 

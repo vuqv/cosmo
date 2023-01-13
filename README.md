@@ -17,7 +17,7 @@ OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
 
 The package is ready for studying various problems such as, conformation dynamics of single chain, LLPS ...
 
-Check out documentation for more details: [here](https://qvv5013.github.io/tools/hpsOpenMM/)
+Check out documentation for more details: [here](https://qvv5013.github.io/docs-hpsOpenMM/)
 
 -------------------------------------
 

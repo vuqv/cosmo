@@ -23,37 +23,19 @@ class models:
         Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
         initialized parameters.
 
-        Initializes a coarse-grained, carbon alpha (CA), hpsOpenMM system class
-        from a structure and a contact file defining the native contacts for the
-        coarse grained model.
-
-        The system creation steps are:
-
-        1) Add the geometrical parameters for the model.
-        2) Add the default force field parameters for the model.
-        3) Create the default force objects.
-        4) Create the OpenMM system class.
-
-        The method can be used to generate an initialized hpsOpenMM system class, that only
-        contains the geometrical parameters, by passing the option default_parameters as False.
-
-
         Parameters
         ----------
-        structure_file : string [requires]
+        structure_file : string [required]
             Path to the input structure file.
         minimize : boolean (False)
-            If True the initial structure will undergo the energy minimization.
+            If True, the initial structure will undergo energy minimization.
         model : string [Optional, hps_urry]
-            HPS scale. There are three options correspond to two scale:
-                * 'hps_urry': using Urry scale (default).
-                * 'hps_ss': hps_urry with angle and torsion potential.
-                * 'hps_kr': using Kapcha-Rossy scale.
+            HPS scale. Available options are 'hps_urry', 'hps_ss', 'hps_kr', and 'mpipi'.
         box_dimension : float or array (None)
-            If box_dimension is supplied, then will use PBC.
-            if float is given, then use cubic box
-            if an array of (3,1) is given, then use rectangular box with the given dimension
-            if not specify: do not use PBC
+            If box_dimension is supplied, a PBC will be used.
+            If a float is given, a cubic box will be used.
+            If an array of (3,1) is given, a rectangular box with the given dimension will be used.
+            If not specified, PBC will not be used.
 
         Returns
         -------
@@ -63,7 +45,7 @@ class models:
         """
 
         # common for all model:
-        print('Generating CA hps for structure file ' + structure_file)
+        print(f'Generating CA hps for structure file {structure_file}')
         print('')
         hps = system(structure_file, model)
         print("Checking input structure file:")
@@ -76,8 +58,12 @@ class models:
 
         print(f'There are {hps.n_chains} chain(s) in the input file.')
 
+        # Common for all
         hps.getAtoms()
         print('Added ' + str(hps.n_atoms) + ' CA atoms')
+
+        hps.getBonds()
+        print('Added ' + str(hps.n_bonds) + ' bonds')
 
         print("Setting alpha-carbon masses to their average residue mass.")
         hps.setCAMassPerResidueType()
@@ -98,10 +84,6 @@ class models:
             hps.setCAIDPerResidueType()
 
         # add forces to system
-        # Common for all
-        hps.getBonds()
-        print('Added ' + str(hps.n_bonds) + ' bonds')
-
         print('Adding default bond force constant:', end=' ')
         hps.setBondForceConstants()
         print('')

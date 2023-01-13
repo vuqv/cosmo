@@ -166,10 +166,17 @@ class Dynamics:
         print(f'Prefix use to write file: {self.protein_code}')
         self.checkpoint = params.get('checkpoint', self.checkpoint)
         self.device = params.get('device', self.device)
+        print(f'Running simulation on {self.device}')
+        if self.device == "CPU":
+            self.ppn = int(params.get('ppn', self.ppn))
+            print(f'Using {self.ppn} threads')
         self.restart = bool(strtobool(params.get('restart', self.restart)))
         print(f'Restart simulation: {self.restart}')
-        self.minimize = bool(strtobool(params.get('minimize', self.minimize)))
-        print(f'Perform Energy minimization of input structure: {self.minimize}')
+        if self.restart:
+            self.minimize = False
+        else:
+            self.minimize = bool(strtobool(params.get('minimize', self.minimize)))
+            print(f'Perform Energy minimization of input structure: {self.minimize}')
 
         print('__________________________________________________________________')
         """
@@ -222,6 +229,7 @@ class Dynamics:
         start_time = time.time()
         if self.restart:
             simulation.loadCheckpoint(self.checkpoint)
+            print(f"Restart simulation from step: {simulation.context.getState().getStepCount()}")
             nsteps_remain = self.md_steps - simulation.context.getState().getStepCount()
         else:
             xyz = np.array(self.hps_model.positions / unit.nanometer)
