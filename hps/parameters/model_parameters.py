@@ -50,9 +50,13 @@ parameters:
 """
 import numpy as np
 
+protein_list = ["MET", "GLY", "LYS", "THR", "ARG", "ALA", "ASP", "GLU", "TYR", "VAL", "LEU", "GLN", "TRP", "PHE", "SER",
+                "HIS", "ASN", "PRO", "CYS", "ILE"]
+nucleic_list = ["A", "C", "G", "U"]
 parameters = {
     "hps_kr": {
         "bond_length_protein": 0.38,  # nm
+        "bond_length_nucleic": 0.5,  # nm
         "bond_force_constant": 8368.0,  # kj/mol/nm^2
         "bonded_exclusions_index": 1,
         "ALA": {
@@ -227,6 +231,7 @@ parameters = {
     },
     "hps_urry": {
         "bond_length_protein": 0.382,
+        "bond_length_nucleic": 0.5,  # nm
         "bond_force_constant": 8368.0,  # kj/mol/nm^2
         "bonded_exclusions_index": 1,
         "ALA": {
@@ -353,6 +358,7 @@ parameters = {
     },
     "hps_ss": {
         "bond_length_protein": 0.382,
+        "bond_length_nucleic": 0.5,  # nm
         "bond_force_constant": 8368.0,  # kj/mol/nm^2
         "bonded_exclusions_index": 3,
         "ALA": {
