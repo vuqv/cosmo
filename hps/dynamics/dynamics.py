@@ -165,6 +165,11 @@ class Dynamics:
         self.protein_code = params['protein_code']
         print(f'Prefix use to write file: {self.protein_code}')
         self.checkpoint = params.get('checkpoint', self.checkpoint)
+        self.device = params.get('device', self.device)
+        self.restart = bool(strtobool(params.get('restart', self.restart)))
+        print(f'Restart simulation: {self.restart}')
+        self.minimize = bool(strtobool(params.get('minimize', self.minimize)))
+        print(f'Perform Energy minimization of input structure: {self.minimize}')
 
         print('__________________________________________________________________')
         """
