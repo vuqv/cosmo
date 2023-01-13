@@ -52,7 +52,7 @@ import numpy as np
 
 parameters = {
     "hps_kr": {
-        "bond_length": 0.38,  # nm
+        "bond_length_protein": 0.38,  # nm
         "bond_force_constant": 8368.0,  # kj/mol/nm^2
         "bonded_exclusions_index": 1,
         "ALA": {
@@ -226,7 +226,7 @@ parameters = {
         }
     },
     "hps_urry": {
-        "bond_length": 0.382,
+        "bond_length_protein": 0.382,
         "bond_force_constant": 8368.0,  # kj/mol/nm^2
         "bonded_exclusions_index": 1,
         "ALA": {
@@ -352,7 +352,7 @@ parameters = {
 
     },
     "hps_ss": {
-        "bond_length": 0.382,
+        "bond_length_protein": 0.382,
         "bond_force_constant": 8368.0,  # kj/mol/nm^2
         "bonded_exclusions_index": 3,
         "ALA": {
@@ -497,7 +497,8 @@ parameters = {
         }
     },
     "mpipi": {
-        "bond_length": 0.381,
+        "bond_length_protein": 0.381,
+        "bond_length_nucleic": 0.5,  # RNA
         "bond_force_constant": 8030.0,  # kj/mol/nm^2
         "bonded_exclusions_index": 0,
         "MET": {

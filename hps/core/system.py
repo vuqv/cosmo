@@ -142,7 +142,7 @@ class system:
         self.bonds = OrderedDict()
         self.bonds_indexes = []
         self.n_bonds = None
-        self.bond_length = model_parameters.parameters[model]["bond_length"]
+        self.bond_length_protein = model_parameters.parameters[model]["bond_length_protein"]
         self.bondedTo = None
         self.harmonicBondForce = None
 
@@ -299,8 +299,9 @@ class system:
         # Add bonds to hps object
         self.n_bonds = 0
         for bond in bonds:
-            bond_length = self.bond_length * openmm.unit.nanometer
-            self.bonds[bond] = (bond_length, None)
+            # TODO: Currently this is bond length for protein. Need to deal with system of Protein+DNA+RNA complexes.
+            bond_length_protein = self.bond_length_protein * openmm.unit.nanometer
+            self.bonds[bond] = (bond_length_protein, None)
             self.n_bonds += 1
 
             # Store bond indexes
