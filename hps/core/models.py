@@ -102,9 +102,8 @@ class models:
         hps.getBonds()
         print('Added ' + str(hps.n_bonds) + ' bonds')
 
-        print('Adding default bond force constant...')
-        # measured in unit of kj/mol/nm^2 (k_bond is set to 20kcal/mol/A^2)
-        hps.setBondForceConstants(8368.0)
+        print('Adding default bond force constant:', end=' ')
+        hps.setBondForceConstants()
         print('')
         print('__________________________________________________________________')
 
@@ -113,16 +112,16 @@ class models:
         print('Added Harmonic Bond Forces')
 
         if model == "hps_ss":
+            # this model has angle bonded potential.
+            # angle
             hps.getAngles()
             print(f'Added {hps.n_angles} angles ')
-
-            hps.getTorsions()
-            print(f'Added {hps.n_torsions} torsion angles ')
-
-        if model == "hps_ss":
             hps.addGaussianAngleForces()
             print('Added Gaussian Angle Forces')
 
+            # torsional
+            hps.getTorsions()
+            print(f'Added {hps.n_torsions} torsion angles ')
             hps.addGaussianTorsionForces()
             print('Add Gaussian Torsion Forces')
 

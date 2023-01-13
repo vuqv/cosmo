@@ -122,6 +122,11 @@ class Dynamics:
         """
         Read simulation control parameters from config file *.ini into class attributes.
 
+        Parameters
+        ----------
+        config_file: string, default=None
+            Control file store simulation parameters.
+
         TODO: check parameters in control file more carefully.
                 Raise error and exit immediately if something wrong.
         """
