@@ -12,36 +12,38 @@ from PeptideBuilder import Geometry
 from mdtraj.utils.rotation import rotation_matrix_from_quaternion
 
 
-def tile_universe(universe, n_x, n_y):
+def tile_universe(original_universe: mda.core.universe.Universe, num_copies_x: int,
+                  num_copies_y: int) -> mda.core.universe.Universe:
     """
-    tile universe: load universe of single chain and then make n_x*n_y copy.
+    tile universe: load universe of single chain and then make num_copies_x * num_copies_y copy.
 
     Parameters
     ----------
-    universe: Original universe which contains single chain
-    n_x: copy as x dimension
-    n_y: copy as y dimension
+    original_universe: Original universe which contains single chain
+    num_copies_x: copy as x dimension
+    num_copies_y: copy as y dimension
 
     Returns
     -------
-    new_universe: universe contains n_x*n_y chains of original chain.
+    new_universe: universe contains num_copies_x * num_copies_y chains of original chain.
 
     """
+    if num_copies_x <= 0 or num_copies_y <= 0:
+        raise ValueError("num_copies_x and num_copies_y should be greater than 0")
     chain_list = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
                   'U', 'V', 'W', 'X', 'Y', 'Z']
 
-    n_atoms = len(list(universe.atoms))
+    n_atoms = len(list(original_universe.atoms))
     print(f"number of atoms in model: {n_atoms}")
     copied = []
-    for x in range(n_x):
-        for y in range(n_y):
-            u_ = universe.copy()
-            # distance in (x,y) coordinates are 10 angstrom apart between each chain.
-            move_by = np.array([10, 10, 10]) * (x, y, 0)
-            # print(move_by)
+    for x in range(num_copies_x):
+        for y in range(num_copies_y):
+            u_ = original_universe.copy()
+            move_by = np.array([x * 10, y * 10, 0])
             u_.atoms.translate(move_by)
-            u_.add_TopologyAttr('chainID', n_atoms * [chain_list[(x * n_x + y) % len(chain_list)]])
-            u_.add_TopologyAttr('segid', [chain_list[(x * n_x + y) % len(chain_list)]])
+            chain_id = [chain_list[(x * num_copies_x + y) % len(chain_list)] for _ in range(n_atoms)]
+            u_.add_TopologyAttr('chainID', chain_id)
+            u_.add_TopologyAttr('segid', [chain_list[(x * num_copies_x + y) % len(chain_list)]])
             copied.append(u_.atoms)
 
     new_universe = mda.Merge(*copied)
@@ -51,6 +53,9 @@ def tile_universe(universe, n_x, n_y):
 
 
 def buildTemplateSingleChain(fasta):
+    """
+    Build protein structure from fasta sequence using peptidebuilder
+    """
     geo = Geometry.geometry(fasta[0])
     geo.phi = -120
     geo.psi_im1 = 150
@@ -105,8 +110,8 @@ User can change following parameters:
 seq = 'MRTQWPSPAKLNLFLYITGQRADGYHTLQTLFQFLDYGDTISIELRDDGDIRLLTPVEGVEHEDNLIVRAARLLMKTAADSGRLPTGSGANISIDKRLPMGGGLGGGSSNAATVLVALNHLWQCGLSMDELAEMGLTLGADVPVFVRGHAAFAEGVGEILTPVDPPEKWYLVAHPGVSIPTPVIFKDPELPRNTPKRSIETLLKCEFSNDCEVIARKRFREVDAVLSWLLEYAPSRLTGTGACVFAEFDTESEARQVLEQAPEWLNGFVAKGANLSPLHRAML'
 protein_name = "2ww4"
 # number of chains = nx*ny
-nx = 1
-ny = 1
+nx = 2
+ny = 2
 
 # build model structure
 print("\n")
