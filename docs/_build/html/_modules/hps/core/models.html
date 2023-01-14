@@ -115,43 +115,25 @@
 <div class="viewcode-block" id="models.buildHPSModel"><a class="viewcode-back" href="../../../modules/models.html#hps.core.models.models.buildHPSModel">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">buildHPSModel</span><span class="p">(</span><span class="n">structure_file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
                       <span class="n">minimize</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                      <span class="n">hps_scale</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hps_urry&#39;</span><span class="p">,</span>
+                      <span class="n">model</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;hps_urry&#39;</span><span class="p">,</span>
                       <span class="n">box_dimension</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default</span>
 <span class="sd">        initialized parameters.</span>
 
-<span class="sd">        Initializes a coarse-grained, carbon alpha (CA), hpsOpenMM system class</span>
-<span class="sd">        from a structure and a contact file defining the native contacts for the</span>
-<span class="sd">        coarse grained model.</span>
-
-<span class="sd">        The system creation steps are:</span>
-
-<span class="sd">        1) Add the geometrical parameters for the model.</span>
-<span class="sd">        2) Add the default force field parameters for the model.</span>
-<span class="sd">        3) Create the default force objects.</span>
-<span class="sd">        4) Create the OpenMM system class.</span>
-
-<span class="sd">        The method can be used to generate an initialized hpsOpenMM system class, that only</span>
-<span class="sd">        contains the geometrical parameters, by passing the option default_parameters as False.</span>
-
-
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        structure_file : string [requires]</span>
+<span class="sd">        structure_file : string [required]</span>
 <span class="sd">            Path to the input structure file.</span>
 <span class="sd">        minimize : boolean (False)</span>
-<span class="sd">            If True the initial structure will undergo the energy minimization.</span>
-<span class="sd">        hps_scale : string [Optional, hps_urry]</span>
-<span class="sd">            HPS scale. There are three options correspond to two scale:</span>
-<span class="sd">                * &#39;hps_urry&#39;: using Urry scale (default).</span>
-<span class="sd">                * &#39;hps_ss&#39;: hps_urry with angle and torsion potential.</span>
-<span class="sd">                * &#39;hps_kr&#39;: using Kapcha-Rossy scale.</span>
+<span class="sd">            If True, the initial structure will undergo energy minimization.</span>
+<span class="sd">        model : string [Optional, hps_urry]</span>
+<span class="sd">            HPS scale. Available options are &#39;hps_urry&#39;, &#39;hps_ss&#39;, &#39;hps_kr&#39;, and &#39;mpipi&#39;.</span>
 <span class="sd">        box_dimension : float or array (None)</span>
-<span class="sd">            If box_dimension is supplied, then will use PBC.</span>
-<span class="sd">            if float is given, then use cubic box</span>
-<span class="sd">            if an array of (3,1) is given, then use rectangular box with the given dimension</span>
-<span class="sd">            if not specify: do not use PBC</span>
+<span class="sd">            If box_dimension is supplied, a PBC will be used.</span>
+<span class="sd">            If a float is given, a cubic box will be used.</span>
+<span class="sd">            If an array of (3,1) is given, a rectangular box with the given dimension will be used.</span>
+<span class="sd">            If not specified, PBC will not be used.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -160,9 +142,10 @@
 <span class="sd">            a coarse-grained CA force field.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Generating CA hps for structure file &#39;</span> <span class="o">+</span> <span class="n">structure_file</span><span class="p">)</span>
+        <span class="c1"># common for all model:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Generating CA hps for structure file </span><span class="si">{</span><span class="n">structure_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="n">hps</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">structure_file</span><span class="p">,</span> <span class="n">hps_scale</span><span class="p">)</span>
+        <span class="n">hps</span> <span class="o">=</span> <span class="n">system</span><span class="p">(</span><span class="n">structure_file</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checking input structure file:&quot;</span><span class="p">)</span>
 
         <span class="c1"># Set up geometric parameters of the model</span>
@@ -173,34 +156,34 @@
 
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;There are </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_chains</span><span class="si">}</span><span class="s1"> chain(s) in the input file.&#39;</span><span class="p">)</span>
 
+        <span class="c1"># Common for all</span>
         <span class="n">hps</span><span class="o">.</span><span class="n">getAtoms</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">hps</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; CA atoms&#39;</span><span class="p">)</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon masses to their average residue mass.&quot;</span><span class="p">)</span>
-        <span class="n">hps</span><span class="o">.</span><span class="n">setCAMassPerResidueType</span><span class="p">()</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon atoms radii to their statistical residue radius.&quot;</span><span class="p">)</span>
-        <span class="n">hps</span><span class="o">.</span><span class="n">setCARadiusPerResidueType</span><span class="p">()</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon charge to their residue charge.&quot;</span><span class="p">)</span>
-        <span class="n">hps</span><span class="o">.</span><span class="n">setCAChargePerResidueType</span><span class="p">()</span>
-
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting hydropathy scale to their residue, Using </span><span class="si">{</span><span class="n">hps_scale</span><span class="si">}</span><span class="s2"> scale.&quot;</span><span class="p">)</span>
-        <span class="n">hps</span><span class="o">.</span><span class="n">setCAHPSPerResidueType</span><span class="p">()</span>
 
         <span class="n">hps</span><span class="o">.</span><span class="n">getBonds</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">hps</span><span class="o">.</span><span class="n">n_bonds</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39; bonds&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">hps_scale</span> <span class="o">==</span> <span class="s2">&quot;hps_ss&quot;</span><span class="p">:</span>
-            <span class="n">hps</span><span class="o">.</span><span class="n">getAngles</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_angles</span><span class="si">}</span><span class="s1"> angles &#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon masses to their average residue mass.&quot;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setCAMassPerResidueType</span><span class="p">()</span>
 
-            <span class="n">hps</span><span class="o">.</span><span class="n">getTorsions</span><span class="p">()</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_torsions</span><span class="si">}</span><span class="s1"> torsion angles &#39;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon charge to their residue charge.&quot;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setCAChargePerResidueType</span><span class="p">()</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Adding default bond force constant...&#39;</span><span class="p">)</span>
-        <span class="c1"># measured in unit of kj/mol/nm^2 (k_bond is set to 20kcal/mol/A^2)</span>
-        <span class="n">hps</span><span class="o">.</span><span class="n">setBondForceConstants</span><span class="p">(</span><span class="mf">8368.0</span><span class="p">)</span>
+        <span class="c1"># difference for each model</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;hps_kr&#39;</span><span class="p">,</span> <span class="s1">&#39;hps_urry&#39;</span><span class="p">,</span> <span class="s1">&#39;hps_ss&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setting alpha-carbon atoms radii to their statistical residue radius.&quot;</span><span class="p">)</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">setCARadiusPerResidueType</span><span class="p">()</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting hydropathy scale to their residue, Using </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2"> scale.&quot;</span><span class="p">)</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">setCAHPSPerResidueType</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="n">model</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mpipi&#39;</span><span class="p">]:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting atom type to their residue type, using </span><span class="si">{</span><span class="n">model</span><span class="si">}</span><span class="s2"> model.&quot;</span><span class="p">)</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">setCAIDPerResidueType</span><span class="p">()</span>
+
+        <span class="c1"># add forces to system</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Adding default bond force constant:&#39;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">hps</span><span class="o">.</span><span class="n">setBondForceConstants</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
 
@@ -208,10 +191,17 @@
         <span class="n">hps</span><span class="o">.</span><span class="n">addHarmonicBondForces</span><span class="p">()</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added Harmonic Bond Forces&#39;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">hps_scale</span> <span class="o">==</span> <span class="s2">&quot;hps_ss&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="o">==</span> <span class="s2">&quot;hps_ss&quot;</span><span class="p">:</span>
+            <span class="c1"># this model has angle bonded potential.</span>
+            <span class="c1"># angle</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">getAngles</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_angles</span><span class="si">}</span><span class="s1"> angles &#39;</span><span class="p">)</span>
             <span class="n">hps</span><span class="o">.</span><span class="n">addGaussianAngleForces</span><span class="p">()</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added Gaussian Angle Forces&#39;</span><span class="p">)</span>
 
+            <span class="c1"># torsional</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">getTorsions</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added </span><span class="si">{</span><span class="n">hps</span><span class="o">.</span><span class="n">n_torsions</span><span class="si">}</span><span class="s1"> torsion angles &#39;</span><span class="p">)</span>
             <span class="n">hps</span><span class="o">.</span><span class="n">addGaussianTorsionForces</span><span class="p">()</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Add Gaussian Torsion Forces&#39;</span><span class="p">)</span>
 
@@ -240,8 +230,12 @@
         <span class="n">hps</span><span class="o">.</span><span class="n">addYukawaForces</span><span class="p">(</span><span class="n">use_pbc</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added Yukawa Force&#39;</span><span class="p">)</span>
 
-        <span class="n">hps</span><span class="o">.</span><span class="n">addAshbaughHatchForces</span><span class="p">(</span><span class="n">use_pbc</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added PairWise Force&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;hps_kr&#39;</span><span class="p">,</span> <span class="s1">&#39;hps_urry&#39;</span><span class="p">,</span> <span class="s1">&#39;hps_ss&#39;</span><span class="p">]:</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">addAshbaughHatchForces</span><span class="p">(</span><span class="n">use_pbc</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added PairWise Force&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">model</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;mpipi&#39;</span><span class="p">]:</span>
+            <span class="n">hps</span><span class="o">.</span><span class="n">add_Wang_Frenkel_Forces</span><span class="p">(</span><span class="n">use_pbc</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Added Wang-Frenkel Force&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;__________________________________________________________________&#39;</span><span class="p">)</span>
 

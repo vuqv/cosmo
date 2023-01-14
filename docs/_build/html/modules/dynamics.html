@@ -106,20 +106,22 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">hps.dynamics.</span></span><span class="sig-name descname"><span class="pre">Dynamics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hps/dynamics/dynamics.html#Dynamics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.dynamics.Dynamics" title="Permalink to this definition"></a></dt>
-<dd><p>Dynamics class contains two main functions: read config file and run simulation.
-User only need to provide config file, e.g md.ini and specify parameters control simulation there.</p>
+<dd><p>The Dynamics class is used to perform molecular dynamics simulations.
+It contains two main functions: reading a configuration file and running a simulation.
+To use the class, a user needs to provide a configuration file (e.g md.ini)
+and specify the parameters that control the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config_file</strong> (<em>str</em>) – control parameters for simulation</p>
+<dd class="field-odd"><p><strong>config_file</strong> (<em>str</em>) – The path to the configuration file that contains the parameters for the simulation.</p>
 </dd>
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.md_steps">
 <span class="sig-name descname"><span class="pre">md_steps</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.md_steps" title="Permalink to this definition"></a></dt>
-<dd><p>Number of steps to perform molecular dynamics simulation</p>
+<dd><p>The number of steps to perform in the molecular dynamics simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int [1, steps]</p>
+<dd class="field-odd"><p>int, optional (default: 1000)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -127,10 +129,10 @@ User only need to provide config file, e.g md.ini and specify parameters control
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.dt">
 <span class="sig-name descname"><span class="pre">dt</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.dt" title="Permalink to this definition"></a></dt>
-<dd><p>time step for integration</p>
+<dd><p>The time step for integration in picoseconds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float [0.01, ps]</p>
+<dd class="field-odd"><p>float, optional (default: 0.01) [ps]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -138,11 +140,10 @@ User only need to provide config file, e.g md.ini and specify parameters control
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.nstxout">
 <span class="sig-name descname"><span class="pre">nstxout</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.nstxout" title="Permalink to this definition"></a></dt>
-<dd><p>number of steps that elapse between writing coordinates to output trajectory file,
-the last coordinates are always written</p>
+<dd><p>The number of steps between writing coordinates to the output trajectory file. The last coordinates are always written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int [1, steps]</p>
+<dd class="field-odd"><p>int, optional (default: 10)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -150,10 +151,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.nstlog">
 <span class="sig-name descname"><span class="pre">nstlog</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.nstlog" title="Permalink to this definition"></a></dt>
-<dd><p>number of steps that elapse between writing energies to the log file, the last energies are always written</p>
+<dd><p>The number of steps between writing energies to the log file. The last energies are always written.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int [1, steps]</p>
+<dd class="field-odd"><p>int, optional (default: 10)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -161,10 +162,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.nstcomm">
 <span class="sig-name descname"><span class="pre">nstcomm</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.nstcomm" title="Permalink to this definition"></a></dt>
-<dd><p>frequency for center of mass motion removal</p>
+<dd><p>The frequency for center of mass motion removal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int [100, steps]</p>
+<dd class="field-odd"><p>int, optional (default: 100)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -172,10 +173,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.model">
 <span class="sig-name descname"><span class="pre">model</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.model" title="Permalink to this definition"></a></dt>
-<dd><p>Hydropathy scale</p>
+<dd><p>Hydropathy scale used in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str [‘hps_urry’]</p>
+<dd class="field-odd"><p>str, optional (default: ‘hps_urry’)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -183,10 +184,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.tcoupl">
 <span class="sig-name descname"><span class="pre">tcoupl</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.tcoupl" title="Permalink to this definition"></a></dt>
-<dd><p>Using temperature coupling.</p>
+<dd><p>Indicates whether temperature coupling is used in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p>bool, optional (default: False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -194,10 +195,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.ref_t">
 <span class="sig-name descname"><span class="pre">ref_t</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.ref_t" title="Permalink to this definition"></a></dt>
-<dd><p>reference temperature for coupling</p>
+<dd><p>The reference temperature for coupling in Kelvin.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float [Kelvin]</p>
+<dd class="field-odd"><p>float, optional (default: 300.0) [K]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -205,10 +206,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.tau_t">
 <span class="sig-name descname"><span class="pre">tau_t</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.tau_t" title="Permalink to this definition"></a></dt>
-<dd><p>ime constant for temperature coupling</p>
+<dd><p>The time constant for temperature coupling in picoseconds.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float [ps]</p>
+<dd class="field-odd"><p>float, optional (default: 0.1) [ps]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -216,10 +217,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.pcoupl">
 <span class="sig-name descname"><span class="pre">pcoupl</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.pcoupl" title="Permalink to this definition"></a></dt>
-<dd><p>Pressure coupling</p>
+<dd><p>Indicates whether pressure coupling is used in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p>bool, optional (default: False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -227,10 +228,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.ref_p">
 <span class="sig-name descname"><span class="pre">ref_p</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.ref_p" title="Permalink to this definition"></a></dt>
-<dd><p>The reference pressure for coupling.</p>
+<dd><p>The reference pressure for coupling in bar.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float [bar]</p>
+<dd class="field-odd"><p>float, optional (default: 1.0) [bar]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -241,7 +242,7 @@ the last coordinates are always written</p>
 <dd><p>The frequency for coupling the pressure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int [25, steps]</p>
+<dd class="field-odd"><p>int, optional (default: 25)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -249,10 +250,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.pbc">
 <span class="sig-name descname"><span class="pre">pbc</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.pbc" title="Permalink to this definition"></a></dt>
-<dd><p>Use periodic boundary conditions.</p>
+<dd><p>Indicates whether periodic boundary conditions are used in the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p>bool, optional (default: True)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -260,10 +261,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.box_dimension">
 <span class="sig-name descname"><span class="pre">box_dimension</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.box_dimension" title="Permalink to this definition"></a></dt>
-<dd><p>Box dimension defined the unit cell, better to use rectangular for simplicity</p>
+<dd><p>The dimension of the box used in the simulation. It is better to use rectangular for simplicity.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>float or list of float</p>
+<dd class="field-odd"><p>float or list of float, optional (default: None)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -271,10 +272,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.protein_code">
 <span class="sig-name descname"><span class="pre">protein_code</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.protein_code" title="Permalink to this definition"></a></dt>
-<dd><p>Prefix to write output file based on this parameter</p>
+<dd><p>A prefix to write output files based on this parameter.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>str, optional (default: None)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -282,10 +283,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.checkpoint">
 <span class="sig-name descname"><span class="pre">checkpoint</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.checkpoint" title="Permalink to this definition"></a></dt>
-<dd><p>Checkpoint file name</p>
+<dd><p>The name of the checkpoint file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>str, optional (default: None)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -293,10 +294,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.pdb_file">
 <span class="sig-name descname"><span class="pre">pdb_file</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.pdb_file" title="Permalink to this definition"></a></dt>
-<dd><p>Input structure read to generate model.</p>
+<dd><p>The input structure used to generate the model.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>str, optional (default: None)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -304,10 +305,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.device">
 <span class="sig-name descname"><span class="pre">device</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.device" title="Permalink to this definition"></a></dt>
-<dd><p>Device to perform simulation [GPU/CPU] if CPU is used, then need to provide number of threads to run simulation.</p>
+<dd><p>The device used to perform the simulation. Options are ‘GPU’ or ‘CPU’.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
+<dd class="field-odd"><p>str, optional (default: ‘GPU’)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -315,10 +316,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.ppn">
 <span class="sig-name descname"><span class="pre">ppn</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.ppn" title="Permalink to this definition"></a></dt>
-<dd><p>In case simulation is run on CPU, use this parameter to control the number of threads to run simulation.</p>
+<dd><p>In case the simulation is run on a CPU, this parameter controls the number of threads used to run the simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>int [1, cores]</p>
+<dd class="field-odd"><p>int, optional (default: 1)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -326,10 +327,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.restart">
 <span class="sig-name descname"><span class="pre">restart</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.restart" title="Permalink to this definition"></a></dt>
-<dd><p>If simulation run from beginning or restart from checkpoint.</p>
+<dd><p>Indicates whether the simulation should be run from the beginning or restarted from a checkpoint.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool [No]</p>
+<dd class="field-odd"><p>bool, optional (default: False)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -337,11 +338,10 @@ the last coordinates are always written</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.minimize">
 <span class="sig-name descname"><span class="pre">minimize</span></span><a class="headerlink" href="#hps.dynamics.Dynamics.minimize" title="Permalink to this definition"></a></dt>
-<dd><p>If simulation run from beginning then need to perform energy minimization. If simulation restarted, this
-parameters will be override to False.</p>
+<dd><p>Indicates whether energy minimization should be performed at the start of the simulation</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>bool</p>
+<dd class="field-odd"><p>bool, optional (default: True)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -355,8 +355,12 @@ parameters will be override to False.</p>
 <dt class="sig sig-object py" id="hps.dynamics.Dynamics.read_config">
 <span class="sig-name descname"><span class="pre">read_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_file</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/hps/dynamics/dynamics.html#Dynamics.read_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#hps.dynamics.Dynamics.read_config" title="Permalink to this definition"></a></dt>
 <dd><p>Read simulation control parameters from config file <a href="#id1"><span class="problematic" id="id2">*</span></a>.ini into class attributes.</p>
-<dl class="simple">
-<dt>TODO: check parameters in control file more carefully.</dt><dd><p>Raise error and exit immediately if something wrong.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_file</strong> (<em>string</em><em>, </em><em>default=None</em>) – Control file store simulation parameters.</p></li>
+<li><p><strong>TODO</strong> (<em>check parameters in control file more carefully.</em>) – Raise error and exit immediately if something wrong.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

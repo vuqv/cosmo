@@ -16,6 +16,7 @@ from ..parameters import model_parameters
 
 class system:
     """
+
     A class for generating coarse-grained (CG) systems that can be simulated using the OpenMM interface.
     It allows for the creation of both default and custom CG systems and easy modification of their parameters.
 

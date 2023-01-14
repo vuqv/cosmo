@@ -102,14 +102,15 @@
 <span id="parameters"></span><h1>Parameters<a class="headerlink" href="#module-hps.parameters.model_parameters" title="Permalink to this heading"></a></h1>
 <p>Dictionary contains parameters for hps model.
 First level is the model name</p>
-<ul class="simple">
-<li><p>HPS-Kr scale was taken from:</p></li>
-</ul>
-<p>Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018).
+<ul>
+<li><p>HPS-Kr scale was taken from:</p>
+<blockquote>
+<div><p>Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018).
 Sequence determinants of protein phase behavior from a coarse-grained model.
 PLoS Computational Biology, 1–23.
 <a class="reference external" href="https://doi.org/10.1101/238170">https://doi.org/10.1101/238170</a></p>
-<ul class="simple">
+</div></blockquote>
+</li>
 <li><p>Parameter for Nucleic acids (KR scale):</p></li>
 </ul>
 <p>Regy, R. M., Dignon, G. L., Zheng, W., Kim, Y. C., Mittal, J. (2020).
@@ -137,7 +138,7 @@ lambda_{ij} = lambda0_{ij} - 0.08 = 0.5*(lambda_i+lambda_j) - 0.08 = 0.5(lambda_
 </dd>
 </dl>
 <p>In both version, KR and Urry, we can tune directly lambda parameter in Urry by 0.08 so we can use only one equation for
-two model (choose parameter when passing hps_scale parameter)</p>
+two model (choose parameter when passing model parameter)</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="hps.parameters.model_parameters.parameters">
 <span class="sig-prename descclassname"><span class="pre">hps.parameters.model_parameters.</span></span><span class="sig-name descname"><span class="pre">parameters</span></span><a class="headerlink" href="#hps.parameters.model_parameters.parameters" title="Permalink to this definition"></a></dt>

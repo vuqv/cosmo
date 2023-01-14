@@ -4,10 +4,10 @@ First level is the model name
 
 * HPS-Kr scale was taken from:
 
-Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018).
-Sequence determinants of protein phase behavior from a coarse-grained model.
-PLoS Computational Biology, 1–23.
-https://doi.org/10.1101/238170
+    Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018).
+    Sequence determinants of protein phase behavior from a coarse-grained model.
+    PLoS Computational Biology, 1–23.
+    https://doi.org/10.1101/238170
 
 * Parameter for Nucleic acids (KR scale):
 
