@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import numpy as np
-from openmm import unit
+import openmm.unit as unit
 
 
 class geometry:

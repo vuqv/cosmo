@@ -5,8 +5,8 @@ from distutils.util import strtobool
 from json import loads
 
 import numpy as np
-import openmm
-from openmm import unit
+import openmm as mm
+import openmm.unit as unit
 from parmed.exceptions import OpenMMWarning
 
 from ..core import models
@@ -202,30 +202,30 @@ class Dynamics:
             self.hps_model.dumpForceFieldData(f'{self.protein_code}_ff.dat')
         self.hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
         self.hps_model.dumpTopology(f'{self.protein_code}.psf')
-        self.hps_model.system.addForce(openmm.CMMotionRemover(self.nstcomm))
+        self.hps_model.system.addForce(mm.CMMotionRemover(self.nstcomm))
 
         # setup integrator and simulation object
-        integrator = openmm.LangevinIntegrator(self.ref_t, self.tau_t, self.dt)
+        integrator = mm.LangevinIntegrator(self.ref_t, self.tau_t, self.dt)
         if self.pcoupl:
             # if pressure coupling is on, add barostat force to the system.
-            barostat = openmm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
+            barostat = mm.MonteCarloBarostat(self.ref_p, self.ref_t, self.frequency_p)
             self.hps_model.system.addForce(barostat)
 
         # Setup platform to run simulation
         if self.device == 'GPU':
             # Run simulation on CUDA
             print(f"Running simulation on GPU CUDA")
-            platform = openmm.Platform.getPlatformByName('CUDA')
+            platform = mm.Platform.getPlatformByName('CUDA')
             properties = {'CudaPrecision': 'mixed', "DeviceIndex": "0"}
             # in case of many GPUs present, we can select which one to use
 
         elif self.device == 'CPU':
             print(f"Running simulation on CPU using {self.ppn} cores")
-            platform = openmm.Platform.getPlatformByName('CPU')
+            platform = mm.Platform.getPlatformByName('CPU')
             properties = {'Threads': str(self.ppn)}
 
-        simulation = openmm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
-                                           properties)
+        simulation = mm.app.Simulation(self.hps_model.topology, self.hps_model.system, integrator, platform,
+                                       properties)
         start_time = time.time()
         if self.restart:
             simulation.loadCheckpoint(self.checkpoint)
@@ -242,19 +242,19 @@ class Dynamics:
             nsteps_remain = self.md_steps
 
         simulation.reporters = []
-        simulation.reporters.append(openmm.app.CheckpointReporter(self.checkpoint, self.nstxout))
+        simulation.reporters.append(mm.app.CheckpointReporter(self.checkpoint, self.nstxout))
         simulation.reporters.append(
-            openmm.app.DCDReporter(f'{self.protein_code}.dcd', self.nstxout, enforcePeriodicBox=bool(self.pbc),
-                                   append=self.restart))
+            mm.app.DCDReporter(f'{self.protein_code}.dcd', self.nstxout, enforcePeriodicBox=bool(self.pbc),
+                               append=self.restart))
         simulation.reporters.append(
-            openmm.app.StateDataReporter(f'{self.protein_code}.log', self.nstlog, step=True, time=True,
-                                         potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
-                                         temperature=True, remainingTime=True, speed=True,
-                                         totalSteps=self.md_steps, separator='\t', append=self.restart))
+            mm.app.StateDataReporter(f'{self.protein_code}.log', self.nstlog, step=True, time=True,
+                                     potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
+                                     temperature=True, remainingTime=True, speed=True,
+                                     totalSteps=self.md_steps, separator='\t', append=self.restart))
         simulation.step(nsteps_remain)
 
         # write the last frame
         last_frame = simulation.context.getState(getPositions=True, enforcePeriodicBox=bool(self.pbc)).getPositions()
-        openmm.app.PDBFile.writeFile(self.hps_model.topology, last_frame, open(f'{self.protein_code}_final.pdb', 'w'))
+        mm.app.PDBFile.writeFile(self.hps_model.topology, last_frame, open(f'{self.protein_code}_final.pdb', 'w'))
         simulation.saveCheckpoint(self.checkpoint)
         print("--- Finished in %s seconds ---" % (time.time() - start_time))
