@@ -40,13 +40,16 @@ def stretch_func(t, B, ta):
 ##############################################################
 # first col is inverse temperature
 # second row is real data, and following rows are bootstrapping data
-data = np.loadtxt('result.dat')
+data = np.loadtxt('result_New_sinc.dat')
 t = data[:, 0]
 # T_range = np.arange(T.min(), T.max(), 1)
 fkt = data[:, 1]
 # T_range = np.arange(100, 1000, 1)
 
-kopt, kcov = curve_fit(stretch_func, t, fkt, maxfev=5000)
+# kopt, kcov = curve_fit(stretch_func, t[10:], fkt[10:], bounds=(0, [2, np.inf]), maxfev=5000)
+# cc = np.corrcoef([fkt[10:], stretch_func(t[10:], *kopt)])[0, 1] ** 2
+
+kopt, kcov = curve_fit(stretch_func, t, fkt, bounds=(0, [2, np.inf]), maxfev=5000)
 cc = np.corrcoef([fkt, stretch_func(t, *kopt)])[0, 1] ** 2
 
 fig = plt.figure(figsize=(12, 8))
@@ -66,4 +69,6 @@ plt.title(r'$\alpha$-synuclein')
 ax.legend()
 plt.xscale('log')
 plt.xlim(1, len(t))
-fig.savefig('asyn_FIT_fkt.png', dpi=600)
+plt.show()
+# fig.savefig('asyn_FIT_fkt.png', dpi=600)
+
