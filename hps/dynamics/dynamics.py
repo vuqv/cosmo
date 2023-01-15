@@ -1,3 +1,14 @@
+"""
+The Dynamics class is used to perform molecular dynamics simulations of a protein system using the
+HPS (hydrophobic-polar scale) force field. The class has a constructor that takes a configuration file as an input,
+which contains the parameters for the simulation. The class has several attributes such as the number of steps,
+the time step, the frequency for writing coordinates and energies, the hydropathy scale, the temperature and
+pressure coupling, the reference temperature and pressure, the frequency for pressure coupling, the PBC, the device,
+the number of threads, whether to restart the simulation or not, and whether to minimize energy or not.
+The class also has several methods such as reading the config file, setting up the system, running the simulation, and
+writing the output files.
+The class also uses the parmed library to handle the system and the openmm library to perform the simulations.
+"""
 import configparser
 import time
 import warnings

@@ -20,6 +20,18 @@ class models:
                       model: str = 'hps_urry',
                       box_dimension: Any = None):
         """
+        This is a method for building a coarse-grained model for a protein system
+        using the HPS (hydrophobic-polar scale) force field. The method takes as input a structure file,
+        as well as optional parameters for whether to minimize the initial structure,
+        the HPS scale to use (options include 'hps_urry', 'hps_ss', 'hps_kr', and 'mpipi'),
+        and the dimensions of the periodic boundary conditions box.
+        The method uses the hpsOpenMM system class to create an alpha-carbon only system,
+        and then sets up the geometric parameters of the model (keeping only alpha carbon atoms in the topology,
+        adding bonds and setting masses and charges of the alpha-carbon atoms based on residue type).
+        Depending on the chosen HPS scale, it also sets the radii or atom types of the alpha-carbon atoms based on
+        residue type. The method then adds bond, angle and torsional forces to the system, and uses periodic boundary
+        conditions if the box_dimension parameter is provided.
+
         Creates an alpha-carbon only :code:`hpsOpenMM` system class object with default
         initialized parameters.
 
