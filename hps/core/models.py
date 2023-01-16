@@ -148,7 +148,7 @@ class models:
             hps.addAshbaughHatchForces(use_pbc)
             print('Added PairWise Force')
         elif model in ['mpipi']:
-            hps.add_Wang_Frenkel_Forces(use_pbc)
+            hps.addWangFrenkelForces(use_pbc)
             print('Added Wang-Frenkel Force')
         print('')
         print('__________________________________________________________________')

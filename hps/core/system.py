@@ -816,7 +816,7 @@ class system:
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.ashbaugh_HatchForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
 
-    def add_Wang_Frenkel_Forces(self, use_pbc: bool):
+    def addWangFrenkelForces(self, use_pbc: bool):
         """
         MPIPI model. using TabulatedFunction for pair interaction.
         More information about TabulatedFUnction can be found here:
