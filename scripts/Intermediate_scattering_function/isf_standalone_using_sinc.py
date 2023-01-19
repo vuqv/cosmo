@@ -12,7 +12,15 @@ for ts in u.trajectory:
     position_array[ts.frame] = (protein.positions[:, 0:3])
 
 k_vec = 1 / 7.2
+"""
+position_array is 3D array. 
+0-axis: frame
+1-axis: n_atoms
+2-axis: x-y-z coordinate
+in the norm command, norm is calculated along the third dimension of position array-means sqrt(x^2+y^2+z^2) for 
+each frame-each atom.
 
+"""
 
 # @njit(fastmath=True)
 

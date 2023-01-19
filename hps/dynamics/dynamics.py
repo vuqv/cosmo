@@ -213,6 +213,11 @@ class Dynamics:
             self.hps_model.dumpForceFieldData(f'{self.protein_code}_ff.dat')
         self.hps_model.dumpStructure(f'{self.protein_code}_init.pdb')
         self.hps_model.dumpTopology(f'{self.protein_code}.psf')
+
+        # In case we want to serialize the system to inspect, use the follow functionality of openmm:
+        #  mm.XmlSerializer.serialize(system)-it may change in new version
+
+        # Remove center of mass motion
         self.hps_model.system.addForce(mm.CMMotionRemover(self.nstcomm))
 
         # setup integrator and simulation object
