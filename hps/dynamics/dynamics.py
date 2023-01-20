@@ -143,7 +143,9 @@ class Dynamics:
         self.dt = float(params.get('dt', self.dt)) * unit.picoseconds
         print(f'Setting timestep for integration of equations of motion to: {self.dt}')
         self.nstxout = int(params['nstxout'])
+        print(f'Setting number of steps to write checkpoint and coordinate: {self.nstxout}')
         self.nstlog = int(params['nstlog'])
+        print(f'Setting number of steps to write logfile: {self.nstlog}')
         self.nstcomm = int(params.get('nstcomm', self.nstcomm))
         print(f'Setting frequency of center of mass motion removal to every {self.nstcomm} steps')
         self.model = params.get('model', self.model)
