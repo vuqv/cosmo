@@ -60,7 +60,9 @@ print(f'Setting number of simulation steps to: {md_steps}')
 dt = float(params.get('dt', dt)) * unit.picoseconds
 print(f'Setting timestep for integration of equations of motion to: {dt}')
 nstxout = int(params['nstxout'])
+print(f'Setting number of steps to write checkpoint and coordinate: {nstxout}')
 nstlog = int(params['nstlog'])
+print(f'Setting number of steps to write logfile: {nstlog}')
 nstcomm = int(params.get('nstcomm', nstcomm))
 print(f'Setting frequency of center of mass motion removal to every {nstcomm} steps')
 model = params.get('model', model)
@@ -136,7 +138,7 @@ start_time = time.time()
 
 integrator = mm.LangevinIntegrator(ref_t, tau_t, dt)
 simulation = mm.app.Simulation(hps_model.topology, hps_model.system, integrator, platform,
-                                       properties)
+                               properties)
 if restart:
     simulation.loadCheckpoint(checkpoint)
     print(f"Restart simulation from step: {simulation.context.getState().getStepCount()}")
@@ -150,48 +152,18 @@ else:
     simulation.context.setPositions(hps_model.positions)
     simulation.context.setVelocitiesToTemperature(ref_t)
     nsteps_remain = md_steps
-#
-# if restart:
-#     # simulation reporter
-#     integrator = openmm.LangevinIntegrator(ref_t, tau_t, dt)
-#     simulation = openmm.app.Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
-#     simulation.loadCheckpoint(checkpoint)
-#     print(
-#         f"Restart from checkpoint, Time = {simulation.context.getState().getTime()}, Step= {simulation.context.getState().getStepCount()}")
-#     # number of steps remain to run
-#     nsteps_remain = md_steps - simulation.context.getState().getStepCount()
-#     simulation.reporters = []
-#     simulation.reporters.append(openmm.app.CheckpointReporter(checkpoint, nstxout))
-#     simulation.reporters.append(
-#         openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, enforcePeriodicBox=bool(pbc), append=True))
-#     simulation.reporters.append(
-#         openmm.app.StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
-#                                      kineticEnergy=True,
-#                                      totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-#                                      totalSteps=md_steps, separator='\t', append=True))
-#     simulation.step(nsteps_remain)
-# else:
-#     # Production phase, create new integrator and simulation context to reset number of steps
-#     integrator = openmm.LangevinIntegrator(ref_t, tau_t, dt)
-#     simulation = openmm.app.Simulation(cgModel.topology, cgModel.system, integrator, platform, properties)
-#     # Set initial positions: translate input coordinate, the coordinate is >=0
-#     xyz = np.array(cgModel.positions / unit.nanometer)
-#     xyz[:, 0] -= np.amin(xyz[:, 0])
-#     xyz[:, 1] -= np.amin(xyz[:, 1])
-#     xyz[:, 2] -= np.amin(xyz[:, 2])
-#     cgModel.positions = xyz * unit.nanometer
-#     simulation.context.setPositions(cgModel.positions)
-#     simulation.context.setVelocitiesToTemperature(ref_t)
-#     simulation.reporters = []
-#     simulation.reporters.append(openmm.app.CheckpointReporter(checkpoint, nstxout))
-#     simulation.reporters.append(
-#         openmm.app.DCDReporter(f'{protein_code}.dcd', nstxout, enforcePeriodicBox=bool(pbc), append=False))
-#     simulation.reporters.append(
-#         openmm.app.StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True, potentialEnergy=True,
-#                                      kineticEnergy=True,
-#                                      totalEnergy=True, temperature=True, remainingTime=True, speed=True,
-#                                      totalSteps=md_steps, separator='\t', append=False))
-#     simulation.step(md_steps)
+
+simulation.reporters = []
+simulation.reporters.append(mm.app.CheckpointReporter(checkpoint, nstxout))
+simulation.reporters.append(
+    mm.app.DCDReporter(f'{protein_code}.dcd', nstxout, enforcePeriodicBox=bool(pbc),
+                       append=restart))
+simulation.reporters.append(
+    mm.app.StateDataReporter(f'{protein_code}.log', nstlog, step=True, time=True,
+                             potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
+                             temperature=True, remainingTime=True, speed=True,
+                             totalSteps=md_steps, separator='\t', append=restart))
+simulation.step(nsteps_remain)
 
 # write the last frame
 last_frame = simulation.context.getState(getPositions=True, enforcePeriodicBox=bool(pbc)).getPositions()
