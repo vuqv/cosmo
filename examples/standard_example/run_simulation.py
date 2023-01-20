@@ -114,8 +114,15 @@ End of reading parameters
 
 hps_model = hps.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
 
+# Remove center of mass motion
+hps_model.system.addForce(mm.CMMotionRemover(nstcomm))
+
 # dump Forcefield File
-hps_model.dumpForceFieldData('forcefield.dat')
+if model in ['hps_kr', 'hps_urry', 'hps_ss']:
+    """ current dumpForceFieldData function can only write the standard format of forcefield which require
+     sigma, epsilon for each residue.
+    """
+    hps_model.dumpForceFieldData(f'{protein_code}_ff.dat')
 # dump Structure into PDB file for visualize
 hps_model.dumpStructure(f'{protein_code}_init.pdb')
 hps_model.dumpTopology(f'{protein_code}.psf')
