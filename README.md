@@ -7,13 +7,23 @@ OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
 
 
 
-`hps:` hydropathy scale. Currently, there are three models are supported:
+`hps:` hydropathy scale. Currently, there are four models are supported:
 
 1) `hps_urry:` Hydropathy according to Urry scale (default, Recommended).
 2) `hps_kr:`  Kapcha-Rossy scale.
    This model has parameters for nucleic acids and post-translational modification residues.
 3) `hps_ss:` `hps_urry` with bonded potential.  
+4) `mpipi`: another model that using Wang-Frenkel short range potential instead of LJ 12-6
 4) other models can be easily implemented by defining them in `hps/parameters/model_parameters.py`
+
+Model summary
+-------------
+| Model      | component support                     | Implemented             | Tested          |
+|------------|---------------------------------------|-------------------------|-----------------|
+| `hps_kr`   | protein, RNA, phosphorylation protein | protein, p-protein, RNA | protein |
+| `hps_urry` | protein, DNA                          | protein                 | protein |
+| `hps_ss`   | protein                               | protein                 | protein |
+| `mpipi`    | protein, RNA                          | protein                 | protein |
 
 The package is ready for studying various problems such as, conformation dynamics of single chain, LLPS ...
 
