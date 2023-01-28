@@ -853,7 +853,7 @@ class system:
         Note: here we use abs function in ((rc/r)^(2*mu)-1)^(2*nu) because otherwise, nu added by parameters is float.
         when r>rc, produces this is negative and non-integer power of float is nan.
         """
-        energy_function = 'eps * 2*nu*(rc/sigma)^(2*mu) * ((2*nu+1)/(2*nu*((rc/sigma)^(2*mu)-1)))^(2*nu+1)'
+        energy_function = 'step(rc-r) * eps * 2*nu*(rc/sigma)^(2*mu) * ((2*nu+1)/(2*nu*((rc/sigma)^(2*mu)-1)))^(2*nu+1)'
         energy_function += '* ((sigma/r)^(2*mu)-1 )* abs((rc/r)^(2*mu)-1)^(2*nu);'
         energy_function += 'eps = eps_table(id1, id2); sigma = sigma_table(id1, id2);'
         energy_function += 'nu = nu_table(id1, id2);'
