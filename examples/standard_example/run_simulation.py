@@ -194,4 +194,5 @@ def main():
 
 
 if __name__ == '__main__':
+    print(f"OpenMM version: {mm.__version__}")
     main()
