@@ -451,7 +451,7 @@ class system:
         None
         """
         bond_force_constant = model_parameters.parameters[self.model]["bond_force_constant"]
-        print(f"bond_force_constant: {bond_force_constant}")
+        print(f"bond_force_constant: {bond_force_constant} kj/mol/nm^2")
 
         system._setParameters(self.bonds, bond_force_constant)
 
@@ -703,6 +703,7 @@ class system:
         -------
         None
         """
+        print("Setting Coulomb interaction ...")
         # currently, just use debye-length at [NaCl]=100mM
         lD = 1.0 * unit.nanometer
         electric_factor = 138.935458 * unit.kilojoule_per_mole * unit.nanometer / unit.elementary_charge ** 2
@@ -716,10 +717,13 @@ class system:
         self.yukawaForce.addGlobalParameter('lD', lD)
         self.yukawaForce.addPerParticleParameter('charge')
         if use_pbc:
+            print("Set cutoff Periodic ...")
             self.yukawaForce.setNonbondedMethod(mm.NonbondedForce.CutoffPeriodic)
         else:
+            print("Set cutoff NonPeriodic ...")
             self.yukawaForce.setNonbondedMethod(mm.NonbondedForce.CutoffNonPeriodic)
 
+        print(f"Use cutoff distance: {yukawa_cutoff}")
         self.yukawaForce.setCutoffDistance(yukawa_cutoff)
 
         if isinstance(self.particles_charge, float):
@@ -782,6 +786,7 @@ class system:
         -------
         None
         """
+        print("Setting PairWise interaction ...")
         epsilon = 0.8368 * unit.kilojoule_per_mole
         ashbaugh_Hatch_cutoff = 2.0 * unit.nanometer
 
@@ -796,10 +801,13 @@ class system:
         self.ashbaugh_HatchForce.addPerParticleParameter('hps')
         #
         if use_pbc:
+            print("Set cutoff Periodic ...")
             self.ashbaugh_HatchForce.setNonbondedMethod(mm.NonbondedForce.CutoffPeriodic)
         else:
+            print("Set cutoff NonPeriodic ...")
             self.ashbaugh_HatchForce.setNonbondedMethod(mm.NonbondedForce.CutoffNonPeriodic)
 
+        print(f"Use cutoff distance: {ashbaugh_Hatch_cutoff}")
         self.ashbaugh_HatchForce.setCutoffDistance(ashbaugh_Hatch_cutoff)
 
         if isinstance(self.rf_sigma, float):
@@ -822,6 +830,8 @@ class system:
         More information about TabulatedFUnction can be found here:
         http://docs.openmm.org/7.2.0/api-c++/generated/OpenMM.Discrete2DFunction.html
         """
+        print("Setting PairWise interaction ...")
+        print("Cutoff for Wang-Frenkel potential is 3\u03C3")
         wang_frenkel_cutoff = 2.5 * unit.nanometer
 
         """

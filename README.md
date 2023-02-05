@@ -3,7 +3,7 @@
 -------------------------------------
 ### A coarse-grained simulation engine empowered by openMM
 
-OpenMM codebase for IDP which uses HPS-Urry/HPS-KR force field
+OpenMM codebase for IDPs simulation using hydropathy scale.
 
 
 

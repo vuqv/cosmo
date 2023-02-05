@@ -132,6 +132,7 @@ class Dynamics:
            TODO: check parameters in control file more carefully.
                    Raise error and exit immediately if something wrong.
            """
+        print('__________________________________________________________________')
         print(f"OpenMM version: {mm.__version__}")
         print(f"Reading simulation parameters from {config_file} file...")
         config = configparser.ConfigParser()

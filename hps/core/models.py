@@ -57,13 +57,15 @@ class models:
         """
 
         # common for all model:
-        print(f'Generating CA hps for structure file {structure_file}')
+        print(f'Generating CA-hps model for structure from file {structure_file}')
         print('')
         hps = system(structure_file, model)
-        print("Checking input structure file:")
+        print("Checking input structure file ...")
+        print("Be sure that you do not have missing residues in the initial structure. At the moment, I will not take "
+              "care of that")
 
         # Set up geometric parameters of the model
-        print('Setting up geometrical parameters:')
+        print('Setting up geometrical parameters ...')
         print('__________________________________________________________________')
         print('Keeping only alpha carbon atoms in topology')
         hps.getCAlphaOnly()
@@ -104,6 +106,7 @@ class models:
         print('Adding Forces:')
         hps.addHarmonicBondForces()
         print('Added Harmonic Bond Forces')
+        print("---")
 
         if model == "hps_ss":
             # this model has angle bonded potential.
@@ -112,12 +115,14 @@ class models:
             print(f'Added {hps.n_angles} angles ')
             hps.addGaussianAngleForces()
             print('Added Gaussian Angle Forces')
+            print("---")
 
             # torsional
             hps.getTorsions()
             print(f'Added {hps.n_torsions} torsion angles ')
             hps.addGaussianTorsionForces()
             print('Add Gaussian Torsion Forces')
+            print("---")
 
         if box_dimension:
             use_pbc = True
@@ -143,13 +148,16 @@ class models:
 
         hps.addYukawaForces(use_pbc)
         print('Added Yukawa Force')
+        print("---")
 
         if model in ['hps_kr', 'hps_urry', 'hps_ss']:
             hps.addAshbaughHatchForces(use_pbc)
             print('Added PairWise Force')
+            print("---")
         elif model in ['mpipi']:
             hps.addWangFrenkelForces(use_pbc)
             print('Added Wang-Frenkel Force')
+            print("---")
         print('')
         print('__________________________________________________________________')
 
