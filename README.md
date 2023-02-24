@@ -27,14 +27,19 @@ Model summary
 
 The package is ready for studying various problems such as, conformation dynamics of single chain, LLPS ...
 
-Check out documentation for more details: [here](https://qvv5013.github.io/docs-hpsOpenMM/)
+Checkout documentation for more details: [here](https://qvv5013.github.io/docs-hpsOpenMM/). 
+A simple example can be found [here](https://qvv5013.github.io/posts/openMM/hpsOpenMM_tutorial.html).
 
 -------------------------------------
 
 ## Requirements:
 
-- **OpenMM 7.7** (select cuda version that compatible with your nvidia driver)
+- **OpenMM >=7.7<sup>a</sup>** (select cuda version that compatible with your nvidia driver)
 - **Parmed**
+---
+<sup>a</sup>: function `getStepCount()` does not work as expected (or is not implemented in earlier version) in versions.
+This function is necessary when restarting simulations.
+
 
 ## How to use hpsOpenMM:
 
