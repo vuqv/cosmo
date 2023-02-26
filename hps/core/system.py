@@ -7,7 +7,7 @@ import numpy as np
 import openmm as mm
 import openmm.unit as unit
 import parmed as pmd
-
+import warnings
 from ..parameters import model_parameters
 
 
@@ -184,6 +184,17 @@ class system:
         creating alpha-carbon (CA) coarse-grained models.
 
         Keeps in the :code:`hps system` only the alpha carbon atoms from the :code:`OpenMM topology`.
+
+        @TODO:
+        check for residues indices are consecutive:
+
+        # psedo-code
+        np_indices = np.array(atom_indices)
+        if len(np_indices) > 1:
+            if (np_indices[1:] - np_indices[:-1]) SOME_CONDITION_TO_CHECK_FOR_CONSECUTIVE:
+                warnings.warn('atom indices are not monotonically increasing')
+            if len(np.unique(np_indices)) < len(np_indices):
+                warnings.warn('atom_indices are not unique')
 
         Parameters
         ----------
