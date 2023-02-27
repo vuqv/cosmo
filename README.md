@@ -18,8 +18,8 @@ OpenMM codebase for IDPs simulation using hydropathy scale.
 
 Model summary
 -------------
-| Model      | component support                     | Implemented             | Tested          |
-|------------|---------------------------------------|-------------------------|-----------------|
+| Model      | components support                    | Implemented             | Tested  |
+|------------|---------------------------------------|-------------------------|---------|
 | `hps_kr`   | protein, RNA, phosphorylation protein | protein, p-protein, RNA | protein |
 | `hps_urry` | protein, DNA                          | protein                 | protein |
 | `hps_ss`   | protein                               | protein                 | protein |
@@ -34,12 +34,13 @@ A simple example can be found [here](https://qvv5013.github.io/posts/openMM/hpsO
 
 ## Requirements:
 
-- **OpenMM >=7.7<sup>a</sup>** (select cuda version that compatible with your nvidia driver)
+- **OpenMM >=7.7<sup>a,b</sup>** (select cuda version that compatible with your nvidia driver)
 - **Parmed**
 ---
-<sup>a</sup>: function `getStepCount()` does not work as expected (or is not implemented in earlier version) in versions.
+<sup>a</sup>: function `getStepCount()` does not work as expected (or is not implemented in versions earlier than 7.7).
 This function is necessary when restarting simulations.
 
+<sup>b</sup>: I recommend to upgrade to openMM 8.0 for better performance.
 
 ## How to use hpsOpenMM:
 
