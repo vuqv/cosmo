@@ -51,7 +51,7 @@ parameters:
 import numpy as np
 
 protein_list = ["MET", "GLY", "LYS", "THR", "ARG", "ALA", "ASP", "GLU", "TYR", "VAL", "LEU", "GLN", "TRP", "PHE", "SER",
-                "HIS", "ASN", "PRO", "CYS", "ILE"]
+                "HIS", "ASN", "PRO", "CYS", "ILE", "ALY", "SEP", "TPO", "PTR"]
 nucleic_list = ["A", "C", "G", "U"]
 parameters = {
     "hps_kr": {

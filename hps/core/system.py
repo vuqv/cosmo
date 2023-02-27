@@ -992,7 +992,7 @@ class system:
                     r2 = b[1].residue.name + '_' + str(b[1].residue.id)
                     print('of residues: ' + r1 + ' and ' + r2 + ', respectively.')
                 raise ValueError('The bond distance between them ' + str(self.bonds[b][0]) +
-                                 'nm is larger than ' + str(threshold) + ' nm. Please check your input structure.')
+                                 'is larger than ' + str(threshold) + '. Please check your input structure.')
             # else:
         print(f'All bonds seem to be OK (less than threshold: {threshold})')
         print('')

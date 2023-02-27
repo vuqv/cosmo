@@ -96,11 +96,12 @@ We would like to thank:
 
 - OpenMM team for developing an excellent and open source engine.
 - SBMOpenMM's developer team for developing an excellent model and open sourcing the software.
-- Sugita's group for making a clear tutorial to introduce many features of OpenMM
-- OpenMM Github community for many useful discussions
+- Sugita's group for making a clear tutorial to introduce many features of OpenMM.
+- OpenMM Github community for many useful discussions.
+- Group of Prof. Jeetain Mittal for the model parameters.
 
 ## Do you want to cite this work?
-
-Vu, Quyen. (2022). hpsOpenMM (1.2). Zenodo. https://doi.org/10.5281/zenodo.6976690
+- Original works from group of Prof. Jeetain Mittal
+- Vu, Quyen. (2022). hpsOpenMM (1.2). Zenodo. https://doi.org/10.5281/zenodo.6976690
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6976690.svg)](https://doi.org/10.5281/zenodo.6976690)
