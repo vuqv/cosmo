@@ -969,6 +969,9 @@ class system:
         Searches for large bond distances for the atom pairs defined in
         the 'bonds' attribute. It raises an error when large bonds are found.
 
+        //TODO: threshold=0.5 is a safe threshold in protein system.
+        In the presence of RNA, the equilibrium bond is set to 0.5 then will raise error there.
+
         Parameters
         ----------
         threshold : (float, default=0.5 nm)
@@ -978,7 +981,7 @@ class system:
         -------
         None
         """
-        print('Checking large bonds ...')
+        print('Checking large bonds in constructed model ...')
         if isinstance(threshold, float):
             threshold = threshold * unit.nanometer
 
@@ -992,7 +995,8 @@ class system:
                     r2 = b[1].residue.name + '_' + str(b[1].residue.id)
                     print('of residues: ' + r1 + ' and ' + r2 + ', respectively.')
                 raise ValueError('The bond distance between them ' + str(self.bonds[b][0]) +
-                                 'is larger than ' + str(threshold) + '. Please check your input structure.')
+                                 'is larger than ' + str(threshold) + '. This error is caused when building model. '
+                                                                      'Please report the error to the maintainer!')
             # else:
         print(f'All bonds seem to be OK (less than threshold: {threshold})')
         print('')

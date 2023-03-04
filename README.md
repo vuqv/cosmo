@@ -45,21 +45,23 @@ This function is necessary when restarting simulations.
 ## How to use hpsOpenMM:
 
 #### Linux:
-The main requirements is openMM 7.7
-For my specific case, I don't know why I can not install openMM 7.7 with python version < 3.10
-For that reason, I will create a virtual environment with Python 3.10 and then install openMM 7.7.
+The main requirements is `openMM >= 7.7`. Other packages are requires as well (see `requirements.txt`)
 
-- Create conda environment: `conda create -n hpsOpenMM python=3.10`
-- activate `hpsOpenMM` env : `conda activate hpsOpenMM`
-- Install openMM 7.7: `conda install openmm=7.7 cudatoolkit=10.2`
-  (Note that cudatoolkit=10.2 for plgrid, 11.6 for masli6)
-- Download folder and place in target location, for example: `PATH_TO_CODE/hpsOpenMM/`
+- Create conda environment: `conda create -n hpsopenmm python=3.10`
+- activate `hpsOpenMM` env : `conda activate hpsopenmm`
+- Install openMM 7.7: `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
+  * conda will try to install the lastest version of cudatoolkit and 
+  sometime it will not work. </br> You should select version that is compatible with your nvidia-driver (if you have NVIDIA GPU)
+- Download folder and place in target location, for example: </br>`PATH_TO_CODE/hpsOpenMM/`
 - Add hps module in Python path so that Python know what `hps` is (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`
-- The standard example can be found at `example/standard_example`
+#### Example:
+- The standard example can be found at `example/standard_example`. 
+You will need a control parameter file (e.g `md.ini`). Check [here](https://qvv5013.github.io/docs-hpsOpenMM/usage/simulation_control.html) for more information. 
+
 - Run simulation: 
   - I give you two options to perform simulations:
     * First option:
-      - goto example folder, e.g examples/standard_example/: 
+      - goto example folder, e.g `examples/standard_example/`: 
       - edit simulation config file: `md.ini`
       - execute command: `python run_simulation.py -f md.ini`
     * Second option:
@@ -95,10 +97,10 @@ For that reason, I will create a virtual environment with Python 3.10 and then i
 
 We would like to thank:
 
-- OpenMM team for developing an excellent and open source engine.
-- SBMOpenMM's developer team for developing an excellent model and open sourcing the software.
+- `openMM` team for developing an excellent and open source engine.
+- `SBMOpenMM's` developer team for developing an excellent model and open sourcing the software.
 - Sugita's group for making a clear tutorial to introduce many features of OpenMM.
-- OpenMM Github community for many useful discussions.
+- `openMM` Github community for many useful discussions.
 - Group of Prof. Jeetain Mittal for the model parameters.
 
 ## Do you want to cite this work?
