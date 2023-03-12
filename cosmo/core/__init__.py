@@ -1,7 +1,7 @@
 """
-core package of the hpsOpenMM package that contains the main hpsOpenMM classes.
+core package of the hpsOpenMM package that contains the main cosmo classes.
 
-The hpsOpenMM.core package contains the three hpsOpenMM main classes:
+The cosmo.core package contains the three hpsOpenMM main classes:
 
     1. geometry
 
@@ -16,7 +16,7 @@ The final class, system, is the main class that holds all the methods to define,
 with OpenMM.
 
 """
-
+__all__ = ['system', 'models']
 from .geometry import geometry
 from .models import models
 from .system import system

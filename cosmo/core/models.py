@@ -8,7 +8,7 @@ from .system import system
 
 class models:
     """
-    A class to hold functions for the automated generation of default hps models.
+    A class to hold functions for the automated generation of default cosmo models.
 
     Methods
     -------
@@ -51,15 +51,15 @@ class models:
 
         Returns
         -------
-        hps : :code:`hpsOpenMM.system`
+        cosmo : :code:`hpsOpenMM.system`
             Initialized hpsOpenMM.system class with default options for defining
             a coarse-grained CA force field.
         """
 
         # common for all model:
-        print(f'Generating CA-hps model for structure from file {structure_file}')
+        print(f'Generating CA coarse-grained model for structure from file {structure_file}')
         print('')
-        hps = system(structure_file, model)
+        cosmo_model = system(structure_file, model)
         print("Checking input structure file ...")
         print("Be sure that you do not have missing residues in the initial structure. At the moment, I will not take "
               "care of that")
@@ -68,59 +68,59 @@ class models:
         print('Setting up geometrical parameters ...')
         print('__________________________________________________________________')
         print('Keeping only alpha carbon atoms in topology')
-        hps.getCAlphaOnly()
+        cosmo_model.getCAlphaOnly()
 
-        print(f'There are {hps.n_chains} chain(s) in the input file.')
+        print(f'There are {cosmo_model.n_chains} chain(s) in the input file.')
 
         # Common for all
-        hps.getAtoms()
-        print('Added ' + str(hps.n_atoms) + ' CA atoms')
+        cosmo_model.getAtoms()
+        print('Added ' + str(cosmo_model.n_atoms) + ' CA atoms')
 
-        hps.getBonds()
-        print('Added ' + str(hps.n_bonds) + ' bonds')
+        cosmo_model.getBonds()
+        print('Added ' + str(cosmo_model.n_bonds) + ' bonds')
 
         print("Setting alpha-carbon masses to their average residue mass.")
-        hps.setCAMassPerResidueType()
+        cosmo_model.setCAMassPerResidueType()
 
         print("Setting alpha-carbon charge to their residue charge.")
-        hps.setCAChargePerResidueType()
+        cosmo_model.setCAChargePerResidueType()
 
         # difference for each model
         if model in ['hps_kr', 'hps_urry', 'hps_ss']:
             print("Setting alpha-carbon atoms radii to their statistical residue radius.")
-            hps.setCARadiusPerResidueType()
+            cosmo_model.setCARadiusPerResidueType()
 
             print(f"Setting hydropathy scale to their residue, Using {model} scale.")
-            hps.setCAHPSPerResidueType()
+            cosmo_model.setCAHPSPerResidueType()
 
         elif model in ['mpipi']:
             print(f"Setting atom type to their residue type, using {model} model.")
-            hps.setCAIDPerResidueType()
+            cosmo_model.setCAIDPerResidueType()
 
         # add forces to system
         print('Adding default bond force constant:', end=' ')
-        hps.setBondForceConstants()
+        cosmo_model.setBondForceConstants()
         print('')
         print('__________________________________________________________________')
 
         print('Adding Forces:')
-        hps.addHarmonicBondForces()
+        cosmo_model.addHarmonicBondForces()
         print('Added Harmonic Bond Forces')
         print("---")
 
         if model == "hps_ss":
             # this model has angle bonded potential.
             # angle
-            hps.getAngles()
-            print(f'Added {hps.n_angles} angles ')
-            hps.addGaussianAngleForces()
+            cosmo_model.getAngles()
+            print(f'Added {cosmo_model.n_angles} angles ')
+            cosmo_model.addGaussianAngleForces()
             print('Added Gaussian Angle Forces')
             print("---")
 
             # torsional
-            hps.getTorsions()
-            print(f'Added {hps.n_torsions} torsion angles ')
-            hps.addGaussianTorsionForces()
+            cosmo_model.getTorsions()
+            print(f'Added {cosmo_model.n_torsions} torsion angles ')
+            cosmo_model.addGaussianTorsionForces()
             print('Add Gaussian Torsion Forces')
             print("---")
 
@@ -132,30 +132,30 @@ class models:
                 one variable.
                 Rectangular box, given parameter is array of three number
                 """
-                hps.topology.setPeriodicBoxVectors(
+                cosmo_model.topology.setPeriodicBoxVectors(
                     ((box_dimension[0], 0, 0), (0, box_dimension[1], 0), (0, 0, box_dimension[2])))
             else:
                 # cubic box, given parameter is single float
-                hps.topology.setPeriodicBoxVectors(
+                cosmo_model.topology.setPeriodicBoxVectors(
                     ((box_dimension, 0, 0), (0, box_dimension, 0), (0, 0, box_dimension)))
 
-            unit_cell = hps.topology.getPeriodicBoxVectors()
+            unit_cell = cosmo_model.topology.getPeriodicBoxVectors()
             # use this to write coordinate in PBC box. requires 3 numbers, unzip to 3
-            hps.system.setDefaultPeriodicBoxVectors(*unit_cell)
+            cosmo_model.system.setDefaultPeriodicBoxVectors(*unit_cell)
 
         else:
             use_pbc = False
 
-        hps.addYukawaForces(use_pbc)
+        cosmo_model.addYukawaForces(use_pbc)
         print('Added Yukawa Force')
         print("---")
 
         if model in ['hps_kr', 'hps_urry', 'hps_ss']:
-            hps.addAshbaughHatchForces(use_pbc)
+            cosmo_model.addAshbaughHatchForces(use_pbc)
             print('Added PairWise Force')
             print("---")
         elif model in ['mpipi']:
-            hps.addWangFrenkelForces(use_pbc)
+            cosmo_model.addWangFrenkelForces(use_pbc)
             print('Added Wang-Frenkel Force')
             print("---")
         print('')
@@ -165,8 +165,8 @@ class models:
 
         print('Creating System Object:')
         # print('______________________')
-        hps.createSystemObject(minimize=minimize, check_bond_distances=True)
-        print('OpenMM system Object created')
+        cosmo_model.createSystemObject(minimize=minimize, check_bond_distances=True)
+        print('cosmo system Object created')
         print('')
 
-        return hps
+        return cosmo_model

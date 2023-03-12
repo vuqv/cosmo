@@ -4,7 +4,7 @@
 from openmm.app.statedatareporter import StateDataReporter
 from openmm import unit
 
-from hps.core import system
+from cosmo.core import system
 
 
 class hpsReporter(StateDataReporter):

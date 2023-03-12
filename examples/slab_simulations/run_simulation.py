@@ -12,7 +12,7 @@ from openmm import *
 from openmm.app import *
 from parmed.exceptions import OpenMMWarning
 
-import hps
+import cosmo
 
 warnings.filterwarnings("ignore", category=OpenMMWarning)
 
@@ -54,7 +54,7 @@ else:
 End of reading parameters
 """
 
-cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
+cgModel = cosmo.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

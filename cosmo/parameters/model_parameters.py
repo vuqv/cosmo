@@ -1,5 +1,5 @@
 """
-Dictionary contains parameters for hps model.
+Dictionary contains parameters for cosmo model.
 First level is the model name
 
 * HPS-Kr scale was taken from:
@@ -23,7 +23,7 @@ A predictive coarse-grained model for position-specific effects of post-translat
 Biophysical Journal, 120(7), 1187–1197.
 https://doi.org/10.1016/j.bpj.2021.01.034
 
-Note on hps (lambda) in urry scale:
+Note on cosmo (lambda) in urry scale:
 -----------------------------------
 
 # These parameters were shifted by 0.08 from original parameters directly.
@@ -63,170 +63,170 @@ parameters = {
             "mass": 71.08,
             "radii": 0.504,
             "charge": 0.0,
-            "hps": 0.730
+            "cosmo": 0.730
         },
         "ARG": {
             "mass": 156.20,
             "radii": 0.656,
             "charge": 1.0,
-            "hps": 0.000
+            "cosmo": 0.000
         },
         "ASN": {
             "mass": 114.10,
             "radii": 0.568,
             "charge": 0.0,
-            "hps": 0.432
+            "cosmo": 0.432
         },
         "ASP": {
             "mass": 115.10,
             "radii": 0.558,
             "charge": -1.0,
-            "hps": 0.378
+            "cosmo": 0.378
         },
         "CYS": {
             "mass": 103.10,
             "radii": 0.548,
             "charge": 0.0,
-            "hps": 0.595
+            "cosmo": 0.595
         },
         "GLU": {
             "mass": 129.10,
             "radii": 0.592,
             "charge": -1.0,
-            "hps": 0.459
+            "cosmo": 0.459
         },
         "GLN": {
             "mass": 128.10,
             "radii": 0.602,
             "charge": 0.0,
-            "hps": 0.514
+            "cosmo": 0.514
         },
         "GLY": {
             "mass": 57.05,
             "radii": 0.450,
             "charge": 0.0,
-            "hps": 0.649
+            "cosmo": 0.649
         },
         "HIS": {
             "mass": 137.10,
             "radii": 0.608,
             "charge": 0.5,
-            "hps": 0.514
+            "cosmo": 0.514
         },
         "ILE": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.973
+            "cosmo": 0.973
         },
         "LEU": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.973
+            "cosmo": 0.973
         },
         "LYS": {
             "mass": 128.20,
             "radii": 0.636,
             "charge": 1.0,
-            "hps": 0.514
+            "cosmo": 0.514
         },
         "ALY": {
             "mass": 170.20,
             "radii": 0.681,
             "charge": 0.0,
-            "hps": 0.7567
+            "cosmo": 0.7567
         },  # N-epsilon acetyllysine
         "MET": {
             "mass": 131.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.838
+            "cosmo": 0.838
         },
         "PHE": {
             "mass": 147.20,
             "radii": 0.636,
             "charge": 0.0,
-            "hps": 1.000
+            "cosmo": 1.000
         },
         "PRO": {
             "mass": 97.12,
             "radii": 0.556,
             "charge": 0.0,
-            "hps": 1.000
+            "cosmo": 1.000
         },
         "SER": {
             "mass": 87.08,
             "radii": 0.518,
             "charge": 0.0,
-            "hps": 0.595
+            "cosmo": 0.595
         },
         "SEP": {
             "mass": 165.03,
             "radii": 0.636,
             "charge": -2.0,
-            "hps": 0.162
+            "cosmo": 0.162
         },  # phosposerine: phosphorylation of serine
         "THR": {
             "mass": 101.10,
             "radii": 0.562,
             "charge": 0.0,
-            "hps": 0.676
+            "cosmo": 0.676
         },
         "TPO": {
             "mass": 179.05,
             "radii": 0.662,
             "charge": -2.0,
-            "hps": 0.0081
+            "cosmo": 0.0081
         },  # Phosphothreonine:  phosphorylation of Threonine
         "TRP": {
             "mass": 186.20,
             "radii": 0.678,
             "charge": 0.0,
-            "hps": 0.946
+            "cosmo": 0.946
         },
         "TYR": {
             "mass": 163.20,
             "radii": 0.646,
             "charge": 0.0,
-            "hps": 0.865
+            "cosmo": 0.865
         },
         "PTR": {
             "mass": 241.15,
             "radii": 0.738,
             "charge": -2.0,
-            "hps": 0.189
+            "cosmo": 0.189
         },  # phosphotyrosine
         "VAL": {
             "mass": 99.07,
             "radii": 0.586,
             "charge": 0.0,
-            "hps": 0.892
+            "cosmo": 0.892
         },
         # Parameters for RNA (KR scale from OPLS-AA forcefield)
         "A": {
             "mass": 329.20,
             "radii": 0.844,
             "charge": -1.0,
-            "hps": -0.054
+            "cosmo": -0.054
         },
         "C": {
             "mass": 305.2,
             "radii": 0.822,
             "charge": -1.0,
-            "hps": -0.027
+            "cosmo": -0.027
         },
         "G": {
             "mass": 345.2,
             "radii": 0.851,
             "charge": -1.0,
-            "hps": -0.189,
+            "cosmo": -0.189,
         },
         "U": {
             "mass": 306.2,
             "radii": 0.817,
             "charge": -1.0,
-            "hps": -0.027
+            "cosmo": -0.027
         }
     },
     "hps_urry": {
@@ -238,121 +238,121 @@ parameters = {
             "mass": 71.08,
             "radii": 0.504,
             "charge": 0.0,
-            "hps": 0.522942
+            "cosmo": 0.522942
         },
         "ARG": {
             "mass": 156.20,
             "radii": 0.656,
             "charge": 1.0,
-            "hps": 0.478824
+            "cosmo": 0.478824
         },
         "ASN": {
             "mass": 114.10,
             "radii": 0.568,
             "charge": 0.0,
-            "hps": 0.508236
+            "cosmo": 0.508236
         },
         "ASP": {
             "mass": 115.10,
             "radii": 0.558,
             "charge": -1.0,
-            "hps": 0.214119
+            "cosmo": 0.214119
         },
         "CYS": {
             "mass": 103.10,
             "radii": 0.548,
             "charge": 0.0,
-            "hps": 0.56706
+            "cosmo": 0.56706
         },
         "GLU": {
             "mass": 129.10,
             "radii": 0.592,
             "charge": -1.0,
-            "hps": -0.08
+            "cosmo": -0.08
         },
         "GLN": {
             "mass": 128.10,
             "radii": 0.602,
             "charge": 0.0,
-            "hps": 0.478824
+            "cosmo": 0.478824
         },
         "GLY": {
             "mass": 57.05,
             "radii": 0.450,
             "charge": 0.0,
-            "hps": 0.49353
+            "cosmo": 0.49353
         },
         "HIS": {
             "mass": 137.10,
             "radii": 0.608,
             "charge": 0.0,
-            "hps": 0.684707
+            "cosmo": 0.684707
         },
         "ILE": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.625883
+            "cosmo": 0.625883
         },
         "LEU": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.640589
+            "cosmo": 0.640589
         },
         "LYS": {
             "mass": 128.20,
             "radii": 0.636,
             "charge": 1.0,
-            "hps": 0.302354
+            "cosmo": 0.302354
         },
         "MET": {
             "mass": 131.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.596471
+            "cosmo": 0.596471
         },
         "PHE": {
             "mass": 147.20,
             "radii": 0.636,
             "charge": 0.0,
-            "hps": 0.74353
+            "cosmo": 0.74353
         },
         "PRO": {
             "mass": 97.12,
             "radii": 0.556,
             "charge": 0.0,
-            "hps": 0.678824
+            "cosmo": 0.678824
         },
         "SER": {
             "mass": 87.08,
             "radii": 0.518,
             "charge": 0.0,
-            "hps": 0.508236
+            "cosmo": 0.508236
         },
         "THR": {
             "mass": 101.10,
             "radii": 0.562,
             "charge": 0.0,
-            "hps": 0.508236
+            "cosmo": 0.508236
         },
         "TRP": {
             "mass": 186.20,
             "radii": 0.678,
             "charge": 0.0,
-            "hps": 0.92
+            "cosmo": 0.92
         },
         "TYR": {
             "mass": 163.20,
             "radii": 0.646,
             "charge": 0.0,
-            "hps": 0.817059
+            "cosmo": 0.817059
         },
         "VAL": {
             "mass": 99.07,
             "radii": 0.586,
             "charge": 0.0,
-            "hps": 0.584707
+            "cosmo": 0.584707
         }
 
     },
@@ -365,140 +365,140 @@ parameters = {
             "mass": 71.08,
             "radii": 0.504,
             "charge": 0.0,
-            "hps": 0.522942,
+            "cosmo": 0.522942,
             "eps_di": -2.59  # parameter control torsion angle.
         },
         "ARG": {
             "mass": 156.20,
             "radii": 0.656,
             "charge": 1.0,
-            "hps": 0.478824,
+            "cosmo": 0.478824,
             "eps_di": -1.37
         },
         "ASN": {
             "mass": 114.10,
             "radii": 0.568,
             "charge": 0.0,
-            "hps": 0.508236,
+            "cosmo": 0.508236,
             "eps_di": -0.42
         },
         "ASP": {
             "mass": 115.10,
             "radii": 0.558,
             "charge": -1.0,
-            "hps": 0.214119,
+            "cosmo": 0.214119,
             "eps_di": -0.80
         },
         "CYS": {
             "mass": 103.10,
             "radii": 0.548,
             "charge": 0.0,
-            "hps": 0.56706,
+            "cosmo": 0.56706,
             "eps_di": -0.15
         },
         "GLU": {
             "mass": 129.10,
             "radii": 0.592,
             "charge": -1.0,
-            "hps": -0.08,
+            "cosmo": -0.08,
             "eps_di": -1.80
         },
         "GLN": {
             "mass": 128.10,
             "radii": 0.602,
             "charge": 0.0,
-            "hps": 0.478824,
+            "cosmo": 0.478824,
             "eps_di": -1.25
         },
         "GLY": {
             "mass": 57.05,
             "radii": 0.450,
             "charge": 0.0,
-            "hps": 0.49353,
+            "cosmo": 0.49353,
             "eps_di": 0.65
         },
         "HIS": {
             "mass": 137.10,
             "radii": 0.608,
             "charge": 0.0,
-            "hps": 0.684707,
+            "cosmo": 0.684707,
             "eps_di": 0.8
         },
         "ILE": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.625883,
+            "cosmo": 0.625883,
             "eps_di": -1.39
         },
         "LEU": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.640589,
+            "cosmo": 0.640589,
             "eps_di": -2.05
         },
         "LYS": {
             "mass": 128.20,
             "radii": 0.636,
             "charge": 1.0,
-            "hps": 0.302354,
+            "cosmo": 0.302354,
             "eps_di": -0.95
         },
         "MET": {
             "mass": 131.20,
             "radii": 0.618,
             "charge": 0.0,
-            "hps": 0.596471,
+            "cosmo": 0.596471,
             "eps_di": -1.60
         },
         "PHE": {
             "mass": 147.20,
             "radii": 0.636,
             "charge": 0.0,
-            "hps": 0.74353,
+            "cosmo": 0.74353,
             "eps_di": -0.68
         },
         "PRO": {
             "mass": 97.12,
             "radii": 0.556,
             "charge": 0.0,
-            "hps": 0.678824,
+            "cosmo": 0.678824,
             "eps_di": 3.70
         },
         "SER": {
             "mass": 87.08,
             "radii": 0.518,
             "charge": 0.0,
-            "hps": 0.508236,
+            "cosmo": 0.508236,
             "eps_di": -0.69
         },
         "THR": {
             "mass": 101.10,
             "radii": 0.562,
             "charge": 0.0,
-            "hps": 0.508236,
+            "cosmo": 0.508236,
             "eps_di": -0.30
         },
         "TRP": {
             "mass": 186.20,
             "radii": 0.678,
             "charge": 0.0,
-            "hps": 0.92,
+            "cosmo": 0.92,
             "eps_di": -1.15
         },
         "TYR": {
             "mass": 163.20,
             "radii": 0.646,
             "charge": 0.0,
-            "hps": 0.817059,
+            "cosmo": 0.817059,
             "eps_di": -0.68
         },
         "VAL": {
             "mass": 99.07,
             "radii": 0.586,
             "charge": 0.0,
-            "hps": 0.584707,
+            "cosmo": 0.584707,
             "eps_di": -0.75
         }
     },

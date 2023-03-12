@@ -13,7 +13,7 @@ from openmm import unit
 
 from parmed.exceptions import OpenMMWarning
 
-import hps
+import cosmo
 
 # Suppress OpenMM warnings
 warnings.filterwarnings("ignore", category=OpenMMWarning)
@@ -24,7 +24,7 @@ def main():
         Run a simulation using the hpsOpenMM library and parameters specified in a config file.
 
         Usage: python run_simulation.py -f md.ini
-        or hps-simulation -f md.ini
+        or cosmo-simulation -f md.ini
         """
 
     # Default values:
@@ -126,7 +126,7 @@ def main():
     End of reading parameters
     """
 
-    hps_model = hps.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
+    hps_model = cosmo.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
 
     # Remove center of mass motion
     hps_model.system.addForce(mm.CMMotionRemover(nstcomm))

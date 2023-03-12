@@ -5,6 +5,9 @@ import numpy as np
 from PeptideBuilder import Geometry
 from mdtraj.utils.rotation import rotation_matrix_from_quaternion
 
+__all__ = ['build_single_chain']
+
+
 def tile_universe(original_universe: mda.core.universe.Universe, num_copies_x: int,
                   num_copies_y: int) -> mda.core.universe.Universe:
     """

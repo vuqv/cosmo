@@ -1,9 +1,9 @@
 r"""
 Module defines model parameters.
 At the moment, two main models are supported:
-    * hps-kr
+    * cosmo-kr
 
-    *hps-urry.
+    *cosmo-urry.
 
 Other model parameter can be easily defined here such as M2 from Lindorff-larsen
 

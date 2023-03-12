@@ -133,7 +133,8 @@ class Dynamics:
                    Raise error and exit immediately if something wrong.
            """
         print('__________________________________________________________________')
-        print(f"OpenMM version: {mm.__version__}")
+        print("COSMO: COarse-grained Simulation of intrinsically disordered prOteins with openMM")
+        print(f"OpenMM installed version: {mm.__version__}")
         print(f"Reading simulation parameters from {config_file} file...")
         config = configparser.ConfigParser()
         config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))

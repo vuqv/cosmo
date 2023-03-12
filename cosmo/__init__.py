@@ -1,8 +1,7 @@
 """
-Python library to run CG model simulations of IDPs using the OpenMM toolkit
+COSMO: COarse-grained Simulation of intrinsically disordered prOteins with openMM
 
-
-hpsOpenMM is a Python library to run CG simulations using OpenMM toolkit.
+COSMO is a Python library to run CG simulations using OpenMM toolkit.
 The library offers flexibility for creating CG model that can be customised to implemented different potential model.
 
 Considering an input structure, the library automatizes the creation of forces to specify it.
@@ -21,6 +20,7 @@ The first class, geometry, contains methods to calculate the geometrical paramet
 
 The library is open-source and offers flexibility.
 """
+__all__ = ['system', 'models', 'dynamics', 'build_structure']
 
 from .core import geometry
 from .core import models

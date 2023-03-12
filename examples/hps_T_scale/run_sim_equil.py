@@ -13,7 +13,7 @@ from openmm import *
 from openmm.app import *
 from parmed.exceptions import OpenMMWarning
 
-import hps
+import cosmo
 
 warnings.filterwarnings("ignore", category=OpenMMWarning)
 
@@ -55,7 +55,7 @@ else:
 End of reading parameters
 """
 
-cgModel = hps.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
+cgModel = cosmo.models.buildHPSModel(pdb_file, minimize=minimize, model=model, box_dimension=box_dimension)
 
 # ashbaugh force has 1 global parameter: epsilon
 """
@@ -67,18 +67,18 @@ lambda(O) = lambda_HPS + 2.45798364 - 0.01432925*T + 0.00002037*T^2
 lambda(P) = lambda_HPS + 11.795 - 0.067679*T + 0.00009411*T^2
 lambda(C) = lambda_HPS + 9.66118972 - 0.05425780*T + 0.00007312*T^2
 
-change hps parameter for every atoms:
+change cosmo parameter for every atoms:
 using: 
 lj=simulation.system.getForce(2) # force 2 in the system is ashbaugh force
 lj.getParticleParameters(138) # get Particle parameter of atom 138 (0 based)
 
-lj force has 2 per particle parameter: (sigma, hps)
-lj.setParticleParameters(138, (1,2)): change params for particle 138: sigma=1, hps=2. (1,2) can be [1,2]
+lj force has 2 per particle parameter: (sigma, cosmo)
+lj.setParticleParameters(138, (1,2)): change params for particle 138: sigma=1, cosmo=2. (1,2) can be [1,2]
 
 loop through all particle in cgModel:
 for i, atom in enumerate(cgModel.atoms):
     if atom.residue.name in [Hydrophobic/hydrophilic/...]
-        new_hps = hps(T)
+        new_hps = cosmo(T)
         old_params = lj.getParticleParameters(i)
         lj.setParticleParameters(i, (old_params[0], new_hps))
 

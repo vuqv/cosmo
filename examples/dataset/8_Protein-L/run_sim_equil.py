@@ -7,7 +7,7 @@ from simtk.openmm import *
 from simtk.openmm.app import *
 from simtk.unit import *
 
-import hps
+import cosmo
 
 # MD parameter
 # let's decide here now as long as we want to run the simulation and the file writing period
@@ -24,7 +24,7 @@ protein_code = f'{pdbname}'
 pdb_file = f'{pdbname}.pdb'
 
 # Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
-cgModel = hps.models.buildHPSModel(pdb_file)
+cgModel = cosmo.models.buildHPSModel(pdb_file)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')
