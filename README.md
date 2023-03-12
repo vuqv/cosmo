@@ -45,8 +45,8 @@ This function is necessary when restarting simulations.
 #### Linux:
 The main requirements is `openMM >= 7.7`. Other packages are requires as well (see `requirements.txt`)
 
-- Create conda environment: `conda create -n hpsopenmm python=3.10`
-- activate `hpsOpenMM` env : `conda activate hpsopenmm`
+- Create conda environment: `conda create -n py310 python=3.10`
+- activate `hpsOpenMM` env : `conda activate py310`
 - Install openMM 7.7: `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
   * conda will try to install the lastest version of cudatoolkit and 
   sometime it will not work. </br> You should select version that is compatible with your nvidia-driver (if you have NVIDIA GPU)
@@ -106,7 +106,8 @@ minimize = yes ;if not restart, then minimize will be loaded, otherwise, minimiz
       - edit simulation config file: `md.ini`
       - execute command: `python run_simulation.py -f md.ini`
     * Second option:
-      * add python environment created above in the beginning of `cosmo-simulation.py` script: by changing its first line.
+      * add python environment created above in the beginning of `cosmo-simulation.py` script: 
+       `/home/qvv5013/anaconda3/envs/hpsopenmm/bin/python` - point to the environment you created above
       * make the `cosmo-simulation.py` script to be executable: `chmod +x /PATH_TO_COSMO/cosmo-simulation.py`
       * Create an `alias` to `cosmo-simulation.py`. e.g: I modify my `.bashrc`: 
         `alias cosmo-simulation='/home/qvv5013/work3/code/cosmo/cosmo/cosmo-simulation.py '`

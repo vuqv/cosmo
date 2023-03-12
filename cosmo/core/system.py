@@ -587,7 +587,7 @@ class system:
         Add Gaussian functional form of angle.
         Note that in openMM log is neutral logarithm.
 
-        Angle potential take Gaussian functional form in cosmo-ss model.
+        Angle potential take Gaussian functional form in hps-ss model.
 
         .. math::
             U_{angle}(\\theta) = \\frac{-1}{\gamma}
@@ -619,7 +619,7 @@ class system:
 
     def addGaussianTorsionForces(self) -> None:
         """
-        Torsion potential in cosmo-ss model takes the form:
+        Torsion potential in hps-ss model takes the form:
 
         .. math::
             U_{torsion}(\\theta) = -\\ln\\left[ U_{torsion, \\alpha}(\\theta, \\epsilon_d) + U_{torsion, \\beta}(\\theta, \\epsilon_d)\\right]
@@ -758,7 +758,7 @@ class system:
 
         Creates an :code:`mm.CustomNonbondedForce()` object with the parameters
         sigma and epsilon given to this method. The custom non-bonded force
-        is initialized with the formula: (note: cosmo here is :math:`\lambda_{ij}^{0}` in the paper)
+        is initialized with the formula: (note: hps here is :math:`\lambda_{ij}^{0}` in the paper)
 
         Unlike :code:`BondForce` class, where we specify index for atoms pair to add bond, it means
         that number of bondForces may differ from number of particle.
@@ -802,14 +802,14 @@ class system:
         ashbaugh_Hatch_cutoff = 2.0 * unit.nanometer
 
         energy_function = 'step(2^(1/6)*sigma - r) *'
-        energy_function += '(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-cosmo)*epsilon )'
-        energy_function += '+(1-step(2^(1/6)*sigma-r)) * (cosmo*4*epsilon*((sigma/r)^12-(sigma/r)^6));'
+        energy_function += '(4*epsilon* ((sigma/r)^12-(sigma/r)^6) + (1-hps)*epsilon )'
+        energy_function += '+(1-step(2^(1/6)*sigma-r)) * (hps*4*epsilon*((sigma/r)^12-(sigma/r)^6));'
         energy_function += 'sigma=0.5*(sigma1+sigma2);'
-        energy_function += 'cosmo=0.5*(hps1+hps2)'
+        energy_function += 'hps=0.5*(hps1+hps2)'
         self.ashbaugh_HatchForce = mm.CustomNonbondedForce(energy_function)
         self.ashbaugh_HatchForce.addGlobalParameter('epsilon', epsilon)
         self.ashbaugh_HatchForce.addPerParticleParameter('sigma')
-        self.ashbaugh_HatchForce.addPerParticleParameter('cosmo')
+        self.ashbaugh_HatchForce.addPerParticleParameter('hps')
         #
         if use_pbc:
             print("Set cutoff Periodic ...")
@@ -1226,7 +1226,7 @@ class system:
             if self.atoms != OrderedDict():
                 ff.write('[atoms]\n')
                 ff.write(
-                    '# %2s %3s %9s %9s %9s \t %14s\n' % ('atom', 'mass', 'exc_radius', 'charge', 'cosmo', 'atom_name'))
+                    '# %2s %3s %9s %9s %9s \t %14s\n' % ('atom', 'mass', 'exc_radius', 'charge', 'hps', 'atom_name'))
 
                 for i, atom in enumerate(self.atoms):
 
@@ -1378,9 +1378,9 @@ class system:
 
         for r in self.topology.residues():
             if r.name in params:
-                hps.append(params[r.name]['cosmo'])
+                hps.append(params[r.name]['hps'])
             else:
-                raise ValueError('Residue ' + r.name + ' not found in cosmo dictionary.')
+                raise ValueError('Residue ' + r.name + ' not found in hps dictionary.')
 
         self.setParticlesHPS(hps)
 

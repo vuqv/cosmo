@@ -1,4 +1,4 @@
-#!/home/qvv5013/anaconda3/envs/hpsopenmm/bin/python
+#!/home/qvv5013/anaconda3/envs/py311/bin/python
 
 """
 This script is a command-line program for running a simulation of a protein system using the
