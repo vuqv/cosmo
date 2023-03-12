@@ -1,4 +1,4 @@
-hps package
+cosmo package
 ===========
 
 Subpackages
@@ -7,15 +7,15 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   hps.core
-   hps.dynamics
-   hps.parameters
-   hps.reporter
+   cosmo.core
+   cosmo.dynamics
+   cosmo.parameters
+   cosmo.reporter
 
 Module contents
 ---------------
 
-.. automodule:: hps
+.. automodule:: cosmo
    :members:
    :undoc-members:
    :show-inheritance:

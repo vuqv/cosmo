@@ -27,5 +27,5 @@ from .core import models
 from .core import system
 from .dynamics import dynamics
 from .parameters import model_parameters
-from .reporter import hpsReporter
+from .reporter import cosmoReporter
 from .utils import build_structure

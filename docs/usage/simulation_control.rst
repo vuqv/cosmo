@@ -11,7 +11,7 @@ An example of how config file of simulation looks like.
         nstxout = 1000 ; number of steps to write checkpoint = nstxout
         nstlog = 1000 ; number of steps to print log
         nstcomm = 100 ; frequency for center of mass motion removal
-        ; select HPS model, available options: hps_kr, hps_urry, or hps_ss
+        ; select HPS model, available options: hps_kr, hps_urry, hps_ss, or mpipi
         model = hps_urry
 
         ; control temperature coupling

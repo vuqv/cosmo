@@ -7,7 +7,7 @@ from openmm import unit
 from cosmo.core import system
 
 
-class hpsReporter(StateDataReporter):
+class cosmoReporter(StateDataReporter):
     """
     A special case of the StateDataReporter class that outputs information about a simulation,
     such as energy and temperature, etc. to a file. This special reporter outputs the hpsOpenMM
@@ -40,7 +40,7 @@ class hpsReporter(StateDataReporter):
         initialized StateDataReporter class.
 
         """
-        super(hpsReporter, self).__init__(file, reportInterval, **kwargs)
+        super(cosmoReporter, self).__init__(file, reportInterval, **kwargs)
         self._sbmObject = sbmObject
 
     def _constructHeaders(self):

@@ -1,20 +1,18 @@
-# cosmo
+<u><b>(Package under refactoring)</b></u>
+
+# <u>COSMO: COarse-grained Simulation of intrinsically disordered prOteins with openMM</u> 
 
 -------------------------------------
 ### A coarse-grained simulation engine empowered by openMM
 
-OpenMM codebase for IDPs simulation using hydropathy scale.
-
-
-
-`hps:` hydropathy scale. Currently, there are four models are supported:
+Currently, there are four models are supported:
 
 1) `hps_urry:` Hydropathy according to Urry scale (default, Recommended).
 2) `hps_kr:`  Kapcha-Rossy scale.
    This model has parameters for nucleic acids and post-translational modification residues.
 3) `hps_ss:` `hps_urry` with bonded potential.  
 4) `mpipi`: another model that using Wang-Frenkel short range potential instead of LJ 12-6
-4) other models can be easily implemented by defining them in `hps/parameters/model_parameters.py`
+5) Other models can be easily implemented by defining them in `cosmo/parameters/model_parameters.py`
 
 Model summary
 -------------
@@ -42,7 +40,7 @@ This function is necessary when restarting simulations.
 
 <sup>b</sup>: I recommend to upgrade to openMM 8.0 for better performance.
 
-## How to use hpsOpenMM:
+## How to use COSMO:
 
 #### Linux:
 The main requirements is `openMM >= 7.7`. Other packages are requires as well (see `requirements.txt`)
@@ -58,6 +56,49 @@ The main requirements is `openMM >= 7.7`. Other packages are requires as well (s
 - The standard example can be found at `example/standard_example`. 
 You will need a control parameter file (e.g `md.ini`). Check [here](https://qvv5013.github.io/docs-hpsOpenMM/usage/simulation_control.html) for more information. 
 
+Example of `md.ini`:
+--------------------
+
+```
+[OPTIONS]
+md_steps = 10_000 # number of steps
+dt = 0.01 ; time step in ps
+nstxout = 100 ; number of steps to write checkpoint = nstxout
+nstlog = 100 ; number of steps to print log
+nstcomm = 100 ; frequency for center of mass motion removal
+; select model, available options: hps_kr, hps_urry, hps_ss or mpipi
+model = mpipi
+
+; control temperature coupling
+tcoupl = yes
+ref_t = 310 ; Kelvin- reference temperature
+tau_t = 0.01 ; ps^-1
+
+;pressure coupling
+pcoupl = no
+ref_p = 1
+frequency_p = 25
+
+; Periodic boundary condition: if pcoupl is yes then pbc must be yes.
+pbc = yes
+; if pbc=yes, then use box_dimension option to specify box_dimension = x or [x, y, z], unit of nanometer
+box_dimension = 30 ; [30, 30, 60]
+
+; input
+protein_code = ASYN
+pdb_file = asyn.pdb
+; output
+checkpoint = asyn.chk
+;Use GPU/CPU
+device = GPU
+; If CPU is specified, then use ppn variable
+ppn = 4
+;Restart simulation
+restart = no
+minimize = yes ;if not restart, then minimize will be loaded, otherwise, minimize=False
+
+```
+-------------------------------
 - Run simulation: 
   - I give you two options to perform simulations:
     * First option:
@@ -65,12 +106,12 @@ You will need a control parameter file (e.g `md.ini`). Check [here](https://qvv5
       - edit simulation config file: `md.ini`
       - execute command: `python run_simulation.py -f md.ini`
     * Second option:
-      * add python environment created above in the beginning of `hps-simulation.py` script: by changing its first line.
-      * make the `hps-simulation.py` script to be executable: `chmod +x /PATH_TO_HPS/hps-simulation.py`
-      * Create an `alias` to `hps-simulation.py`. e.g: I modify my `.bashrc`: 
-        `alias hps-simulation='/home/qvv5013/work3/code/hpsOpenMM/hps/hps-simulation.py '`
+      * add python environment created above in the beginning of `cosmo-simulation.py` script: by changing its first line.
+      * make the `cosmo-simulation.py` script to be executable: `chmod +x /PATH_TO_COSMO/cosmo-simulation.py`
+      * Create an `alias` to `cosmo-simulation.py`. e.g: I modify my `.bashrc`: 
+        `alias cosmo-simulation='/home/qvv5013/work3/code/cosmo/cosmo/cosmo-simulation.py '`
       * in your simulation directory, prepare control file contains simulation parameters.
-      * run simulation: `hps-simulation -f md.ini`
+      * run simulation: `cosmo-simulation -f md.ini`
        
 #### Windows:
 
@@ -95,16 +136,4 @@ You will need a control parameter file (e.g `md.ini`). Check [here](https://qvv5
 
 ## Acknowledgments
 
-We would like to thank:
-
-- `openMM` team for developing an excellent and open source engine.
-- `SBMOpenMM's` developer team for developing an excellent model and open sourcing the software.
-- Sugita's group for making a clear tutorial to introduce many features of OpenMM.
-- `openMM` Github community for many useful discussions.
-- Group of Prof. Jeetain Mittal for the model parameters.
-
-## Do you want to cite this work?
-- Original works from group of Prof. Jeetain Mittal
-- Vu, Quyen. (2022). hpsOpenMM (1.2). Zenodo. https://doi.org/10.5281/zenodo.6976690
-
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6976690.svg)](https://doi.org/10.5281/zenodo.6976690)
+## Cite this work

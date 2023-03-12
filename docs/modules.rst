@@ -1,7 +1,7 @@
-hpsOpenMM
+COSMO
 =========
 
 .. toctree::
    :maxdepth: 4
 
-   hps
+   cosmo

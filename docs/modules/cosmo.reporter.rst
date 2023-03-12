@@ -1,13 +1,13 @@
-hps.dynamics package
+cosmo.reporter package
 ====================
 
 Submodules
 ----------
 
-hps.dynamics.dynamics module
-----------------------------
+cosmo.reporter.cosmo\_reporter module
+---------------------------------
 
-.. automodule:: hps.dynamics.dynamics
+.. automodule:: cosmo.reporter.cosmo_reporter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ hps.dynamics.dynamics module
 Module contents
 ---------------
 
-.. automodule:: hps.dynamics
+.. automodule:: cosmo.reporter
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,4 +1,4 @@
-hps.parameters package
+cosmo.parameters package
 ======================
 
 Submodules
@@ -7,7 +7,7 @@ Submodules
 hps.parameters.model\_parameters module
 ---------------------------------------
 
-.. automodule:: hps.parameters.model_parameters
+.. automodule:: cosmo.parameters.model_parameters
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ hps.parameters.model\_parameters module
 Module contents
 ---------------
 
-.. automodule:: hps.parameters
+.. automodule:: cosmo.parameters
    :members:
    :undoc-members:
    :show-inheritance:
