@@ -152,7 +152,7 @@ class Dynamics:
         self.nstcomm = int(params.get('nstcomm', self.nstcomm))
         print(f'Setting frequency of center of mass motion removal to every {self.nstcomm} steps')
         self.model = params.get('model', self.model)
-        print(f'Setting hydropathy scale to: {self.model}')
+        print(f'Setting model to: {self.model}')
         self.tcoupl = bool(strtobool(params.get('tcoupl', self.tcoupl)))
         if self.tcoupl:
             self.ref_t = float(params['ref_t']) * unit.kelvin

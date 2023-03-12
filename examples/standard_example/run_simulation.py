@@ -80,7 +80,7 @@ def main():
     nstcomm = int(params.get('nstcomm', nstcomm))
     print(f'Setting frequency of center of mass motion removal to every {nstcomm} steps')
     model = params.get('model', model)
-    print(f'Setting hydropathy scale to: {model}')
+    print(f'Setting model to: {model}')
     tcoupl = bool(strtobool(params.get('tcoupl', tcoupl)))
     if tcoupl:
         ref_t = float(params['ref_t']) * unit.kelvin
