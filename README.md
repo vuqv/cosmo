@@ -1,4 +1,4 @@
-# hpsOpenMM
+# cosmo
 
 -------------------------------------
 ### A coarse-grained simulation engine empowered by openMM
