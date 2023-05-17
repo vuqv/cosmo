@@ -1,7 +1,13 @@
-<u><b>(Package under refactoring)</b></u>
+# `COSMO`: COarse-grained Simulation of intrinsically disordered prOteins with openMM 
 
-# <u>COSMO: COarse-grained Simulation of intrinsically disordered prOteins with openMM</u> 
+-------------------------------------
+<b>Package under refactoring</b>:
+- Initially, the package was named `hpsOpenMM` because it used the hps scale to simulate IDP. 
+However, we are now implementing more models, such as mpipi, which do not use the hps scale anymore. 
+Therefore, a different name is needed. We decided to change the name to `cosmo`.
 
+- If the name `hpsOpenMM` still appears in the documentation/source code, it means that we missed some instances of 
+renaming.
 -------------------------------------
 ### A coarse-grained simulation engine empowered by openMM
 
@@ -28,6 +34,8 @@ The package is ready for studying various problems such as, conformation dynamic
 Checkout documentation for more details: [here](https://qvv5013.github.io/docs-hpsOpenMM/). 
 A simple example can be found [here](https://qvv5013.github.io/posts/openMM/hpsOpenMM_tutorial.html).
 
+More information can be found in my personal blog: https://qvv5013.github.io/
+
 -------------------------------------
 
 ## Requirements:
@@ -46,12 +54,16 @@ This function is necessary when restarting simulations.
 The main requirements is `openMM >= 7.7`. Other packages are requires as well (see `requirements.txt`)
 
 - Create conda environment: `conda create -n py310 python=3.10`
-- activate `hpsOpenMM` env : `conda activate py310`
-- Install openMM 7.7: `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
-  * conda will try to install the lastest version of cudatoolkit and 
+- activate `py310` env : `conda activate py310`
+- Install `openMM 7.7` (or later): `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
+  * conda will try to install the latest version of `cudatoolkit` and 
   sometime it will not work. </br> You should select version that is compatible with your nvidia-driver (if you have NVIDIA GPU)
-- Download folder and place in target location, for example: </br>`PATH_TO_CODE/hpsOpenMM/`
-- Add hps module in Python path so that Python know what `hps` is (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`
+- Download folder and place in target location, for example: </br>`PATH_TO_CODE/cosmo/`
+- Add `cosmo` module in Python path so that Python know what `cosmo` is (in `.bashrc` file): 
+`export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
+
+<u>REMEMBER TO CHANGE `PATH_TO_CODE` TO YOUR SPECIFIC.</u>
+
 #### Example:
 - The standard example can be found at `example/standard_example`. 
 You will need a control parameter file (e.g `md.ini`). Check [here](https://qvv5013.github.io/docs-hpsOpenMM/usage/simulation_control.html) for more information. 
@@ -137,4 +149,17 @@ minimize = yes ;if not restart, then minimize will be loaded, otherwise, minimiz
 
 ## Acknowledgments
 
+
 ## Cite this work
+
+This software is based on the original work of Prof. Jeetain Mittal's group (hps family) and 
+Prof. Rosana Collepardo-Guevara's group (mpipi model). We have not published any paper using this software yet. 
+If you have used it in your publications, please cite the source accordingly.
+
+* hps family:
+  - (`hps-kr`) Dignon, G. L.; Zheng, W.; Kim, Y. C.; Best, R. B.; Mittal, J. Sequence Determinants of Protein Phase Behavior from a Coarse-Grained Model. PLoS Comput. Biol. 2018, 1–23. https://doi.org/10.1101/238170.
+  - (`hps-urry`) Regy, R. M.; Thompson, J.; Kim, Y. C.; Mittal, J. Improved Coarse-Grained Model for Studying Sequence Dependent Phase Separation of Disordered Proteins. Protein Sci. 2021, 30 (7), 1371–1379. https://doi.org/10.1002/pro.4094.
+  - (`hps-ss`) Rizuan, A.; Jovic, N.; Phan, T. M.; Kim, Y. C.; Mittal, J. Developing Bonded Potentials for a Coarse-Grained Model of Intrinsically Disordered Proteins. J. Chem. Inf. Model. 2022, 62 (18), 4474–4485. https://doi.org/10.1021/acs.jcim.2c00450.
+
+* mpipi
+  - (`mpipi`)  Joseph, J. A.; Reinhardt, A.; Aguirre, A.; Chew, P. Y.; Russell, K. O.; Espinosa, J. R.; Garaizar, A.; Collepardo-Guevara, R. Physics-Driven Coarse-Grained Model for Biomolecular Phase Separation with near-Quantitative Accuracy. Nat. Comput. Sci. 2021, 1 (11), 732–743. https://doi.org/10.1038/s43588-021-00155-3.
