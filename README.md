@@ -119,7 +119,7 @@ minimize = yes ;if not restart, then minimize will be loaded, otherwise, minimiz
       - execute command: `python run_simulation.py -f md.ini`
     * Second option:
       * add python environment created above in the beginning of `cosmo-simulation.py` script: 
-       `/home/qvv5013/anaconda3/envs/hpsopenmm/bin/python` - point to the environment you created above
+       `/home/qvv5013/anaconda3/envs/py310/bin/python` - point to the environment you created above
       * make the `cosmo-simulation.py` script to be executable: `chmod +x /PATH_TO_COSMO/cosmo-simulation.py`
       * Create an `alias` to `cosmo-simulation.py`. e.g: I modify my `.bashrc`: 
         `alias cosmo-simulation='/home/qvv5013/work3/code/cosmo/cosmo/cosmo-simulation.py '`
@@ -145,7 +145,9 @@ minimize = yes ;if not restart, then minimize will be loaded, otherwise, minimiz
 
 ## Bugs
 
-- If you encounter any bugs, please report the issue to Quyen Vu (`vuqv.phys@gmail.com`)
+- If you encounter any bugs, please report the issue to Quyen Vu (`vuqv.phys@gmail.com`). 
+- Please note that any bugs encountered are my responsibility and not that of the authors of the models. 
+Therefore, I kindly request that you refrain from bothering them regarding any issues that may arise.
 
 ## Acknowledgments
 
