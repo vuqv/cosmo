@@ -31,9 +31,10 @@ A simple example can be found [here](https://qvv5013.github.io/posts/openMM/hpsO
 -------------------------------------
 
 ## Requirements:
-
+Most dependent packages (see requirements.txt) can be installed via conda (recommended):
 - **OpenMM >=7.7<sup>a,b</sup>** (select cuda version that compatible with your nvidia driver)
 - **Parmed**
+- `PeptideBuilder` can be install via pip: ```pip install PeptideBuilder```
 ---
 <sup>a</sup>: function `getStepCount()` does not work as expected (or is not implemented in versions earlier than 7.7).
 This function is necessary when restarting simulations.
@@ -46,12 +47,13 @@ This function is necessary when restarting simulations.
 The main requirements is `openMM >= 7.7`. Other packages are requires as well (see `requirements.txt`)
 
 - Create conda environment: `conda create -n py310 python=3.10`
-- activate `hpsOpenMM` env : `conda activate py310`
+- activate `cosmo` env : `conda activate py310`
 - Install openMM 7.7: `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
   * conda will try to install the lastest version of cudatoolkit and 
   sometime it will not work. </br> You should select version that is compatible with your nvidia-driver (if you have NVIDIA GPU)
-- Download folder and place in target location, for example: </br>`PATH_TO_CODE/hpsOpenMM/`
-- Add hps module in Python path so that Python know what `hps` is (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/hpsOpenMM/`
+- these package can be installed via `conda` or `mamba` (recommended)
+- Download folder and place in target location, for example: </br>`PATH_TO_CODE/cosmo/`
+- Add hps module in Python path so that Python know what `hps` is (in `.bashrc` file): `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
 #### Example:
 - The standard example can be found at `example/standard_example`. 
 You will need a control parameter file (e.g `md.ini`). Check [here](https://qvv5013.github.io/docs-hpsOpenMM/usage/simulation_control.html) for more information. 

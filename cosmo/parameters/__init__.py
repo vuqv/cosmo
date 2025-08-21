@@ -13,3 +13,4 @@ single-chain properties. BioRxiv, 1–9.
 """
 
 from .model_parameters import parameters
+from .globular_model_parameters import globular_parameters

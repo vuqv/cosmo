@@ -1,0 +1,11 @@
+n_residues: 283
+intra_domains:
+  A:
+    residues: [1-164]
+    strength: 1.114
+  B:
+    residues: [165-283]
+    strength: 1.114
+
+inter_domains:
+  A-B: 2.124

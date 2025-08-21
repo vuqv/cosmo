@@ -4,7 +4,7 @@
 from typing import Any
 
 from .system import system
-
+from ..utils.build_nonbonded_interaction_revise import build_nonbonded_interaction
 
 class models:
     """
@@ -158,6 +158,145 @@ class models:
             cosmo_model.addWangFrenkelForces(use_pbc)
             print('Added Wang-Frenkel Force')
             print("---")
+        print('')
+        print('__________________________________________________________________')
+
+        # Generate the system object and add previously generated forces
+
+        print('Creating System Object:')
+        # print('______________________')
+        cosmo_model.createSystemObject(minimize=minimize, check_bond_distances=True)
+        print('cosmo system Object created')
+        print('')
+
+        return cosmo_model
+
+    def buildEDModel(structure_file: str,
+                     minimize: bool = False,
+                     model: str = 'ed',
+                     domain_def: str = None,
+                     stride_output_file: str = None,
+                     box_dimension: Any = None):
+        """
+        This is a method for building a coarse-grained model for a protein system
+        using the ED force field. The method takes as input a structure file,
+        as well as optional parameters for whether to minimize the initial structure,
+        the ED scale to use (options include 'ed'),
+        and the dimensions of the periodic boundary conditions box.
+        """
+
+        # common for all model:
+        print(f'Generating CA coarse-grained model for structure from file {structure_file}')
+        print('')
+        cosmo_model = system(structure_file, model)
+        print("Checking input structure file ...")
+        print("Be sure that you do not have missing residues in the initial structure. At the moment, I will not take "
+              "care of that")
+
+        # Set up geometric parameters of the model
+        print('Setting up geometrical parameters ...')
+        print('__________________________________________________________________')
+        print('Keeping only alpha carbon atoms in topology')
+        cosmo_model.getCAlphaOnly()
+
+        print(f'There are {cosmo_model.n_chains} chain(s) in the input file.')
+
+        # set particle's properties
+        # Common for all
+        cosmo_model.getAtoms()
+        print('Added ' + str(cosmo_model.n_atoms) + ' CA atoms')
+
+        cosmo_model.getBonds()
+        print('Added ' + str(cosmo_model.n_bonds) + ' bonds')
+
+        print("Setting alpha-carbon masses to their average residue mass.")
+        cosmo_model.setCAMassPerResidueType()
+
+        print("Setting alpha-carbon charge to their residue charge.")
+        cosmo_model.setCAChargePerResidueType()
+
+        
+        
+        # set particle interactions
+        # add forces to system
+        print('Adding default bond force constant:', end=' ')
+        cosmo_model.setBondForceConstants()
+        print('')
+        print('__________________________________________________________________')
+
+        # all models have bonded interactions
+        print('Adding Forces:')
+        cosmo_model.addHarmonicBondForces()
+        print('Added Harmonic Bond Forces')
+        print("---")
+
+
+        # this model has angle bonded potential.
+        # angle
+        cosmo_model.getAngles()
+        print(f'Added {cosmo_model.n_angles} angles ')
+        cosmo_model.addGaussianAngleForces()
+        print('Added Gaussian Angle Forces')
+        print("---")
+
+        #add Periodic Torsion angle for Ed model
+        cosmo_model.getTorsions()
+        cosmo_model.addPeriodicTorsionForce()
+
+
+
+        if box_dimension:
+            use_pbc = True
+            if isinstance(box_dimension, list):
+                """
+                OpenMM use this to write dimension in PDB and dcd file. Require one-argument, so zip box dimension into 
+                one variable.
+                Rectangular box, given parameter is array of three number
+                """
+                cosmo_model.topology.setPeriodicBoxVectors(
+                    ((box_dimension[0], 0, 0), (0, box_dimension[1], 0), (0, 0, box_dimension[2])))
+            else:
+                # cubic box, given parameter is single float
+                cosmo_model.topology.setPeriodicBoxVectors(
+                    ((box_dimension, 0, 0), (0, box_dimension, 0), (0, 0, box_dimension)))
+
+            unit_cell = cosmo_model.topology.getPeriodicBoxVectors()
+            # use this to write coordinate in PBC box. requires 3 numbers, unzip to 3
+            cosmo_model.system.setDefaultPeriodicBoxVectors(*unit_cell)
+
+        else:
+            use_pbc = False
+
+        cosmo_model.addYukawaForces(use_pbc)
+        print('Added Yukawa Force')
+        print("---")
+
+        # non-bonded interaction
+        print("Building non-bonded interactions for ED model...")
+        try:
+            distance_matrix, energy_matrix = build_nonbonded_interaction(
+                structure_file,
+                domain_def,
+                stride_output_file
+            )
+            print(f"Built non-bonded interaction matrices: {distance_matrix.shape}, {energy_matrix.shape}")
+            
+            # Store the matrices in the cosmo_model object for later use
+            cosmo_model.distance_matrix = distance_matrix
+            cosmo_model.energy_matrix = energy_matrix
+            
+            # You can also add them to the system if needed
+            cosmo_model.addCustomNonBondedForce(distance_matrix, energy_matrix, use_pbc)
+            
+        except Exception as e:
+            print(f"Warning: Could not build non-bonded interactions: {e}")
+            print("Continuing with default non-bonded interactions...")
+            distance_matrix = None
+            energy_matrix = None
+
+
+
+
         print('')
         print('__________________________________________________________________')
 

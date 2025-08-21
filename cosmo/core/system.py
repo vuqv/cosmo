@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
-
+# import os
 from collections import OrderedDict
 
 import numpy as np
@@ -9,7 +9,8 @@ import openmm.unit as unit
 import parmed as pmd
 import warnings
 from ..parameters import model_parameters
-
+# from ..parameters import globular_parameters
+# import json #for reading periodic dihedral params
 
 # from openmm import *
 # from openmm.app import *
@@ -159,6 +160,7 @@ class system:
         self.torsions_indexes = []
         self.n_torsions = None
         self.gaussianTorsionForce = None
+        self.periodicTorsionForce = None
 
         # Exclusion rule for nonbonded forces
         self.bonded_exclusions_index = model_parameters.parameters[model]["bonded_exclusions_index"]
@@ -168,6 +170,8 @@ class system:
 
         # instance for Wang-Frenkel potential, alternative to Ashbaugh_Hatch
         self.wang_Frenkel_Force = None
+
+        self.custom_non_bonded_force = None
 
         # Define parameters for DH potential Force
         self.yukawaForce = None
@@ -370,7 +374,7 @@ class system:
         # add angles to cosmo object
         self.n_angles = 0
         for angle in unique_angles:
-            self.angles[angle] = None
+            self.angles[angle] = None #all angles have the same parameter in GaussianAnglePotential so no need extra params.
             self.n_angles += 1
             self.angles_indexes.append((angle[0].index, angle[1].index, angle[2].index))
 
@@ -439,14 +443,14 @@ class system:
             # using weighting rule 1-1001-1: (i-1), i, (i+3), (i+4) are 1 and (i+1), (i+2) are 0
             eps_d = (eps_di_preceding + params[torsion[0].residue.name]['eps_di'] + params[torsion[3].residue.name][
                 'eps_di'] + eps_di_succeeding) / (weight_succeeding + weight_preceding + 2)
-
+            # each torsion angle has torsion-specific parameter eps_d
             self.torsions[torsion] = (eps_d, None)  # add torsion angle parameters
             self.n_torsions += 1
             self.torsions_indexes.append((torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index))
 
     """ Functions for setting force specific parameters """
 
-    def setBondForceConstants(self):
+    def setBondForceConstants(self) -> None:
         """
         Change the forcefield parameters for bonded terms.
 
@@ -601,8 +605,8 @@ class system:
         eps_alpha = 17.9912 * unit.kilojoule_per_mole  # 4.3 kcal/mol
         theta_alpha = 1.6 * unit.radian
         theta_beta = 2.27 * unit.radian
-        k_alpha = 445.1776 * unit.kilojoule_per_mole / unit.radian ** 2
-        k_beta = 110.0392 * unit.kilojoule_per_mole / unit.radian ** 2
+        k_alpha = 445.1776 * unit.kilojoule_per_mole / unit.radian ** 2 # 106.4 kcal/mol/rad^-2
+        k_beta = 110.0392 * unit.kilojoule_per_mole / unit.radian ** 2 # 26.3 kcal/mol/rad^-2
 
         energy_function = '(-1 / gamma) * log(exp(-gamma * (k_alpha * (theta - theta_alpha) ^ 2 + eps_alpha)) ' \
                           '+ exp(-gamma * k_beta * (theta - theta_beta) ^ 2))'
@@ -616,6 +620,7 @@ class system:
 
         for angle in self.angles:
             self.gaussianAngleForce.addAngle(angle[0].index, angle[1].index, angle[2].index)
+
 
     def addGaussianTorsionForces(self) -> None:
         """
@@ -686,6 +691,33 @@ class system:
         for torsion in self.torsions:
             self.gaussianTorsionForce.addTorsion(torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index,
                                                  (self.torsions[torsion][0],))
+
+    def addPeriodicTorsionForce(self) -> None:
+        """
+        Torsion potential in Ed's model, which is used periodic torsion angle.
+        """
+        # self.harmonicBondForce = mm.HarmonicBondForce()
+        # for bond in self.bonds:
+        #     self.harmonicBondForce.addBond(bond[0].index,
+        #                                    bond[1].index,
+        #                                    self.bonds[bond][0],
+        #                                    self.bonds[bond][1])
+
+        # read the parameter for Periodic Torsion angle, which phase and force constant is depend on two middle residues type
+        # print(f"current dir : {os.getcwd()}")
+
+        dihedral_params = model_parameters.parameters[self.model]["dihedral_params"]
+        # print(dihedral_params)
+
+        self.periodicTorsionForce = mm.PeriodicTorsionForce()
+        for torsion in self.torsions:
+            # each torsion has 4 periodicity.
+            for j in range(1, 5):
+                delta_j = dihedral_params[str((str(torsion[1].residue.name), str(torsion[2].residue.name), j))][1]
+                k_D_j = dihedral_params[str((str(torsion[1].residue.name), str(torsion[2].residue.name), j))][2]
+                self.periodicTorsionForce.addTorsion(torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index,
+                                                     j, delta_j, k_D_j)
+
 
     def addYukawaForces(self, use_pbc: bool) -> None:
         """
@@ -908,6 +940,37 @@ class system:
         # set exclusion rule
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.wang_Frenkel_Force.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+
+    def addCustomNonBondedForce(self, distance_matrix, energy_matrix, use_pbc):
+        """
+        Add a custom non-bonded force to the system.
+        """
+        print("Adding custom non-bonded force...")
+        table_R_ravel = distance_matrix.ravel().tolist()
+        table_eps_ravel = energy_matrix.ravel().tolist()
+        n_atom_types = distance_matrix.shape[0]
+        energy_function = 'eps*(13*(R/r)^12 - 18*(R/r)^10 + 4*(R/r)^6);'
+        energy_function += 'eps = eps_table(id1, id2);'
+        energy_function += 'R = R_table(id1, id2);'
+
+        self.custom_non_bonded_force = mm.CustomNonbondedForce(energy_function)
+        self.custom_non_bonded_force.addTabulatedFunction('eps_table', mm.Discrete2DFunction(n_atom_types, n_atom_types,
+                                                                                        table_eps_ravel))
+        self.custom_non_bonded_force.addTabulatedFunction('R_table', mm.Discrete2DFunction(n_atom_types, n_atom_types,
+                                                                                        table_R_ravel))
+        self.custom_non_bonded_force.addPerParticleParameter('id')
+        for i, atom in enumerate(self.atoms):
+            self.custom_non_bonded_force.addParticle((i,))
+
+        self.custom_non_bonded_force.setNonbondedMethod(mm.NonbondedForce.CutoffPeriodic if use_pbc else mm.NonbondedForce.CutoffNonPeriodic)
+        self.custom_non_bonded_force.setUseSwitchingFunction(True)
+        self.custom_non_bonded_force.setSwitchingDistance(1.8 * unit.nanometer)
+        self.custom_non_bonded_force.setCutoffDistance(2.0 * unit.nanometer)
+
+        # set exclusion rule
+        bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
+        self.custom_non_bonded_force.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+    
 
     """ Functions for creating OpenMM system object """
 
@@ -1137,6 +1200,10 @@ class system:
             self.system.addForce(self.gaussianTorsionForce)
             self.forceGroups['Gaussian Torsion Energy'] = self.gaussianTorsionForce
 
+        if self.periodicTorsionForce is not None:
+            self.system.addForce(self.periodicTorsionForce)
+            self.forceGroups['Periodic Torsion Energy'] = self.periodicTorsionForce
+
         if self.yukawaForce is not None:
             self.system.addForce(self.yukawaForce)
             self.forceGroups['Yukawa Energy'] = self.yukawaForce
@@ -1148,6 +1215,10 @@ class system:
         if self.wang_Frenkel_Force is not None:
             self.system.addForce(self.wang_Frenkel_Force)
             self.forceGroups['PairWire Energy'] = self.wang_Frenkel_Force
+        
+        if self.custom_non_bonded_force is not None:
+            self.system.addForce(self.custom_non_bonded_force)
+            self.forceGroups['Custom Non-Bonded Energy'] = self.custom_non_bonded_force
 
     def dumpStructure(self, output_file: str) -> None:
         """
@@ -1274,6 +1345,29 @@ class system:
                                                                   atom2.name + '_' + res2.name + '_' + str(
                                                                       res2.index + 1)))
 
+            if self.angles != OrderedDict():
+                ff.write('\n')
+                ff.write('[angles]\n')
+                ff.write("header of angle\n")
+                for angle in self.angles:
+                    atom1 = angle[0]
+                    atom2 = angle[1]
+                    atom3 = angle[2]
+                    ff.write(f"{atom1.index+1} {atom2.index+1} {atom3.index+1} #{atom1.name}_{atom1.residue.name}_{str(atom1.residue.index+1)},"
+                             f"{atom2.name}_{atom2.residue.name}_{str(atom2.residue.index+1)} {atom3.name}_{atom3.residue.name}_{str(atom3.residue.index+1)}\n")
+
+            if self.torsions != OrderedDict():
+                ff.write('\n')
+                ff.write('[torsions]\n')
+                ff.write('header of torsions\n')
+                for torsion in self.torsions:
+                    atom1 = torsion[0]
+                    atom2 = torsion[1]
+                    atom3 = torsion[2]
+                    atom4 = torsion[3]
+                    ff.write(f"{atom1.index+1} {atom2.index+1} {atom3.index+1} {atom4.index+1}\n")
+
+
     def setCAMassPerResidueType(self):
         """
         Sets alpha carbon atoms to their average residue mass. Used specially for
@@ -1300,7 +1394,7 @@ class system:
 
         self.setParticlesMass(masses)
 
-    def setCARadiusPerResidueType(self):
+    def setCARadiusPerResidueType(self) -> None:
         """
         Sets alpha carbon atoms to their average residue mass. Used specially for
         modifying alpha-carbon (CA) coarse-grained models.
@@ -1330,7 +1424,7 @@ class system:
 
         self.setParticlesRadii(radii)
 
-    def setCAChargePerResidueType(self):
+    def setCAChargePerResidueType(self) -> None:
         """
         Sets the charge of the alpha carbon atoms
         to characteristic charge of their corresponding amino acid
@@ -1356,7 +1450,7 @@ class system:
 
         self.setParticlesCharge(charge)
 
-    def setCAHPSPerResidueType(self):
+    def setCAHPSPerResidueType(self) -> None:
         """
         Sets alpha carbon atoms to their residue hydropathy scale. Used specially for
         modifying alpha-carbon (CA) coarse-grained models.
@@ -1384,7 +1478,10 @@ class system:
 
         self.setParticlesHPS(hps)
 
-    def setCAIDPerResidueType(self):
+    def setCAIDPerResidueType(self) -> None:
+        """
+        The mpipi model specified interactions are residue-specific, hence requires an extra particle identity.
+        """
         params = model_parameters.parameters['mpipi']
         atom_type = []
 
