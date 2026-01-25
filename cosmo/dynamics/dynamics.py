@@ -132,69 +132,70 @@ class Dynamics:
            TODO: check parameters in control file more carefully.
                    Raise error and exit immediately if something wrong.
            """
-        print('__________________________________________________________________')
+        print('-' * 70)
         print("COSMO: COarse-grained Simulation of intrinsically disordered prOteins with openMM")
         print(f"OpenMM installed version: {mm.__version__}")
         print(f"Reading simulation parameters from {config_file} file...")
+        print('-' * 70)
+        print('Simulation parameters:')
         config = configparser.ConfigParser()
         config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
         config.read(config_file)
         params = config['OPTIONS']
 
         self.md_steps = int(params.get('md_steps', self.md_steps))
-        print(f'Setting number of simulation steps to: {self.md_steps}')
+        print(f'  md_steps: {self.md_steps}')
         self.dt = float(params.get('dt', self.dt)) * unit.picoseconds
-        print(f'Setting timestep for integration of equations of motion to: {self.dt}')
+        print(f'  dt: {self.dt}')
         self.nstxout = int(params['nstxout'])
-        print(f'Setting number of steps to write checkpoint and coordinate: {self.nstxout}')
+        print(f'  nstxout: {self.nstxout}')
         self.nstlog = int(params['nstlog'])
-        print(f'Setting number of steps to write logfile: {self.nstlog}')
+        print(f'  nstlog: {self.nstlog}')
         self.nstcomm = int(params.get('nstcomm', self.nstcomm))
-        print(f'Setting frequency of center of mass motion removal to every {self.nstcomm} steps')
+        print(f'  nstcomm: {self.nstcomm}')
         self.model = params.get('model', self.model)
-        print(f'Setting model to: {self.model}')
+        print(f'  model: {self.model}')
         self.tcoupl = bool(strtobool(params.get('tcoupl', self.tcoupl)))
         if self.tcoupl:
             self.ref_t = float(params['ref_t']) * unit.kelvin
             self.tau_t = float(params['tau_t']) / unit.picoseconds
-            print(
-                f'Turning on temperature coupling with reference temperature: {self.ref_t} and time constant: {self.tau_t}')
+            print(f'  tcoupl: on (ref_t={self.ref_t}, tau_t={self.tau_t})')
         else:
-            print("Temperature coupling is off")
+            print('  tcoupl: off')
         self.pbc = bool(strtobool(params.get('pbc', self.pbc)))
         if self.pbc:
             self.box_dimension = loads(params['box_dimension'])
-            print(f'Turning on periodic boundary conditions with box dimension: {self.box_dimension} nm')
+            print(f'  pbc: on (box_dimension={self.box_dimension} nm)')
         else:
             self.box_dimension = None
-            print('Periodic boundary conditions are off')
+            print('  pbc: off')
         self.pcoupl = bool(strtobool(params.get('pcoupl', self.pcoupl)))
         if self.pcoupl:
             assert self.pbc, "Pressure coupling requires box dimensions and periodic boundary condition is on"
             self.ref_p = float(params['ref_p']) * unit.bar
             self.frequency_p = int(params['frequency_p'])
-            print(f'Pressure is set to reference of {self.ref_p} with frequency of coupling {self.frequency_p}')
+            print(f'  pcoupl: on (ref_p={self.ref_p}, frequency={self.frequency_p})')
         else:
-            print("Pressure coupling is off")
+            print('  pcoupl: off')
         self.pdb_file = params['pdb_file']
-        print(f'Input structure: {self.pdb_file}')
+        print(f'  pdb_file: {self.pdb_file}')
         self.protein_code = params['protein_code']
-        print(f'Prefix use to write file: {self.protein_code}')
+        print(f'  output_prefix: {self.protein_code}')
         self.checkpoint = params.get('checkpoint', self.checkpoint)
         self.device = params.get('device', self.device)
-        print(f'Running simulation on {self.device}')
+        print(f'  device: {self.device}')
         if self.device == "CPU":
             self.ppn = int(params.get('ppn', self.ppn))
-            print(f'Using {self.ppn} threads')
+            print(f'  threads: {self.ppn}')
         self.restart = bool(strtobool(params.get('restart', self.restart)))
-        print(f'Restart simulation: {self.restart}')
+        print(f'  restart: {self.restart}')
         if self.restart:
             self.minimize = False
         else:
             self.minimize = bool(strtobool(params.get('minimize', self.minimize)))
-            print(f'Perform Energy minimization of input structure: {self.minimize}')
+            print(f'  minimize: {self.minimize}')
 
-        print('__________________________________________________________________')
+        print('-' * 70)
         """
         End of reading parameters
         """
@@ -235,13 +236,13 @@ class Dynamics:
         # Setup platform to run simulation
         if self.device == 'GPU':
             # Run simulation on CUDA
-            print(f"Running simulation on GPU CUDA")
+            print("Running on GPU (CUDA)")
             platform = mm.Platform.getPlatformByName('CUDA')
             properties = {'CudaPrecision': 'mixed', "DeviceIndex": "0"}
             # in case of many GPUs present, we can select which one to use
 
         elif self.device == 'CPU':
-            print(f"Running simulation on CPU using {self.ppn} cores")
+            print(f"Running on CPU with {self.ppn} cores")
             platform = mm.Platform.getPlatformByName('CPU')
             properties = {'Threads': str(self.ppn)}
 
@@ -250,7 +251,7 @@ class Dynamics:
         start_time = time.time()
         if self.restart:
             simulation.loadCheckpoint(self.checkpoint)
-            print(f"Restart simulation from step: {simulation.context.getState().getStepCount()}")
+            print(f"Restarting from step: {simulation.context.getState().getStepCount()}")
             nsteps_remain = self.md_steps - simulation.context.getState().getStepCount()
         else:
             xyz = np.array(self.hps_model.positions / unit.nanometer)
@@ -278,4 +279,4 @@ class Dynamics:
         last_frame = simulation.context.getState(getPositions=True, enforcePeriodicBox=bool(self.pbc)).getPositions()
         mm.app.PDBFile.writeFile(self.hps_model.topology, last_frame, open(f'{self.protein_code}_final.pdb', 'w'))
         simulation.saveCheckpoint(self.checkpoint)
-        print(f"--- Finished in {(time.time() - start_time):.2f} seconds ---")
+        print(f"Finished in {(time.time() - start_time):.2f} seconds")

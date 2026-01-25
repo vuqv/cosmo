@@ -63,6 +63,8 @@ def main():
 
     # Read config file
     print(f"Reading simulation parameters from {config_file} file...")
+    print('-' * 70)
+    print('Simulation parameters:')
     config = configparser.ConfigParser()
     config = configparser.ConfigParser(inline_comment_prefixes=("#", ";"))
     config.read(config_file)
@@ -70,57 +72,57 @@ def main():
 
     # Update simulation parameters
     md_steps = int(params.get('md_steps', md_steps))
-    print(f'Setting number of simulation steps to: {md_steps}')
+    print(f'  md_steps: {md_steps}')
     dt = float(params.get('dt', dt)) * unit.picoseconds
-    print(f'Setting timestep for integration of equations of motion to: {dt}')
+    print(f'  dt: {dt}')
     nstxout = int(params['nstxout'])
-    print(f'Setting number of steps to write checkpoint and coordinate: {nstxout}')
+    print(f'  nstxout: {nstxout}')
     nstlog = int(params['nstlog'])
-    print(f'Setting number of steps to write logfile: {nstlog}')
+    print(f'  nstlog: {nstlog}')
     nstcomm = int(params.get('nstcomm', nstcomm))
-    print(f'Setting frequency of center of mass motion removal to every {nstcomm} steps')
+    print(f'  nstcomm: {nstcomm}')
     model = params.get('model', model)
-    print(f'Setting model to: {model}')
+    print(f'  model: {model}')
     tcoupl = bool(strtobool(params.get('tcoupl', tcoupl)))
     if tcoupl:
         ref_t = float(params['ref_t']) * unit.kelvin
         tau_t = float(params['tau_t']) / unit.picoseconds
-        print(
-            f'Turning on temperature coupling with reference temperature: {ref_t} and time constant: {tau_t}')
+        print(f'  tcoupl: on (ref_t={ref_t}, tau_t={tau_t})')
     else:
-        print("Temperature coupling is off")
+        print('  tcoupl: off')
     pbc = bool(strtobool(params.get('pbc', pbc)))
     if pbc:
         box_dimension = loads(params['box_dimension'])
-        print(f'Turning on periodic boundary conditions with box dimension: {box_dimension} nm')
+        print(f'  pbc: on (box_dimension={box_dimension} nm)')
     else:
         box_dimension = None
-        print('Periodic boundary conditions are off')
+        print('  pbc: off')
     pcoupl = bool(strtobool(params.get('pcoupl', pcoupl)))
     if pcoupl:
         assert pbc, "Pressure coupling requires box dimensions and periodic boundary condition is on"
         ref_p = float(params['ref_p']) * unit.bar
         frequency_p = int(params['frequency_p'])
-        print(f'Pressure is set to reference of {ref_p} with frequency of coupling {frequency_p}')
+        print(f'  pcoupl: on (ref_p={ref_p}, frequency={frequency_p})')
     else:
-        print("Pressure coupling is off")
+        print('  pcoupl: off')
     pdb_file = params['pdb_file']
-    print(f'Input structure: {pdb_file}')
+    print(f'  pdb_file: {pdb_file}')
     protein_code = params['protein_code']
-    print(f'Prefix use to write file: {protein_code}')
+    print(f'  output_prefix: {protein_code}')
     checkpoint = params.get('checkpoint', checkpoint)
     device = params.get('device', device)
-    print(f'Running simulation on {device}')
+    print(f'  device: {device}')
     if device == "CPU":
         ppn = int(params.get('ppn', ppn))
-        print(f'Using {ppn} threads')
+        print(f'  threads: {ppn}')
     restart = bool(strtobool(params.get('restart', restart)))
-    print(f'Restart simulation: {restart}')
+    print(f'  restart: {restart}')
     if restart:
         minimize = False
     else:
         minimize = bool(strtobool(params.get('minimize', minimize)))
-        print(f'Perform Energy minimization of input structure: {minimize}')
+        print(f'  minimize: {minimize}')
+    print('-' * 70)
 
     """
     End of reading parameters
@@ -143,13 +145,13 @@ def main():
 
     if device == 'GPU':
         # Run simulation on CUDA
-        print(f"Running simulation on GPU CUDA")
+        print("Running on GPU (CUDA)")
         platform = mm.Platform.getPlatformByName('CUDA')
         properties = {'CudaPrecision': 'mixed', "DeviceIndex": "0"}
         # in case of many GPUs present, we can select which one to use
 
     elif device == 'CPU':
-        print(f"Running simulation on CPU using {ppn} cores")
+        print(f"Running on CPU with {ppn} cores")
         platform = mm.Platform.getPlatformByName('CPU')
         properties = {'Threads': str(ppn)}
 
@@ -161,7 +163,7 @@ def main():
                                    properties)
     if restart:
         simulation.loadCheckpoint(checkpoint)
-        print(f"Restart simulation from step: {simulation.context.getState().getStepCount()}")
+        print(f"Restarting from step: {simulation.context.getState().getStepCount()}")
         nsteps_remain = md_steps - simulation.context.getState().getStepCount()
     else:
         xyz = np.array(hps_model.positions / unit.nanometer)
@@ -190,7 +192,7 @@ def main():
     mm.app.PDBFile.writeFile(hps_model.topology, last_frame, open(f'{protein_code}_final.pdb', 'w'))
     simulation.saveCheckpoint(checkpoint)
 
-    print(f"--- Finished in {(time.time() - start_time):.3f} seconds ---")
+    print(f"Finished in {(time.time() - start_time):.3f} seconds")
 
 
 if __name__ == '__main__':

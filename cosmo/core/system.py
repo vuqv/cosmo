@@ -1055,20 +1055,21 @@ class system:
             forces = [np.linalg.norm([f[0]._value, f[1]._value, f[2]._value]) for f in state.getForces()]
             # print(state.getForces())
             prev_force = None
+            iteration = 0
             tolerance = 10
 
             while np.max(forces) > threshold:
+                iteration += 1
 
                 # Write atom with the largest force if not reported before
                 if np.max(forces) != prev_force:
                     atom = self.atoms[np.argmax(forces)]
                     residue = atom.residue
-                    print(f'Large force {np.max(forces):.3f} kJ/(mol nm) found in:')
-                    print(f'Atom: {atom.index} {atom.name}')
-                    print(f'Residue: {residue.name} {residue.index}')
-                    print(f'Minimising system with energy tolerance of {tolerance:.1f} kJ/mol')
-                    print('_______________________')
-                    print('')
+                    print(
+                        f'[{iteration}] max_force={np.max(forces):.3f} kJ/(mol nm) '
+                        f'atom={atom.index} {atom.name} residue={residue.name} {residue.index} '
+                        f'tolerance={tolerance:.1f} kJ/mol'
+                    )
 
                 sim.minimizeEnergy(tolerance=tolerance * unit.kilojoule / (unit.mole * unit.nanometer))
                 # minimized = True
