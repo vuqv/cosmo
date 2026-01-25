@@ -1,0 +1,4 @@
+Sphinx>=5.0
+sphinx-rtd-theme>=1.2
+rst2pdf>=0.100
+GitPython>=3.1
