@@ -1,67 +1,70 @@
-# `COSMO`: COarse-grained Simulation of intrinsically disordered prOteins with openMM 
+# COSMO: COarse-grained Simulation of intrinsically disordered prOteins with OpenMM
 
--------------------------------------
-### A coarse-grained simulation engine empowered by openMM
+COSMO is a coarse-grained simulation engine for intrinsically disordered proteins and
+related biomolecules, built on OpenMM.
 
-Currently, there are four models are supported:
+## Supported models
 
-1) `hps_urry:` Hydropathy according to Urry scale (default, Recommended).
-2) `hps_kr:`  Kapcha-Rossy scale.
-   This model has parameters for nucleic acids and post-translational modification residues.
-3) `hps_ss:` `hps_urry` with bonded potential.  
-4) `mpipi`: another model that using Wang-Frenkel short range potential instead of LJ 12-6
-5) Other models can be easily implemented by defining them in `cosmo/parameters/model_parameters.py`
+Currently, these models are supported:
 
-<u>Models summary:</u>
--------------
-| Model      | components support                    | Implemented             | Tested  |
+1) `hps_urry`: Hydropathy according to the Urry scale (default, recommended).
+2) `hps_kr`: Kapcha-Rossy scale. Includes parameters for nucleic acids and
+   post-translational modifications.
+3) `hps_ss`: `hps_urry` with bonded potential.
+4) `mpipi`: Wang-Frenkel short-range potential instead of LJ 12-6.
+5) Additional models can be added by defining them in
+   `cosmo/parameters/model_parameters.py`.
+
+### Models summary
+
+| Model      | Components supported                  | Implemented             | Tested  |
 |------------|---------------------------------------|-------------------------|---------|
 | `hps_kr`   | protein, RNA, phosphorylation protein | protein, p-protein, RNA | protein |
 | `hps_urry` | protein, DNA                          | protein                 | protein |
 | `hps_ss`   | protein                               | protein                 | protein |
 | `mpipi`    | protein, RNA                          | protein                 | protein |
 
-The package is ready for studying various problems such as, conformation dynamics of single chain, LLPS ...
+COSMO can be used to study single-chain conformations, LLPS, and related phenomena.
 
-Checkout documentation for more details: [here](https://qvv5013.github.io/docs-hpsOpenMM/). 
-A simple example can be found [here](https://qvv5013.github.io/posts/openMM/hpsOpenMM_tutorial.html).
+## Documentation and tutorials
 
-More information can be found in my personal blog: https://qvv5013.github.io/
+- Documentation: https://qvv5013.github.io/docs-hpsOpenMM/
+- Tutorial: https://qvv5013.github.io/posts/openMM/hpsOpenMM_tutorial.html
+- Additional notes: https://vuqv.github.io/
 
--------------------------------------
+## Requirements
 
-## Requirements:
+- OpenMM >= 7.7 (choose a CUDA toolkit compatible with your NVIDIA driver)
+- ParmEd
 
-- **OpenMM >=7.7<sup>a,b</sup>** (select cuda version that compatible with your nvidia driver)
-- **Parmed**
----
-<sup>a</sup>: function `getStepCount()` does not work as expected (or is not implemented in versions earlier than 7.7).
-This function is necessary when restarting simulations.
+Notes:
+- `getStepCount()` is not available or reliable before OpenMM 7.7 and is required to
+  restart simulations.
+- OpenMM 8.2 is recommended for better performance.
 
-<sup>b</sup>: I recommend to upgrade to openMM 8.0 for better performance.
+## Installation and usage (Linux)
 
-## How to use COSMO:
+1) Create a conda environment:
+   `conda create -n py310 python=3.10`
+2) Activate it:
+   `conda activate py310`
+3) Install OpenMM 7.7 or later:
+   `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
+   - Conda may pick a newer CUDA toolkit by default. Choose a version compatible with
+     your NVIDIA driver.
+4) Download this repository to a target path, for example: `PATH_TO_CODE/cosmo/`
+5) Add the module to your Python path in `.bashrc`:
+   `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
 
-#### Linux:
-The main requirements is `openMM >= 7.7`. Other packages are requires as well (see `requirements.txt`)
+Remember to replace `PATH_TO_CODE` with your actual path.
 
-- Create conda environment: `conda create -n py310 python=3.10`
-- activate `py310` env : `conda activate py310`
-- Install `openMM 7.7` (or later): `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
-  * conda will try to install the latest version of `cudatoolkit` and 
-  sometime it will not work. </br> You should select version that is compatible with your nvidia-driver (if you have NVIDIA GPU)
-- Download folder and place in target location, for example: </br>`PATH_TO_CODE/cosmo/`
-- Add `cosmo` module in Python path so that Python know what `cosmo` is (in `.bashrc` file): 
-`export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
+## Example
 
-<u>REMEMBER TO CHANGE `PATH_TO_CODE` TO YOUR SPECIFIC.</u>
+The standard example is at `examples/standard_example`. You will need a control file
+(for example, `md.ini`). See the parameter reference here:
+https://qvv5013.github.io/docs-hpsOpenMM/usage/simulation_control.html
 
-#### Example:
-- The standard example can be found at `example/standard_example`. 
-You will need a control parameter file (e.g `md.ini`). Check [here](https://qvv5013.github.io/docs-hpsOpenMM/usage/simulation_control.html) for more information. 
-
-Example of `md.ini`:
---------------------
+Example `md.ini`:
 
 ```
 [OPTIONS]
@@ -75,17 +78,17 @@ model = mpipi
 
 ; control temperature coupling
 tcoupl = yes
-ref_t = 310 ; Kelvin- reference temperature
+ref_t = 310 ; Kelvin - reference temperature
 tau_t = 0.01 ; ps^-1
 
-;pressure coupling
+; pressure coupling
 pcoupl = no
 ref_p = 1
 frequency_p = 25
 
-; Periodic boundary condition: if pcoupl is yes then pbc must be yes.
+; periodic boundary condition: if pcoupl is yes then pbc must be yes
 pbc = yes
-; if pbc=yes, then use box_dimension option to specify box_dimension = x or [x, y, z], unit of nanometer
+; if pbc=yes, then use box_dimension to specify x or [x, y, z] in nm
 box_dimension = 30 ; [30, 30, 60]
 
 ; input
@@ -93,67 +96,87 @@ protein_code = ASYN
 pdb_file = asyn.pdb
 ; output
 checkpoint = asyn.chk
-;Use GPU/CPU
+; use GPU/CPU
 device = GPU
-; If CPU is specified, then use ppn variable
+; if CPU is specified, then use ppn
 ppn = 4
-;Restart simulation
+; restart simulation
 restart = no
-minimize = yes ;if not restart, then minimize will be loaded, otherwise, minimize=False
-
+minimize = yes ; if not restart, then minimize will be loaded
 ```
--------------------------------
-- Run simulation: 
-  - I give you two options to perform simulations:
-    * First option:
-      - goto example folder, e.g `examples/standard_example/`: 
-      - edit simulation config file: `md.ini`
-      - execute command: `python run_simulation.py -f md.ini`
-    * Second option:
-      * add python environment created above in the beginning of `cosmo-simulation.py` script: 
-       `/home/qvv5013/anaconda3/envs/py310/bin/python` - point to the environment you created above
-      * make the `cosmo-simulation.py` script to be executable: `chmod +x /PATH_TO_COSMO/cosmo-simulation.py`
-      * Create an `alias` to `cosmo-simulation.py`. e.g: I modify my `.bashrc`: 
-        `alias cosmo-simulation='/home/qvv5013/work3/code/cosmo/cosmo/cosmo-simulation.py '`
-      * in your simulation directory, prepare control file contains simulation parameters.
-      * run simulation: `cosmo-simulation -f md.ini`
-       
-#### Windows:
 
-- No idea (no time to test) !!!
+## Running a simulation
 
-#### MacOS:
+Option 1: run from an example directory:
 
-- No money to test !!!
+1) Go to `examples/standard_example/`.
+2) Edit `md.ini`.
+3) Run: `python run_simulation.py -f md.ini`
 
-## Notes:
+Option 2: use the `cosmo-simulation.py` wrapper:
 
-- *Note that in cluster, when submit job, the environment may not load `.bashrc`, so need to
-  load conda environment in job file:*
-  `source PATH_TO_ANNACONDA/anaconda3/etc/profile.d/conda.sh`
-- Activate environment (e.g py310): `conda activate py310`
+1) Set the Python path at the top of `cosmo-simulation.py` to your environment:
+   `/home/qvv5013/anaconda3/envs/py310/bin/python`
+2) Make it executable:
+   `chmod +x /PATH_TO_COSMO/cosmo-simulation.py`
+3) Add an alias in `.bashrc`, for example:
+   `alias cosmo-simulation='/home/qvv5013/work3/code/cosmo/cosmo/cosmo-simulation.py'`
+4) In your simulation directory, prepare a control file.
+5) Run: `cosmo-simulation -f md.ini`
 
--------------------------------------
+## Windows
+
+Not tested yet.
+
+## macOS
+
+Not tested yet.
+
+## Cluster note
+
+When submitting jobs on a cluster, `.bashrc` may not load. Source conda manually in the
+job script:
+
+`source PATH_TO_ANACONDA/anaconda3/etc/profile.d/conda.sh`
+
+Then activate your environment, for example:
+
+`conda activate py310`
 
 ## Bugs
 
-- If you encounter any bugs, please report the issue to `Quyen Vu` (`vuqv.phys@gmail.com`). 
-- Please note that any bugs encountered are my responsibility and not that of the authors of the models. 
-Therefore, I kindly request that you refrain from bothering them regarding any issues that may arise.
+If you encounter issues, please report them to Quyen Vu (`vuqv.phys@gmail.com`).
+Please do not contact the model authors for COSMO-specific bugs.
 
-## <u>Acknowledgments:</u>
+## Acknowledgments
 
+This project builds on the original work of Prof. Jeetain Mittal's group (hps family)
+and Prof. Rosana Collepardo-Guevara's group (mpipi model).
 
-## <u>Cite this work</u>
+This software was developed with time and financial support from the Institute of Physics,
+Polish Academy of Sciences (Prof. Mai Suan Li), and Penn State University (Prof. Edward O'Brien).
 
-This software is based on the original work of Prof. Jeetain Mittal's group (hps family) and 
-Prof. Rosana Collepardo-Guevara's group (mpipi model). We have not published any paper using this software yet. 
-If you have used it in your publications, please cite the source accordingly.
+## Cite this work
 
-* `hps` family (`hps-urry`, `hps-kr`, and `hps-ss`):
-  - (`hps-kr`) Dignon, G. L.; Zheng, W.; Kim, Y. C.; Best, R. B.; Mittal, J. Sequence Determinants of Protein Phase Behavior from a Coarse-Grained Model. PLoS Comput. Biol. 2018, 1–23. https://doi.org/10.1101/238170.
-  - (`hps-urry`) Regy, R. M.; Thompson, J.; Kim, Y. C.; Mittal, J. Improved Coarse-Grained Model for Studying Sequence Dependent Phase Separation of Disordered Proteins. Protein Sci. 2021, 30 (7), 1371–1379. https://doi.org/10.1002/pro.4094.
-  - (`hps-ss`) Rizuan, A.; Jovic, N.; Phan, T. M.; Kim, Y. C.; Mittal, J. Developing Bonded Potentials for a Coarse-Grained Model of Intrinsically Disordered Proteins. J. Chem. Inf. Model. 2022, 62 (18), 4474–4485. https://doi.org/10.1021/acs.jcim.2c00450.
+If you use this software in your publications, please cite the following sources.
 
-* `mpipi`
-  - (`mpipi`)  Joseph, J. A.; Reinhardt, A.; Aguirre, A.; Chew, P. Y.; Russell, K. O.; Espinosa, J. R.; Garaizar, A.; Collepardo-Guevara, R. Physics-Driven Coarse-Grained Model for Biomolecular Phase Separation with near-Quantitative Accuracy. Nat. Comput. Sci. 2021, 1 (11), 732–743. https://doi.org/10.1038/s43588-021-00155-3.
+- Vu, Q. V.; Sitarik, I.; Li, M. S.; O’Brien, E. P. Noncovalent Lasso Entanglements are
+  Common in Experimentally Derived Intrinsically Disordered Protein Ensembles and
+  Strongly Influenced by Protein Length and Charge. J Phys Chem B 129, 4682–4691 (2025).
+
+- `hps` family (`hps-urry`, `hps-kr`, and `hps-ss`):
+  - Dignon, G. L.; Zheng, W.; Kim, Y. C.; Best, R. B.; Mittal, J. Sequence Determinants
+    of Protein Phase Behavior from a Coarse-Grained Model. PLoS Comput. Biol. 2018,
+    1–23. https://doi.org/10.1101/238170.
+  - Regy, R. M.; Thompson, J.; Kim, Y. C.; Mittal, J. Improved Coarse-Grained Model for
+    Studying Sequence Dependent Phase Separation of Disordered Proteins. Protein Sci.
+    2021, 30 (7), 1371–1379. https://doi.org/10.1002/pro.4094.
+  - Rizuan, A.; Jovic, N.; Phan, T. M.; Kim, Y. C.; Mittal, J. Developing Bonded
+    Potentials for a Coarse-Grained Model of Intrinsically Disordered Proteins. J. Chem.
+    Inf. Model. 2022, 62 (18), 4474–4485. https://doi.org/10.1021/acs.jcim.2c00450.
+
+- `mpipi` model:
+  - Joseph, J. A.; Reinhardt, A.; Aguirre, A.; Chew, P. Y.; Russell, K. O.; Espinosa,
+    J. R.; Garaizar, A.; Collepardo-Guevara, R. Physics-Driven Coarse-Grained Model for
+    Biomolecular Phase Separation with near-Quantitative Accuracy. Nat. Comput. Sci.
+    2021, 1 (11), 732–743. https://doi.org/10.1038/s43588-021-00155-3.
