@@ -78,17 +78,18 @@ Torsion Potential
 
 Parameters:
 
-    :math:`k_{\alpha,1}=11.4 kcal/(mol \times rad^2),\\
-    k_{\alpha,2}=0.15 kcal/(mol\times rad^4),\\
-    \theta_{\alpha,1} = 0.9 rad,\\
-    \theta_{\alpha,2}=1.02 rad,\\
-    e_0 = 0.27 kcal/mol,\\
-    k_{\beta,1}=1.8kcal/(mol \times rad^2),\\
-    k_{\beta,2}=0.65kcal/(mol\times rad^4),\\
-    \theta_{\beta,1}=-1.55 rad,\\
-    \theta_{\beta,2}=-2.5 rad,\\
-    e_1 = 0.14 kcal/mol,\\
-    e_2 = 0.4 kcal/mol`
+.. math::
+    k_{\alpha,1} = 11.4 \ \mathrm{kcal}/(\mathrm{mol} \times \mathrm{rad}^2) \\
+    k_{\alpha,2} = 0.15 \ \mathrm{kcal}/(\mathrm{mol} \times \mathrm{rad}^4) \\
+    \theta_{\alpha,1} = 0.9 \ \mathrm{rad} \\
+    \theta_{\alpha,2} = 1.02 \ \mathrm{rad} \\
+    e_0 = 0.27 \ \mathrm{kcal}/\mathrm{mol} \\
+    k_{\beta,1} = 1.8 \ \mathrm{kcal}/(\mathrm{mol} \times \mathrm{rad}^2) \\
+    k_{\beta,2} = 0.65 \ \mathrm{kcal}/(\mathrm{mol} \times \mathrm{rad}^4) \\
+    \theta_{\beta,1} = -1.55 \ \mathrm{rad} \\
+    \theta_{\beta,2} = -2.5 \ \mathrm{rad} \\
+    e_1 = 0.14 \ \mathrm{kcal}/\mathrm{mol} \\
+    e_2 = 0.4 \ \mathrm{kcal}/\mathrm{mol}
 
 
 The Pairwise potential:

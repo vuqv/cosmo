@@ -19,7 +19,7 @@ Currently, these models are supported:
 
 | Model      | Components supported                  | Implemented             | Tested  |
 |------------|---------------------------------------|-------------------------|---------|
-| `hps_kr`   | protein, RNA, phosphorylation protein | protein, p-protein, RNA | protein |
+| `hps_kr`   | protein, RNA, phosphorylation protein | protein, p-protein, RNA | protein / RNA |
 | `hps_urry` | protein, DNA                          | protein                 | protein |
 | `hps_ss`   | protein                               | protein                 | protein |
 | `mpipi`    | protein, RNA                          | protein                 | protein |
@@ -28,8 +28,8 @@ COSMO can be used to study single-chain conformations, LLPS, and related phenome
 
 ## Documentation and tutorials
 
-- Documentation: https://vuqv.github.io/docs-cosmo/
-- Tutorial: https://vuqv.github.io/posts/openMM/cosmo_tutorial.html
+- Documentation: https://vuqv.github.io/cosmo/
+- Tutorial: ```coming soon```
 - Additional notes: https://vuqv.github.io/
 
 ## Requirements
