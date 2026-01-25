@@ -24,8 +24,8 @@ A class containing methods and parameters for generating CG systems to be simula
         .. automethod:: cosmo.core.system.dumpStructure
         .. automethod:: cosmo.core.system.dumpTopology
         .. automethod:: cosmo.core.system.dumpForceFieldData
-        .. automethod:: cosmo.core.system.setCAMassPerResidueType
-        .. automethod:: cosmo.core.system.setCARadiusPerResidueType
-        .. automethod:: cosmo.core.system.setCAChargePerResidueType
-        .. automethod:: cosmo.core.system.setCAHPSPerResidueType
+        .. automethod:: cosmo.core.system.setMassPerResidueType
+        .. automethod:: cosmo.core.system.setRadiusPerResidueType
+        .. automethod:: cosmo.core.system.setChargePerResidueType
+        .. automethod:: cosmo.core.system.setHPSPerResidueType
         .. automethod:: cosmo.core.system._setParameters

@@ -177,13 +177,15 @@ class system:
         # Initialise an OpenMM system class instance
         self.system = mm.System()
 
-    def getCAlphaOnly(self) -> None:
+    def coarseGrainingStructure(self) -> None:
         """
-        Filter in only alpha carbon atoms from the input structure and updates
-        the topology object to add new bonds between them. Used specially for
-        creating alpha-carbon (CA) coarse-grained models.
+        Filter in only alpha carbon atoms and phosphate P atoms from the input
+        structure and updates the topology object to add new bonds between them.
+        Used specially for creating alpha-carbon (CA) coarse-grained models and
+        nucleotide P representations.
 
-        Keeps in the :code:`cosmo system` only the alpha carbon atoms from the :code:`OpenMM topology`.
+        Keeps in the :code:`cosmo system` only the alpha carbon atoms and P atoms
+        from the :code:`OpenMM topology`.
 
         @TODO:
         check for residues indices are consecutive:
@@ -205,14 +207,14 @@ class system:
         None
         """
 
-        # save all non C-alpha atoms
+        # save all non C-alpha and non P atoms
         atoms_to_remove = []
         # oldIndex = []
         for a in self.topology.atoms():
             if a.name != 'CA' and a.name != 'P': # for RNA, keep atom P for phosphate groups
                 atoms_to_remove.append(a)
 
-        # Remove all non C-alpha atoms
+        # Remove all non C-alpha and non P atoms
         modeller_topology = mm.app.modeller.Modeller(self.topology, self.positions)
         modeller_topology.delete(atoms_to_remove)
         self.topology = modeller_topology.getTopology()
@@ -247,9 +249,10 @@ class system:
         Reads atoms from topology, adds them to the main class and sorts them
         into a dictionary to store their forcefield properties.
 
-        After getCAlphaOnly, C-alpha atoms are stored on :code:`self.topology only`.
-        We need to add them to atoms attribute and system also.
-        Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`COSMO system` class.
+        After coarseGrainingStructure, retained CA and P atoms are stored on
+        :code:`self.topology` only. We need to add them to the atoms attribute
+        and system also. Adds :code:`atoms` in the :code:`OpenMM topology`
+        instance to the :code:`COSMO system` class.
 
         Parameters
         ----------
@@ -1022,8 +1025,8 @@ class system:
         """
 
         # minimized = False
-        print('__________________________________________________________________')
-        print('Potential Energy from initial structure (input structure):')
+        print('-' * 70)
+        print('Potential energy from initial structure:')
 
         # Define test simulation to extract forces
         integrator = mm.LangevinIntegrator(1 * unit.kelvin, 1 / unit.picosecond,
@@ -1033,11 +1036,13 @@ class system:
         state = sim.context.getState(getForces=True, getEnergy=True)
 
         # Print initial state of the system
-        print(f'The Potential Energy of the system is : {state.getPotentialEnergy()}')
+        print(
+            f'Total: {state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole):.3f} kJ/mol'
+        )
         for i, n in enumerate(self.forceGroups):
             energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                 unit.kilojoules_per_mole)
-            print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kJ/mol')
+            print(f'{n.replace("Force", "Energy")}: {energy:.3f} kJ/mol')
         print('')
 
         # print(state.getForces())
@@ -1078,19 +1083,19 @@ class system:
                     raise ValueError('The system could not be minimized at the requested convergence\n' +
                                      'Try to increase the force threshold value to achieve convergence.')
 
-            print(f'All forces are less than {threshold:.2f} kJ/mol/nm')
-            print('______________________')
+            print(f'All forces are below {threshold:.2f} kJ/mol/nm')
+            print('-' * 30)
             state = sim.context.getState(getPositions=True, getEnergy=True)
-            print('Potential Energy After minimisation:')
-            print(f'The Potential Energy of the system (after minimized) is : {state.getPotentialEnergy()}')
+            print('Potential energy after minimization:')
+            print(f'Total: {state.getPotentialEnergy().value_in_unit(unit.kilojoules_per_mole):.3f} kJ/mol')
             for i, n in enumerate(self.forceGroups):
                 energy = sim.context.getState(getEnergy=True, groups={i}).getPotentialEnergy().value_in_unit(
                     unit.kilojoules_per_mole)
-                print('The ' + n.replace('Force', 'Energy') + ' is: ' + str(energy) + ' kJ/mol')
+                print(f'{n.replace("Force", "Energy")}: {energy:.3f} kJ/mol')
 
             print('')
             self.positions = state.getPositions()
-            print('Saving minimized positions')
+            print('Saving minimized positions...')
             print('__________________________________________________________________')
             print('')
 
@@ -1274,13 +1279,13 @@ class system:
                                                                   atom2.name + '_' + res2.name + '_' + str(
                                                                       res2.index + 1)))
 
-    def setCAMassPerResidueType(self):
+    def setMassPerResidueType(self):
         """
-        Sets alpha carbon atoms to their average residue mass. Used specially for
-        modifying alpha-carbon (CA) coarse-grained models.
+        Sets CA and P atoms to their average residue mass. Used specially for
+        modifying CA coarse-grained models with nucleotide P representations.
 
-        Sets the masses of the alpha carbon atoms to the average mass
-        of its amino acid residue.
+        Sets the masses of CA and P atoms to the average mass of their
+        corresponding residues.
 
         Parameters
         ----------
@@ -1300,14 +1305,13 @@ class system:
 
         self.setParticlesMass(masses)
 
-    def setCARadiusPerResidueType(self):
+    def setRadiusPerResidueType(self):
         """
-        Sets alpha carbon atoms to their average residue mass. Used specially for
-        modifying alpha-carbon (CA) coarse-grained models.
+        Sets CA and P atoms to their characteristic residue radius. Used specially for
+        modifying CA coarse-grained models with nucleotide P representations.
 
-        Sets the excluded volume radii of the alpha carbon atoms
-        to characteristic radii of their corresponding amino acid
-        residue.
+        Sets the excluded volume radii of CA and P atoms to characteristic
+        radii of their corresponding residues.
 
         Parameters
         ----------
@@ -1330,11 +1334,10 @@ class system:
 
         self.setParticlesRadii(radii)
 
-    def setCAChargePerResidueType(self):
+    def setChargePerResidueType(self):
         """
-        Sets the charge of the alpha carbon atoms
-        to characteristic charge of their corresponding amino acid
-        residue.
+        Sets the charge of CA and P atoms to the characteristic charge of their
+        corresponding residues.
 
         Parameters
         ----------
@@ -1356,12 +1359,12 @@ class system:
 
         self.setParticlesCharge(charge)
 
-    def setCAHPSPerResidueType(self):
+    def setHPSPerResidueType(self):
         """
-        Sets alpha carbon atoms to their residue hydropathy scale. Used specially for
-        modifying alpha-carbon (CA) coarse-grained models.
+        Sets the hydropathy scale for CA and P atoms. Used specially for
+        modifying CA coarse-grained models with nucleotide P representations.
 
-        Sets the HPS model of the alpha carbon atoms using corresponding scale.
+        Sets the HPS model of CA and P atoms using corresponding scale.
 
         Parameters
         ----------
