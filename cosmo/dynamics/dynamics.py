@@ -278,4 +278,4 @@ class Dynamics:
         last_frame = simulation.context.getState(getPositions=True, enforcePeriodicBox=bool(self.pbc)).getPositions()
         mm.app.PDBFile.writeFile(self.hps_model.topology, last_frame, open(f'{self.protein_code}_final.pdb', 'w'))
         simulation.saveCheckpoint(self.checkpoint)
-        print("--- Finished in %s seconds ---" % (time.time() - start_time))
+        print(f"--- Finished in {(time.time() - start_time):.2f} seconds ---")

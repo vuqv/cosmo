@@ -209,7 +209,7 @@ class system:
         atoms_to_remove = []
         # oldIndex = []
         for a in self.topology.atoms():
-            if a.name != 'CA':
+            if a.name != 'CA' and a.name != 'P': # for RNA, keep atom P for phosphate groups
                 atoms_to_remove.append(a)
 
         # Remove all non C-alpha atoms
@@ -913,7 +913,7 @@ class system:
 
     def createSystemObject(self, check_bond_distances: bool = True, minimize: bool = False,
                            check_large_forces: bool = True, force_threshold: float = 10.0,
-                           bond_threshold: float = 0.5) -> None:
+                           bond_threshold: float = 0.7) -> None:
         """
         Creates OpenMM system object adding particles, masses and forces.
         It also groups the added forces into Force-Groups for the hpsReporter
@@ -1065,7 +1065,7 @@ class system:
                     print('_______________________')
                     print('')
 
-                sim.minimizeEnergy(tolerance=tolerance * unit.kilojoule / unit.mole)
+                sim.minimizeEnergy(tolerance=tolerance * unit.kilojoule / (unit.mole * unit.nanometer))
                 # minimized = True
                 state = sim.context.getState(getForces=True)
                 prev_force = np.max(forces)
@@ -1385,6 +1385,16 @@ class system:
         self.setParticlesHPS(hps)
 
     def setCAIDPerResidueType(self):
+        """
+        In the mpipi model, we use the id to identify the type of the residue, because their interactions are tabulated.
+        So we need to set the id for each residue.
+
+        Parameters
+        ----------
+        Returns
+        -------
+        None
+        """
         params = model_parameters.parameters['mpipi']
         atom_type = []
 
