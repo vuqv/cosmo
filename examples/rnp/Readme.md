@@ -1,3 +1,3 @@
-This is a standard example to work with hpsOpenMM code.
+This is a standard example to work with COSMO.
 Just plug the PDB file in, modify md.ini as you need and tada...
 Run the simulation and happy analyzing the data.

@@ -1,5 +1,5 @@
 # Import OpenMM library
-# Import hpsOpenMM library
+# Import COSMO library
 import argparse
 
 import cosmo

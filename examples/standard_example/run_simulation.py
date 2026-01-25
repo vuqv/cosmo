@@ -1,5 +1,5 @@
 # Import OpenMM library
-# Import hpsOpenMM library
+# Import COSMO library
 import argparse
 import configparser
 import time
@@ -21,7 +21,7 @@ warnings.filterwarnings("ignore", category=OpenMMWarning)
 
 def main():
     """
-        Run a simulation using the hpsOpenMM library and parameters specified in a config file.
+        Run a simulation using the COSMO library and parameters specified in a config file.
 
         Usage: python run_simulation.py -f md.ini
         or cosmo-simulation -f md.ini

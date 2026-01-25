@@ -4,7 +4,7 @@ cosmo.reporter package
 Submodules
 ----------
 
-cosmo.reporter.hps\_reporter module
+cosmo.reporter.cosmo\_reporter module
 ---------------------------------
 
 .. automodule:: cosmo.reporter.cosmo_reporter

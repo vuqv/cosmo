@@ -19,7 +19,7 @@ import sys
 
 # -- Project information -----------------------------------------------------
 
-project = u'hpsOpenMM'
+project = u'COSMO'
 copyright = u'2022, Quyen Vu'
 author = u'Quyen Vu'
 
@@ -60,7 +60,7 @@ extensions = [
     'sphinx.ext.githubpages',
 ]
 
-pdf_documents = [('index', u'rst2pdf', u'hpsOpenMM', u'Quyen Vu'),]
+pdf_documents = [('index', u'rst2pdf', u'COSMO', u'Quyen Vu'),]
 
 
 #mathjax_config = {
@@ -149,7 +149,7 @@ html_logo = "_static/logo.svg"
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'hpsOpenMMdoc'
+htmlhelp_basename = 'cosmodoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -176,8 +176,8 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'hpsOpenMM.tex', 'hpsOpenMM Documentation',
-     'hpsOpenMM', 'manual'),
+    (master_doc, 'cosmo.tex', 'COSMO Documentation',
+     'COSMO', 'manual'),
 ]
 
 
@@ -186,7 +186,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'hpsOpenMM', 'hpsOpenMM Documentation',
+    (master_doc, 'cosmo', 'COSMO Documentation',
      [author], 1)
 ]
 
@@ -197,8 +197,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'hpsOpenMM', 'hpsOpenMM Documentation',
-     author, 'hpsOpenMM', 'Analysis package for all-atom simulations of proteins, with a specific focus on intrinsically disordered proteins.',
+    (master_doc, 'cosmo', 'COSMO Documentation',
+     author, 'cosmo', 'Coarse-grained simulation package for intrinsically disordered proteins.',
      'Miscellaneous'),
 ]
 
@@ -222,7 +222,7 @@ templates_path = ['_templates']
 if 'REPO_NAME' in os.environ:
     REPO_NAME = os.environ['REPO_NAME']
 else:
-    REPO_NAME = 'hpsOpenMM'
+    REPO_NAME = 'cosmo'
 
 # SET CURRENT_LANGUAGE
 if 'current_language' in os.environ:
@@ -275,6 +275,6 @@ rinoh_documents = [(
 )]
 today_fmt = "%B %d, %Y"
 html_context['display_github'] = True
-html_context['github_user'] = 'qvv5013'
-html_context['github_repo'] = 'rtd-github-pages'
+html_context['github_user'] = 'vuqv'
+html_context['github_repo'] = 'cosmo'
 html_context['github_version'] = 'main'

@@ -1,7 +1,7 @@
 """
-core package of the hpsOpenMM package that contains the main cosmo classes.
+core package of the COSMO package that contains the main cosmo classes.
 
-The cosmo.core package contains the three hpsOpenMM main classes:
+The cosmo.core package contains the three COSMO main classes:
 
     1. geometry
 

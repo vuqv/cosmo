@@ -1,29 +1,29 @@
-hps.core package
+cosmo.core package
 ================
 
 Submodules
 ----------
 
-hps.core.geometry module
+cosmo.core.geometry module
 ------------------------
 
-.. automodule:: hps.core.geometry
+.. automodule:: cosmo.core.geometry
    :members:
    :undoc-members:
    :show-inheritance:
 
-hps.core.models module
+cosmo.core.models module
 ----------------------
 
-.. automodule:: hps.core.models
+.. automodule:: cosmo.core.models
    :members:
    :undoc-members:
    :show-inheritance:
 
-hps.core.system module
+cosmo.core.system module
 ----------------------
 
-.. automodule:: hps.core.system
+.. automodule:: cosmo.core.system
    :members:
    :undoc-members:
    :show-inheritance:
@@ -31,7 +31,7 @@ hps.core.system module
 Module contents
 ---------------
 
-.. automodule:: hps.core
+.. automodule:: cosmo.core
    :members:
    :undoc-members:
    :show-inheritance:

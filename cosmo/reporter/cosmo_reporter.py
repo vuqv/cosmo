@@ -10,7 +10,7 @@ from cosmo.core import system
 class cosmoReporter(StateDataReporter):
     """
     A special case of the StateDataReporter class that outputs information about a simulation,
-    such as energy and temperature, etc. to a file. This special reporter outputs the hpsOpenMM
+    such as energy and temperature, etc. to a file. This special reporter outputs the COSMO
     force group energies inside the sbmOpenMM system object.
 
     It is used in the same way as the OpenMM StateDataReporter class, but it takes as additional
@@ -69,7 +69,7 @@ class cosmoReporter(StateDataReporter):
 
     def _constructReportValues(self, simulation, state):
         """
-        Calculates the energies for the force groups in the hpsOpenMM system instance.
+        Calculates the energies for the force groups in the COSMO system instance.
 
         Parameters
         ----------

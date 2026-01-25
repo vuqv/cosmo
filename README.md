@@ -28,8 +28,8 @@ COSMO can be used to study single-chain conformations, LLPS, and related phenome
 
 ## Documentation and tutorials
 
-- Documentation: https://qvv5013.github.io/docs-hpsOpenMM/
-- Tutorial: https://qvv5013.github.io/posts/openMM/hpsOpenMM_tutorial.html
+- Documentation: https://vuqv.github.io/docs-cosmo/
+- Tutorial: https://vuqv.github.io/posts/openMM/cosmo_tutorial.html
 - Additional notes: https://vuqv.github.io/
 
 ## Requirements
@@ -62,7 +62,7 @@ Remember to replace `PATH_TO_CODE` with your actual path.
 
 The standard example is at `examples/standard_example`. You will need a control file
 (for example, `md.ini`). See the parameter reference here:
-https://qvv5013.github.io/docs-hpsOpenMM/usage/simulation_control.html
+https://vuqv.github.io/docs-cosmo/usage/simulation_control.html
 
 Example `md.ini`:
 
@@ -116,11 +116,11 @@ Option 1: run from an example directory:
 Option 2: use the `cosmo-simulation.py` wrapper:
 
 1) Set the Python path at the top of `cosmo-simulation.py` to your environment:
-   `/home/qvv5013/anaconda3/envs/py310/bin/python`
+   `$HOME/anaconda3/envs/py310/bin/python`
 2) Make it executable:
    `chmod +x /PATH_TO_COSMO/cosmo-simulation.py`
 3) Add an alias in `.bashrc`, for example:
-   `alias cosmo-simulation='/home/qvv5013/work3/code/cosmo/cosmo/cosmo-simulation.py'`
+   `alias cosmo-simulation='$HOME/work3/code/cosmo/cosmo/cosmo-simulation.py'`
 4) In your simulation directory, prepare a control file.
 5) Run: `cosmo-simulation -f md.ini`
 

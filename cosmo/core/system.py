@@ -249,7 +249,7 @@ class system:
 
         After getCAlphaOnly, C-alpha atoms are stored on :code:`self.topology only`.
         We need to add them to atoms attribute and system also.
-        Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
+        Adds :code:`atoms` in the :code:`OpenMM topology` instance to the :code:`COSMO system` class.
 
         Parameters
         ----------
@@ -278,7 +278,7 @@ class system:
         Reads bonds from topology, adds them to the main class and sorts them
         into a dictionary to store their forcefield properties.
 
-        Adds :code:`bonds` in the :code:`OpenMM topology` instance to the :code:`hpsOpenMM system` class.
+        Adds :code:`bonds` in the :code:`OpenMM topology` instance to the :code:`COSMO system` class.
 
         Parameters
         ----------
@@ -477,7 +477,7 @@ class system:
         Parameters
         ----------
         particles_mass : float or list
-            Mass(es) values to add for the particles in the hpsOpenMM system class.
+            Mass(es) values to add for the particles in the COSMO system class.
 
         Returns
         -------
@@ -497,7 +497,7 @@ class system:
         Parameters
         ----------
         particles_radii : float or list
-            Radii values to add for the particles in the hpsOpenMM system class.
+            Radii values to add for the particles in the COSMO system class.
 
         Returns
         -------
@@ -515,7 +515,7 @@ class system:
         Parameters
         ----------
         particles_charge : float or list
-            Charge values to add for the particles in the hpsOpenMM system class.
+            Charge values to add for the particles in the COSMO system class.
 
         Returns
         -------
@@ -533,7 +533,7 @@ class system:
         Parameters
         ----------
         particles_hps : float or list
-            HPS scale values to add for the particles in the hpsOpenMM system class.
+            HPS scale values to add for the particles in the COSMO system class.
 
         Returns
         -------
@@ -1172,7 +1172,7 @@ class system:
         Writes a topology file of the system in PSF format, this is used for visualization and post-analysis.
 
         Writes a file containing the current topology in the
-        hpsOpenMM system. This file contains topology of system, used in visualization and analysis.
+        COSMO system. This file contains topology of system, used in visualization and analysis.
 
         Here, we used :code:`parmed` to load :code:`openMM topology` and :code:`openMM system` to create
         :code:`Structure` object in :code:`parmed`.

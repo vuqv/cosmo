@@ -11,6 +11,6 @@
 cd $PBS_O_WORKDIR
 
 cur_dir=`pwd`
-source /storage/home/qvv5013/work/anaconda3/etc/profile.d/conda.sh
+source "$HOME/anaconda3/etc/profile.d/conda.sh"
 #conda activate py37
 python single_run_get_time_fQ.py -f control_cal_fQ.config

@@ -8,7 +8,7 @@ Considering an input structure, the library automatizes the creation of forces t
 
 The library offers methods to tailor forcefield parameter for each force term.
 
-hpsOpenMM is divided in three main classes:
+COSMO is divided in three main classes:
 
     1. geometry
 

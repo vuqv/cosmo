@@ -1,4 +1,4 @@
-#!/home/qvv5013/anaconda3/envs/py311/bin/python
+#!/usr/bin/env python3
 
 """
 This script is a command-line program for running a simulation of a protein system using the
@@ -9,7 +9,7 @@ Finally, the script runs the simulation by calling the run() method on the Dynam
 """
 
 # Import OpenMM library
-# Import hpsOpenMM library
+# Import COSMO library
 import argparse
 
 import cosmo

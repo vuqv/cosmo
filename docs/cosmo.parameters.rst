@@ -4,7 +4,7 @@ cosmo.parameters package
 Submodules
 ----------
 
-hps.parameters.model\_parameters module
+cosmo.parameters.model\_parameters module
 ---------------------------------------
 
 .. automodule:: cosmo.parameters.model_parameters
