@@ -5,10 +5,12 @@ The models class contains three methods for automatic setting up predefined pote
 
 It works by initializing a system class with the necessary force field parameters.
 
-Coarse grained, alpha-carbon (CA), model
+Coarse grained, CA/P model
 ++++++++++++++++++++++++++++++++++++++++
 
-The coarse grained method represents the protein system as beads centered at the alpha carbons of each residue in the protein. 
+The coarse grained method represents proteins as beads centered at the alpha
+carbons of each residue and nucleic acids as beads centered at the phosphate P
+atom of each nucleotide.
 
 It uses harmonic potentials to hold the covalent connectivity and geometry of the beads. 
 
@@ -16,7 +18,7 @@ Torsional geometries are modeled with a periodic torsion potential.
 
 Native contacts are represented through the use of Lennard-Jones potentials that allow to form and break non-bonded interactions, permitting complete and local unfolding of the structures.
 
-To create a CA model, call:
+To create a CA/P model, call:
 :code:`cosmo.core.models.buildHPSModel(structure_file, model='hps_urry')`
 
 Here, pdb_file is the path to the PDB format structure of the protein.
