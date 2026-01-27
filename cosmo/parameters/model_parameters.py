@@ -229,6 +229,181 @@ parameters = {
             "hps": -0.027
         }
     },
+    "synthesis_kr": {
+        "bond_length_protein": 0.38,  # nm
+        "bond_length_nucleic": 0.5,  # nm
+        "bond_force_constant": 8368.0,  # kj/mol/nm^2
+        "bonded_exclusions_index": 1,
+        "ALA": {
+            "mass": 71.08,
+            "radii": 0.504,
+            "charge": 0.0,
+            "hps": 0.730
+        },
+        "ARG": {
+            "mass": 156.20,
+            "radii": 0.656,
+            "charge": 1.0,
+            "hps": 0.000
+        },
+        "ASN": {
+            "mass": 114.10,
+            "radii": 0.568,
+            "charge": 0.0,
+            "hps": 0.432
+        },
+        "ASP": {
+            "mass": 115.10,
+            "radii": 0.558,
+            "charge": -1.0,
+            "hps": 0.378
+        },
+        "CYS": {
+            "mass": 103.10,
+            "radii": 0.548,
+            "charge": 0.0,
+            "hps": 0.595
+        },
+        "GLU": {
+            "mass": 129.10,
+            "radii": 0.592,
+            "charge": -1.0,
+            "hps": 0.459
+        },
+        "GLN": {
+            "mass": 128.10,
+            "radii": 0.602,
+            "charge": 0.0,
+            "hps": 0.514
+        },
+        "GLY": {
+            "mass": 57.05,
+            "radii": 0.450,
+            "charge": 0.0,
+            "hps": 0.649
+        },
+        "HIS": {
+            "mass": 137.10,
+            "radii": 0.608,
+            "charge": 0.5,
+            "hps": 0.514
+        },
+        "ILE": {
+            "mass": 113.20,
+            "radii": 0.618,
+            "charge": 0.0,
+            "hps": 0.973
+        },
+        "LEU": {
+            "mass": 113.20,
+            "radii": 0.618,
+            "charge": 0.0,
+            "hps": 0.973
+        },
+        "LYS": {
+            "mass": 128.20,
+            "radii": 0.636,
+            "charge": 1.0,
+            "hps": 0.514
+        },
+        "ALY": {
+            "mass": 170.20,
+            "radii": 0.681,
+            "charge": 0.0,
+            "hps": 0.7567
+        },  # N-epsilon acetyllysine
+        "MET": {
+            "mass": 131.20,
+            "radii": 0.618,
+            "charge": 0.0,
+            "hps": 0.838
+        },
+        "PHE": {
+            "mass": 147.20,
+            "radii": 0.636,
+            "charge": 0.0,
+            "hps": 1.000
+        },
+        "PRO": {
+            "mass": 97.12,
+            "radii": 0.556,
+            "charge": 0.0,
+            "hps": 1.000
+        },
+        "SER": {
+            "mass": 87.08,
+            "radii": 0.518,
+            "charge": 0.0,
+            "hps": 0.595
+        },
+        "SEP": {
+            "mass": 165.03,
+            "radii": 0.636,
+            "charge": -2.0,
+            "hps": 0.162
+        },  # phosposerine: phosphorylation of serine
+        "THR": {
+            "mass": 101.10,
+            "radii": 0.562,
+            "charge": 0.0,
+            "hps": 0.676
+        },
+        "TPO": {
+            "mass": 179.05,
+            "radii": 0.662,
+            "charge": -2.0,
+            "hps": 0.0081
+        },  # Phosphothreonine:  phosphorylation of Threonine
+        "TRP": {
+            "mass": 186.20,
+            "radii": 0.678,
+            "charge": 0.0,
+            "hps": 0.946
+        },
+        "TYR": {
+            "mass": 163.20,
+            "radii": 0.646,
+            "charge": 0.0,
+            "hps": 0.865
+        },
+        "PTR": {
+            "mass": 241.15,
+            "radii": 0.738,
+            "charge": -2.0,
+            "hps": 0.189
+        },  # phosphotyrosine
+        "VAL": {
+            "mass": 99.07,
+            "radii": 0.586,
+            "charge": 0.0,
+            "hps": 0.892
+        },
+        # Parameters for RNA (KR scale from OPLS-AA forcefield)
+        "A": {
+            "mass": 329.20,
+            "radii": 0.844,
+            "charge": -1.0,
+            "hps": -0.054
+        },
+        "C": {
+            "mass": 305.2,
+            "radii": 0.822,
+            "charge": -1.0,
+            "hps": -0.027
+        },
+        "G": {
+            "mass": 345.2,
+            "radii": 0.851,
+            "charge": -1.0,
+            "hps": -0.189,
+        },
+        "U": {
+            "mass": 306.2,
+            "radii": 0.817,
+            "charge": -1.0,
+            "hps": -0.027
+        }
+    },
     "hps_urry": {
         "bond_length_protein": 0.382,
         "bond_length_nucleic": 0.5,  # nm

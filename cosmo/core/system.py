@@ -285,16 +285,12 @@ class system:
 
         Parameters
         ----------
-        except_chains: String [optional]
-
+        except_chains: String [optional]. List of chain IDs to exclude. If provided, all bonds of atoms in the specified chains will be excluded.
+            If not provided, all bonds will be included. Default is None.
         Returns
         -------
         None
         """
-
-        if isinstance(except_chains, str):
-            except_chains = list(except_chains)
-
         # Get Bonds From Topology
         bonds = []
         for bond in self.topology.bonds():
@@ -690,7 +686,7 @@ class system:
             self.gaussianTorsionForce.addTorsion(torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index,
                                                  (self.torsions[torsion][0],))
 
-    def addYukawaForces(self, use_pbc: bool) -> None:
+    def addYukawaForces(self, use_pbc: bool, exclusion_list: list = None) -> None:
         """
         Creates a nonbonded force term for electrostatic interaction DH potential.
 
@@ -750,11 +746,36 @@ class system:
             for i, atom in enumerate(self.atoms):
                 self.yukawaForce.addParticle((self.particles_charge[i],))
 
-        # set exclusions rule
+
+        # add exclusions from bonds
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.yukawaForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+        print(f"Added {len(bonded_exclusions)} exclusions from bonds")
+        # set exclusions rule - use set for O(1) lookup instead of O(n) list lookup
+        if exclusion_list is None:
+            exclusion_list = []
+        if exclusion_list:
+            bonded_exclusions_set = set(bonded_exclusions)
+            # Filter out exclusions that are already in bonded_exclusions
+            new_exclusions = [excl for excl in exclusion_list if excl not in bonded_exclusions_set]
+            print(f"Adding {len(new_exclusions)} exclusions (filtered from {len(exclusion_list)} total)")
+            # Add exclusions with progress reporting for large lists
+            if len(new_exclusions) > 10000:
+                import sys
+                chunk_size = len(new_exclusions) // 10
+                for idx, exclusion in enumerate(new_exclusions):
+                    self.yukawaForce.addExclusion(exclusion[0], exclusion[1])
+                    if (idx + 1) % chunk_size == 0:
+                        progress = 100 * (idx + 1) / len(new_exclusions)
+                        print(f"  Progress: {progress:.1f}% ({idx + 1}/{len(new_exclusions)})", end='\r')
+                        sys.stdout.flush()
+                print()  # New line after progress
+            else:
+                for exclusion in new_exclusions:
+                    self.yukawaForce.addExclusion(exclusion[0], exclusion[1])
+            print(f"Added {len(new_exclusions)} exclusions")
 
-    def addAshbaughHatchForces(self, use_pbc: bool) -> None:
+    def addAshbaughHatchForces(self, use_pbc: bool, exclusion_list: list = None) -> None:
         """
         HPS family used Ashbaugh-Hatch Potential instead of Wang-Frenkel
         Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).
@@ -837,6 +858,30 @@ class system:
         # set exclusions rule
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.ashbaugh_HatchForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+        print(f"Added {len(bonded_exclusions)} exclusions from bonds")
+        # set exclusions rule - use set for O(1) lookup instead of O(n) list lookup
+        if exclusion_list is None:
+            exclusion_list = []
+        if exclusion_list:
+            bonded_exclusions_set = set(bonded_exclusions)
+            # Filter out exclusions that are already in bonded_exclusions
+            new_exclusions = [excl for excl in exclusion_list if excl not in bonded_exclusions_set]
+            print(f"Adding {len(new_exclusions)} exclusions (filtered from {len(exclusion_list)} total)")
+            # Add exclusions with progress reporting for large lists
+            if len(new_exclusions) > 10000:
+                import sys
+                chunk_size = len(new_exclusions) // 10
+                for idx, exclusion in enumerate(new_exclusions):
+                    self.ashbaugh_HatchForce.addExclusion(exclusion[0], exclusion[1])
+                    if (idx + 1) % chunk_size == 0:
+                        progress = 100 * (idx + 1) / len(new_exclusions)
+                        print(f"  Progress: {progress:.1f}% ({idx + 1}/{len(new_exclusions)})", end='\r')
+                        sys.stdout.flush()
+                print()  # New line after progress
+            else:
+                for exclusion in new_exclusions:
+                    self.ashbaugh_HatchForce.addExclusion(exclusion[0], exclusion[1])
+            print(f"Added {len(new_exclusions)} exclusions")
 
     def addWangFrenkelForces(self, use_pbc: bool):
         """

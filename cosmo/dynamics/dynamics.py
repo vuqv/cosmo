@@ -212,7 +212,7 @@ class Dynamics:
         self.hps_model = models.buildHPSModel(self.pdb_file, minimize=self.minimize, model=self.model,
                                               box_dimension=self.box_dimension)
         # dump topology PSF file and initial coordinate pdb file
-        if self.model in ['hps_kr', 'hps_urry', 'hps_ss']:
+        if self.model in ['hps_kr', 'synthesis_kr', 'hps_urry', 'hps_ss']:
             """ current dumpForceFieldData function can only write the standard format of forcefield which require
              sigma, epsilon for each residue.
             """
