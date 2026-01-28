@@ -9,3 +9,5 @@
 **/*.iml
 **/.idea/
 /docs/_build/
+# Trajectory directory
+**/traj/
