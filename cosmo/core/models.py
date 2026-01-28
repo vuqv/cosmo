@@ -18,8 +18,7 @@ class models:
     def buildHPSModel(structure_file: str,
                       minimize: bool = False,
                       model: str = 'hps_urry',
-                      box_dimension: Any = None,
-                      PTC_atom_index: int = None):
+                      box_dimension: Any = None):
         """
         This is a method for building a coarse-grained model for protein and
         nucleic-acid systems using the HPS (hydrophobic-polar scale) force field.
@@ -84,11 +83,7 @@ class models:
         # Get atom index of ribosome and nascent chain
         ribosome_atom_indices = [atom.index for atom in cosmo_model.atoms if atom.residue.chain.id != '8']
         nascent_atom_indices = [atom.index for atom in cosmo_model.atoms if atom.residue.chain.id == '8']
-        untranslated_atom_indices = [i for i in nascent_atom_indices if i > PTC_atom_index]
-        translated_atom_indices = [i for i in nascent_atom_indices if i <= PTC_atom_index]
-        print(f"There are {len(untranslated_atom_indices)} untranslated atoms and {len(translated_atom_indices)} translated atoms")
-        print(f"Untranslated atom indices: {untranslated_atom_indices}")
-        print(f"Translated atom indices: {translated_atom_indices}")
+        print(f"There are {len(ribosome_atom_indices)} ribosome atoms and {len(nascent_atom_indices)} nascent chain atoms")
         # Get bonds, optionally excluding bonds of specified chains. In the synthesis pipeline, we want to exclude bonds of the ribosome chain.
         nascent_chain_id = '8'
         except_chains = [chain.id for chain in cosmo_model.chains if chain.id != nascent_chain_id]
@@ -162,30 +157,13 @@ class models:
 
         else:
             use_pbc = False
-        #TODO: 
-        """
-        For Nonbonded forces, we need to exclude all nonbonded interactions within ribosome,
-        And for nascent chain, exclude all nonbonded interactions that involves untranslated regions.
-        """
+        # Exclusion list for nonbonded forces
+        # Only exclude ribosome-ribosome interactions (ribosome is frozen)
+        # All nascent chain atoms are considered translated and interact normally
         exclusion_list = []
         # exclude ribosome-ribosome interactions
         for i in ribosome_atom_indices:
             for j in ribosome_atom_indices:
-                if i < j:
-                    exclusion_list.append((i, j))
-        # exclude ribosome-untranslated interactions
-        for i in ribosome_atom_indices:
-            for j in untranslated_atom_indices:
-                if i < j:
-                    exclusion_list.append((i, j))
-        # exclude untranslated-untranslated interactions
-        for i in untranslated_atom_indices:
-            for j in untranslated_atom_indices:
-                if i < j:
-                    exclusion_list.append((i, j))
-        # exclude translated-untranslated interactions
-        for i in translated_atom_indices:
-            for j in untranslated_atom_indices:
                 if i < j:
                     exclusion_list.append((i, j))
         cosmo_model.addYukawaForces(use_pbc, exclusion_list)
@@ -212,8 +190,6 @@ class models:
         # all atoms of ribosome has mass 0 since they are frozen
         for atom_index in ribosome_atom_indices:
             # print(f"Setting mass of atom {atom_index} to 0.0")
-            cosmo_model.system.setParticleMass(atom_index, 0.0 * unit.dalton)
-        for atom_index in untranslated_atom_indices:
             cosmo_model.system.setParticleMass(atom_index, 0.0 * unit.dalton)
 
         print('cosmo system Object created')

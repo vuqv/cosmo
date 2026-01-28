@@ -68,10 +68,19 @@ def write_pdb_with_chain_ids(topology, positions, output_file):
                     # Get element symbol
                     element = '  '
                     if hasattr(atom, 'element') and atom.element:
-                        element = atom.element.symbol
+                        element_symbol = atom.element.symbol
+                        # Fix common misassignments: CA (C-alpha) should be C (carbon), not Ca (calcium)
+                        if atom_name.strip() == 'CA' and element_symbol == 'Ca':
+                            element = 'C'
+                        else:
+                            element = element_symbol
                     elif atom_name:
                         # Try to infer from atom name
-                        element = atom_name[0] if atom_name[0].isalpha() else '  '
+                        # CA (C-alpha) should be C (carbon)
+                        if atom_name.strip() == 'CA':
+                            element = 'C'
+                        else:
+                            element = atom_name[0] if atom_name[0].isalpha() else '  '
                     
                     # Format PDB ATOM line
                     line = (
