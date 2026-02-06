@@ -11,3 +11,4 @@
 /docs/_build/
 # Trajectory directory
 **/traj/
+.DS_Store
