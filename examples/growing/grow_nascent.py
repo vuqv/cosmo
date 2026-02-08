@@ -21,34 +21,17 @@ import warnings
 from distutils.util import strtobool
 from json import loads
 
-import numpy as np
 import openmm as mm
 from openmm import unit
 
 from parmed.exceptions import OpenMMWarning
 
 import cosmo
-from cosmo.utils import write_pdb_with_chain_ids
+from cosmo.utils import write_pdb_with_chain_ids, parse_nascent_sequence, generate_mRNA_sequence
+from cosmo.utils.ctf_utils import codon_translation_time
 
 # Suppress OpenMM warnings
 warnings.filterwarnings("ignore", category=OpenMMWarning)
-
-
-def parse_nascent_sequence(nascent_pdb):
-    """
-    Parse nascent.pdb to extract amino acid sequence.
-    
-    Returns a list of (residue_name, residue_number) tuples in order.
-    """
-    sequence = []
-    with open(nascent_pdb, 'r') as f:
-        for line in f:
-            if line.startswith('ATOM') or line.startswith('HETATM'):
-                # Extract residue name (columns 17-20) and residue number (columns 22-26)
-                res_name = line[17:20].strip()
-                res_num = int(line[22:26].strip())
-                sequence.append((res_name, res_num))
-    return sequence
 
 
 def append_amino_acid_to_complex(input_pdb, output_pdb, res_name, res_num, chain_id='8', position=(0.0, 0.0, 0.0)):
@@ -120,11 +103,10 @@ def append_amino_acid_to_complex(input_pdb, output_pdb, res_name, res_num, chain
         f.write("END\n")
 
 
-def run_single_iteration(complex_pdb, output_prefix, frozen_indices, except_chains, nb_exclusions, config_file, model, box_dimension, 
-                         device, ppn, nascent_chain_id='8', md_steps=1000, traj_dir='traj'):
+def run_single_iteration(complex_pdb, output_prefix, frozen_indices, except_chains, nb_exclusions, sim_params, md_steps=1000):
     """
     Run a single iteration of the simulation.
-    
+
     Parameters
     ----------
     complex_pdb : str
@@ -137,54 +119,49 @@ def run_single_iteration(complex_pdb, output_prefix, frozen_indices, except_chai
         List of chain IDs to exclude from bonding
     nb_exclusions : list
         List of pairs of atom indices to exclude from nonbonded forces
-    config_file : str
-        Path to config file (for reading some parameters)
-    model : str
-        HPS model name
-    box_dimension : list or None
-        Box dimensions for PBC
-    device : str
-        'CPU' or 'GPU'
-    ppn : int
-        Number of threads for CPU
-    nascent_chain_id : str
-        Chain ID of nascent chain
+    sim_params : dict
+        Simulation parameters: model, box_dimension, device, ppn, traj_dir
     md_steps : int
         Number of MD steps
     """
+    model = sim_params['model']
+    dt = sim_params['dt']
+    ref_t = sim_params['ref_t']
+    tau_t = sim_params['tau_t']
+    pbc = sim_params['pbc']
+    nstxout = sim_params['nstxout']
+    nstlog = sim_params['nstlog']
+    box_dimension = sim_params['box_dimension']
+    device = sim_params['device']
+    ppn = sim_params['ppn']
+    traj_dir = sim_params['traj_dir']
+
     print(f"\n{'='*70}")
     print(f"Running simulation for {output_prefix}")
     print(f"{'='*70}")
-    
-    # Read some parameters from config if needed
-    dt = 0.01 * unit.picoseconds
-    nstxout = 100
-    nstlog = 100
-    ref_t = 310.0 * unit.kelvin
-    tau_t = 0.01 / unit.picoseconds
-    pbc = box_dimension is not None
-    
+
+
     # Build HPS model
     # All nascent atoms are translated and interact normally
     # Only ribosome-ribosome interactions are excluded
     hps_model = cosmo.models.buildHPSModel(
-        complex_pdb, 
+        complex_pdb,
         minimize=False,  # Don't minimize for iterative growth
-        model=model, 
+        model=model,
         box_dimension=box_dimension,
         except_chains=except_chains,
         frozen_indices=frozen_indices,
         nb_exclusions=nb_exclusions,
     )
-    
+
     #convert ribosome atom indices to set for faster lookup
     rib_atom_indices_set = set(frozen_indices)
     # Get nascent atom indices directly from the built model
-    nascent_atom_indices = [atom.index for atom in hps_model.atoms 
-                           if atom.index not in rib_atom_indices_set] #if not in ribosome index then it is nascent
-    
+    nascent_atom_indices = [atom.index for atom in hps_model.atoms
+                           if atom.index not in rib_atom_indices_set]  # if not in ribosome index then it is nascent
+
     if not nascent_atom_indices:
-        raise ValueError(f"No atoms found with chain ID '{nascent_chain_id}'")
+        raise ValueError("No nascent atoms found (all atoms are in the frozen ribosome set)")
     
     # The last atom index is the newest amino acid to be restrained
     # In iterative growth, all nascent atoms are "translated" - no untranslated regions
@@ -291,29 +268,65 @@ def main():
     params = config['OPTIONS']
     
     model = params.get('model', 'hps_kr')
+
+    rib_structure = params.get('rib_structure', 'rib.pdb')
+    nascent_structure = params.get('nascent_structure', 'nascent.pdb')
+    scale_factor = float(params.get('scale_factor', 1.0))
+    dt = float(params.get('dt', 0.01)) * unit.picoseconds  # timestep in picoseconds
+    ref_t = float(params.get('ref_t', 310.0)) * unit.kelvin
+    tau_t = float(params.get('tau_t', 0.01)) / unit.picoseconds
+    nstxout = int(params.get('nstxout', 100))
+    nstlog = int(params.get('nstlog', 100))
+
+    pbc = bool(strtobool(params.get('pbc', 'no')))
+    box_dimension = loads(params['box_dimension']) if pbc else None  # only read when pbc=yes
+
+    pcoupl = bool(strtobool(params.get('pcoupl', 'no')))
+    if pcoupl:
+        ref_p = float(params.get('ref_p', 1.0)) * unit.bar
+        frequency_p = int(params.get('frequency_p', 25))
+        assert box_dimension is not None, "Pressure coupling requires box dimensions"
+        assert pbc, "Pressure coupling requires periodic boundary condition"
+        print(f"Pressure coupling (pcoupl): on (ref_p={ref_p}, frequency={frequency_p})")
+    else:
+        print('Pressure coupling (pcoupl): off')
+
     nascent_chain_id = params.get('nascent_chain_id', '8')
+    organism = params.get('organism', 'ecoli')
+    translation_type = params.get('translation_type', 'fast')
     device = params.get('device', 'CPU')
     ppn = int(params.get('ppn', 1))
-    
-    pbc = bool(strtobool(params.get('pbc', 'no')))
-    box_dimension = None
-    if pbc:
-        box_dimension = loads(params['box_dimension'])
     
     print("="*70)
     print("Iterative Nascent Chain Growth Simulation")
     print("="*70)
-    print(f"Ribosome PDB: {args.rib}")
-    print(f"Nascent PDB: {args.nascent}")
+    print(f"Ribosome PDB: {rib_structure}")
+    print(f"Nascent PDB: {nascent_structure}")
+    print(f"Organism: {organism}")
     print(f"Model: {model}")
+    print(f"Translation type: {translation_type}")
+    print(f"Scale factor: {scale_factor}")
+    print(f"Timestep (dt): {dt} ps")
+    print(f"Reference temperature (ref_t): {ref_t} K")
+    print(f"Time constant for temperature coupling (tau_t): {tau_t} ps")
+    print(f"Nascent chain ID: {nascent_chain_id}")
     print(f"Device: {device}")
-    print(f"Steps per iteration: {args.steps}")
+    print(f"Steps per iteration: variable (translation_time / dt / scale_factor)")
     print("="*70)
     
     # Parse nascent sequence
-    print(f"\nParsing nascent sequence from {args.nascent}...")
-    sequence = parse_nascent_sequence(args.nascent)
+    print(f"\nParsing nascent sequence from {nascent_structure}...")
+    sequence = parse_nascent_sequence(nascent_structure)
+    aa_three = [res_name for res_name, _ in sequence]
+    mRNA_sequence, translation_time_ms = generate_mRNA_sequence(aa_three, translation_type, organism=organism)
     print(f"Found {len(sequence)} amino acids in nascent chain")
+    print(f"mRNA sequence: {mRNA_sequence}")
+    print(f"Estimated translation time: {translation_time_ms:.1f} ms (real time)")
+    print(f"Estimated translation time in simulation: {(10**3)*translation_time_ms/scale_factor:.6f} microseconds")
+    print(f"Translation type: {translation_type}")
+    print(f"Organism: {organism}")
+    print("="*70)
+    
     
     # Determine range
     start_idx = args.start - 1  # Convert to 0-indexed
@@ -323,41 +336,65 @@ def main():
     print(f"\nWill grow from amino acid {args.start} to {end_idx}")
     print("="*70)
     
-    # Create trajectory directory
+    # Create trajectory directory and package simulation parameters
     traj_dir = 'traj'
     os.makedirs(traj_dir, exist_ok=True)
     print(f"Output files (PDB, DCD, PSF) will be written to '{traj_dir}/' directory")
-    
+
+    sim_params = {
+        'model': model,
+        'dt': dt,
+        'ref_t': ref_t,
+        'tau_t': tau_t,
+        'pbc': pbc,
+        'nstxout': nstxout,
+        'nstlog': nstlog,
+        'box_dimension': box_dimension,
+        'device': device,
+        'ppn': ppn,
+        'traj_dir': traj_dir,
+    }
+
     # Start with ribosome
-    current_complex = args.rib
+    current_complex = rib_structure
 
     # get atom indices of ribosome
-    rib_model = cosmo.system(args.rib, model)
+    rib_model = cosmo.system(rib_structure, model)
     rib_model.coarseGrainingStructure()
     rib_model.getAtoms()
     # Get all atom indices of ribosome to freeze during simulation
     rib_atom_indices = [atom.index for atom in rib_model.atoms]
     print(f"There are {len(rib_atom_indices)} atoms in the ribosome")
-    print(f"Ribosome atom indices: {rib_atom_indices}")
+    # print(f"Ribosome atom indices: {rib_atom_indices}")
     print('-' * 70)
     # get all ribosomal chain to exclude from bonding (except_chains)
     except_chains = [chain.id for chain in rib_model.topology.chains()]
     print(f"Ribosome chains to exclude from bonding: {except_chains}")
     print('-' * 70)
-    # Construct nb_exclusions for nonbonded forces
-    nb_exclusions = []
-    for i in rib_atom_indices:
-        for j in rib_atom_indices:
-            if i < j:
-                nb_exclusions.append((i, j))
+    # Construct nb_exclusions for nonbonded forces (all pairs of ribosome atoms)
+    n_rib = len(rib_atom_indices)
+    nb_exclusions = [(rib_atom_indices[i], rib_atom_indices[j])
+                     for i in range(n_rib) for j in range(i + 1, n_rib)]
     print(f"Nonbonded exclusions: {len(nb_exclusions)}")
     print('-' * 70)
-    
+
+    # Precompute (nsteps, codon, codon_time_ms) per residue: nsteps = time_ps / (dt_ps * scale_factor)
+    # 1 ms = 1e9 ps, so time_ps = codon_time_ms * 1e9
+    dt_ps = dt.value_in_unit(unit.picosecond)  # scalar in picoseconds
+    residue_steps = []
+    for k in range(len(sequence)):
+        codon = mRNA_sequence[3 * k : 3 * k + 3]
+        codon_time_ms = codon_translation_time[organism][codon]['Median_time']
+        time_ps = codon_time_ms * 1e9  # ms -> ps
+        nsteps = max(1, int(time_ps / (dt_ps * scale_factor)))
+        residue_steps.append((nsteps, codon, codon_time_ms))
+
     # Iterate through amino acids
     for i in range(start_idx, end_idx):
         res_name, res_num = sequence[i]
         iteration = i + 1  # 1-indexed iteration number
-        
+        nsteps, codon, codon_time_ms = residue_steps[i]
+
         print(f"\n{'#'*70}")
         print(f"# Iteration {iteration}: Adding {res_name} {res_num}")
         print(f"{'#'*70}")
@@ -375,22 +412,17 @@ def main():
             chain_id=nascent_chain_id,
             position=(0.0, 0.0, 0.0)  # Position in Angstroms (x = 0.0 nm)
         )
-        
+
+        print(f"Codon {codon} translation time: {codon_time_ms:.1f} ms -> {nsteps} steps")
         # Run simulation
         final_pdb = run_single_iteration(
             new_complex,
             output_prefix,
-            rib_atom_indices, # this will be frozen in the simulation
-            except_chains, # these chains will be excluded from bonding
-            nb_exclusions, # these pairs of atoms will be excluded from nonbonded forces
-            args.config,
-            model,
-            box_dimension,
-            device,
-            ppn,
-            nascent_chain_id,
-            args.steps,
-            traj_dir
+            rib_atom_indices,
+            except_chains,
+            nb_exclusions,
+            sim_params,
+            nsteps,
         )
         
         # Update current complex for next iteration

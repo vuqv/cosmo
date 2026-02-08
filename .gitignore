@@ -9,3 +9,4 @@
 **/*.iml
 **/.idea/
 /docs/_build/
+**/traj/*
