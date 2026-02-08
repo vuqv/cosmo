@@ -4,7 +4,7 @@
 from typing import Any
 
 from .system import system
-
+import openmm.unit as unit
 
 class models:
     """
@@ -19,9 +19,9 @@ class models:
                       minimize: bool = False,
                       model: str = 'hps_urry',
                       box_dimension: Any = None,
+                      frozen_indices: list = None,
                       except_chains: list = None,
-                      nb_exclusions: list = None,
-                      frozen_indices: list = None):
+                      nb_exclusions: list = None):
         """
         This is a method for building a coarse-grained model for protein and
         nucleic-acid systems using the HPS (hydrophobic-polar scale) force field.
@@ -53,7 +53,12 @@ class models:
             If a float is given, a cubic box will be used.
             If an array of (3,1) is given, a rectangular box with the given dimension will be used.
             If not specified, PBC will not be used.
-
+        frozen_indices : list (None)
+            List of atom indices to freeze.
+        except_chains : list (None)
+            List of chain IDs to exclude from bonding.
+        nb_exclusions : list (None)
+            List of pairs of atom indices to exclude from nonbonded forces.
         Returns
         -------
         cosmo : :code:`COSMO.system`

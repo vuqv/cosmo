@@ -970,7 +970,6 @@ class system:
             bonded_exclusions_set = set(bonded_exclusions) # use set for faster lookup
             new_exclusions = [excl for excl in nb_exclusions if excl not in bonded_exclusions_set]
             print(f'Adding {len(new_exclusions)} exclusions to Wang-Frenkel Force')
-            # Add exclusions with progress reporting for large lists
             if len(new_exclusions) > 10000:
                 import sys
                 chunk_size = len(new_exclusions) // 10
@@ -985,6 +984,7 @@ class system:
                 for exclusion in new_exclusions:
                     self.wang_Frenkel_Force.addExclusion(exclusion[0], exclusion[1])
             print(f"Added {len(new_exclusions)} exclusions")
+
 
     """ Functions for creating OpenMM system object """
 

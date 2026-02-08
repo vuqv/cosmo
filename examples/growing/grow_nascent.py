@@ -120,7 +120,7 @@ def append_amino_acid_to_complex(input_pdb, output_pdb, res_name, res_num, chain
         f.write("END\n")
 
 
-def run_single_iteration(complex_pdb, output_prefix, config_file, model, box_dimension, 
+def run_single_iteration(complex_pdb, output_prefix, frozen_indices, except_chains, nb_exclusions, config_file, model, box_dimension, 
                          device, ppn, nascent_chain_id='8', md_steps=1000, traj_dir='traj'):
     """
     Run a single iteration of the simulation.
@@ -131,6 +131,12 @@ def run_single_iteration(complex_pdb, output_prefix, config_file, model, box_dim
         Path to input complex PDB file
     output_prefix : str
         Prefix for output files (e.g., 'complex_l1')
+    frozen_indices : list
+        List of atom indices to freeze
+    except_chains : list
+        List of chain IDs to exclude from bonding
+    nb_exclusions : list
+        List of pairs of atom indices to exclude from nonbonded forces
     config_file : str
         Path to config file (for reading some parameters)
     model : str
@@ -165,61 +171,49 @@ def run_single_iteration(complex_pdb, output_prefix, config_file, model, box_dim
         complex_pdb, 
         minimize=False,  # Don't minimize for iterative growth
         model=model, 
-        box_dimension=box_dimension
+        box_dimension=box_dimension,
+        except_chains=except_chains,
+        frozen_indices=frozen_indices,
+        nb_exclusions=nb_exclusions,
     )
     
+    #convert ribosome atom indices to set for faster lookup
+    rib_atom_indices_set = set(frozen_indices)
     # Get nascent atom indices directly from the built model
     nascent_atom_indices = [atom.index for atom in hps_model.atoms 
-                           if atom.residue.chain.id == nascent_chain_id]
+                           if atom.index not in rib_atom_indices_set] #if not in ribosome index then it is nascent
     
     if not nascent_atom_indices:
         raise ValueError(f"No atoms found with chain ID '{nascent_chain_id}'")
     
     # The last atom index is the newest amino acid to be restrained
     # In iterative growth, all nascent atoms are "translated" - no untranslated regions
-    restraint_atom_index = nascent_atom_indices[-1]
-    print(f"Restraining newest amino acid at atom index {restraint_atom_index}")
-    print(f"Note: All {len(nascent_atom_indices)} nascent atoms are considered 'translated' (no untranslated atoms)")
-    
-    # Find particle index for restraint
-    particle_index = None
-    for i, atom in enumerate(hps_model.atoms):
-        if atom.index == restraint_atom_index:
-            particle_index = i
-            break
-    
-    if particle_index is not None:
+    growing_atom_index = nascent_atom_indices[-1]
+    print(f"Restraining growing amino acid at atom index {growing_atom_index}")    
+    if growing_atom_index is not None:
         # Create harmonic position restraint at origin
         restraint_force = mm.CustomExternalForce('k*((x-x0)^2+(y-y0)^2+(z-z0)^2)')
         restraint_force.addGlobalParameter('k', 10000.0 * unit.kilojoule_per_mole / unit.nanometer**2)
         restraint_force.addGlobalParameter('x0', 0.38 * unit.nanometer)
         restraint_force.addGlobalParameter('y0', 0.0 * unit.nanometer)
         restraint_force.addGlobalParameter('z0', 0.0 * unit.nanometer)
-        restraint_force.addParticle(particle_index, [])
+        restraint_force.addParticle(growing_atom_index, [])
         hps_model.system.addForce(restraint_force)
-        print(f"Added position restraint to atom {restraint_atom_index} (particle {particle_index}) at (0.38, 0.0, 0.0)")
+        print(f"Added position restraint to atom {growing_atom_index} at (0.38, 0.0, 0.0)")
     
     # Add planar wall force for all translated residues except the newest one (which is restrained)
     # In iterative growth, all nascent atoms are "translated", so we apply wall force to all except the newest
     if len(nascent_atom_indices) > 1:
-        # All nascent atoms except the newest (last) one
-        translated_atom_indices = nascent_atom_indices[:-1]
-        translated_particle_indices = []
-        for i, atom in enumerate(hps_model.atoms):
-            if atom.index in translated_atom_indices:
-                translated_particle_indices.append(i)
-        
-        if translated_particle_indices:
-            # Wall at x = 3.8 Å (0.38 nm) - translated atoms must have x > 3.8 Å
-            wall_position = 0.38  # in nanometers (3.8 Angstroms)
-            print(f"Adding planar wall force: {len(translated_particle_indices)} translated residues (all except newest) restricted to x > {wall_position*10:.1f} Å")
-            # step(wall_position - x) is 1 when x < wall_position, 0 when x >= wall_position
-            # Penalty is (wall_position - x)^2 when x < wall_position
-            wall_force = mm.CustomExternalForce(f'k_wall * step({wall_position} - x) * ({wall_position} - x)^2')
-            wall_force.addGlobalParameter('k_wall', 10000.0 * unit.kilojoule_per_mole / unit.nanometer**2)
-            for particle_idx in translated_particle_indices:
-                wall_force.addParticle(particle_idx, [])
-            hps_model.system.addForce(wall_force)
+        # Wall at x = 0.0 Å (0.0 nm) - translated atoms must have x > 0.0 Å
+        wall_position = 0.38  # in nanometers (3.8 Angstroms)
+        print(f"Adding planar wall force: {len(nascent_atom_indices)-1} nascent residues (all except newest) restricted to x > {wall_position*10:.1f} Å")
+        # step(wall_position - x) is 1 when x < wall_position, 0 when x >= wall_position
+        # Penalty is (wall_position - x)^2 when x < wall_position
+        wall_force = mm.CustomExternalForce(f'k_wall * step({wall_position} - x) * ({wall_position} - x)^2')
+        wall_force.addGlobalParameter('k_wall', 10000.0 * unit.kilojoule_per_mole / unit.nanometer**2)
+        for atom_idx in nascent_atom_indices[:-1]:
+            wall_force.addParticle(atom_idx, [])
+        hps_model.system.addForce(wall_force)
     
     # Create trajectory directory if it doesn't exist
     os.makedirs(traj_dir, exist_ok=True)
@@ -296,7 +290,7 @@ def main():
     config.read(args.config)
     params = config['OPTIONS']
     
-    model = params.get('model', 'hps_urry')
+    model = params.get('model', 'hps_kr')
     nascent_chain_id = params.get('nascent_chain_id', '8')
     device = params.get('device', 'CPU')
     ppn = int(params.get('ppn', 1))
@@ -336,6 +330,28 @@ def main():
     
     # Start with ribosome
     current_complex = args.rib
+
+    # get atom indices of ribosome
+    rib_model = cosmo.system(args.rib, model)
+    rib_model.coarseGrainingStructure()
+    rib_model.getAtoms()
+    # Get all atom indices of ribosome to freeze during simulation
+    rib_atom_indices = [atom.index for atom in rib_model.atoms]
+    print(f"There are {len(rib_atom_indices)} atoms in the ribosome")
+    print(f"Ribosome atom indices: {rib_atom_indices}")
+    print('-' * 70)
+    # get all ribosomal chain to exclude from bonding (except_chains)
+    except_chains = [chain.id for chain in rib_model.topology.chains()]
+    print(f"Ribosome chains to exclude from bonding: {except_chains}")
+    print('-' * 70)
+    # Construct nb_exclusions for nonbonded forces
+    nb_exclusions = []
+    for i in rib_atom_indices:
+        for j in rib_atom_indices:
+            if i < j:
+                nb_exclusions.append((i, j))
+    print(f"Nonbonded exclusions: {len(nb_exclusions)}")
+    print('-' * 70)
     
     # Iterate through amino acids
     for i in range(start_idx, end_idx):
@@ -357,13 +373,16 @@ def main():
             res_name, 
             res_num, 
             chain_id=nascent_chain_id,
-            position=(0.0, 0.0, 0.0)  # Position in Angstroms
+            position=(0.0, 0.0, 0.0)  # Position in Angstroms (x = 0.0 nm)
         )
         
         # Run simulation
         final_pdb = run_single_iteration(
             new_complex,
             output_prefix,
+            rib_atom_indices, # this will be frozen in the simulation
+            except_chains, # these chains will be excluded from bonding
+            nb_exclusions, # these pairs of atoms will be excluded from nonbonded forces
             args.config,
             model,
             box_dimension,
