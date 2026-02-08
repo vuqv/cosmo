@@ -690,7 +690,7 @@ class system:
             self.gaussianTorsionForce.addTorsion(torsion[0].index, torsion[1].index, torsion[2].index, torsion[3].index,
                                                  (self.torsions[torsion][0],))
 
-    def addYukawaForces(self, use_pbc: bool) -> None:
+    def addYukawaForces(self, use_pbc: bool, nb_exclusions: list = None) -> None:
         """
         Creates a nonbonded force term for electrostatic interaction DH potential.
 
@@ -753,8 +753,33 @@ class system:
         # set exclusions rule
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.yukawaForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+        print(f'Added {len(bonded_exclusions)} exclusions to Yukawa Force')
 
-    def addAshbaughHatchForces(self, use_pbc: bool) -> None:
+        # exclusions from nb_exclusions
+        if nb_exclusions is None:
+            nb_exclusions = []
+        else:
+            # exclusion from boned:
+            bonded_exclusions_set = set(bonded_exclusions) # use set for faster lookup
+            new_exclusions = [excl for excl in nb_exclusions if excl not in bonded_exclusions_set]
+            print(f'Adding {len(new_exclusions)} exclusions to Yukawa Force')
+            # Add exclusions with progress reporting for large lists
+            if len(new_exclusions) > 10000:
+                import sys
+                chunk_size = len(new_exclusions) // 10
+                for idx, exclusion in enumerate(new_exclusions):
+                    self.yukawaForce.addExclusion(exclusion[0], exclusion[1])
+                    if (idx + 1) % chunk_size == 0:
+                        progress = 100 * (idx + 1) / len(new_exclusions)
+                        print(f"  Progress: {progress:.1f}% ({idx + 1}/{len(new_exclusions)})", end='\r')
+                        sys.stdout.flush()
+                print()  # New line after progress
+            else:
+                for exclusion in new_exclusions:
+                    self.yukawaForce.addExclusion(exclusion[0], exclusion[1])
+            print(f"Added {len(new_exclusions)} exclusions")
+
+    def addAshbaughHatchForces(self, use_pbc: bool, nb_exclusions: list = None) -> None:
         """
         HPS family used Ashbaugh-Hatch Potential instead of Wang-Frenkel
         Creates a nonbonded force term for pairwise interaction (customize LJ 12-6 potential).
@@ -837,8 +862,33 @@ class system:
         # set exclusions rule
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.ashbaugh_HatchForce.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+        print(f'Added {len(bonded_exclusions)} exclusions to Ashbaugh-Hatch Force')
 
-    def addWangFrenkelForces(self, use_pbc: bool):
+        # exclusions from nb_exclusions
+        if nb_exclusions is None:
+            nb_exclusions = []
+        else:
+            # exclusion from boned:
+            bonded_exclusions_set = set(bonded_exclusions) # use set for faster lookup
+            new_exclusions = [excl for excl in nb_exclusions if excl not in bonded_exclusions_set]
+            print(f'Adding {len(new_exclusions)} exclusions to Ashbaugh-Hatch Force')
+            # Add exclusions with progress reporting for large lists
+            if len(new_exclusions) > 10000:
+                import sys
+                chunk_size = len(new_exclusions) // 10
+                for idx, exclusion in enumerate(new_exclusions):
+                    self.ashbaugh_HatchForce.addExclusion(exclusion[0], exclusion[1])
+                    if (idx + 1) % chunk_size == 0:
+                        progress = 100 * (idx + 1) / len(new_exclusions)
+                        print(f"  Progress: {progress:.1f}% ({idx + 1}/{len(new_exclusions)})", end='\r')
+                        sys.stdout.flush()
+                print()  # New line after progress
+            else:
+                for exclusion in new_exclusions:
+                    self.ashbaugh_HatchForce.addExclusion(exclusion[0], exclusion[1])
+            print(f"Added {len(new_exclusions)} exclusions")
+
+    def addWangFrenkelForces(self, use_pbc: bool, nb_exclusions: list = None) -> None:
         """
         MPIPI model. using TabulatedFunction for pair interaction.
         More information about TabulatedFUnction can be found here:
@@ -911,6 +961,30 @@ class system:
         # set exclusion rule
         bonded_exclusions = [(b[0].index, b[1].index) for b in list(self.topology.bonds())]
         self.wang_Frenkel_Force.createExclusionsFromBonds(bonded_exclusions, self.bonded_exclusions_index)
+        print(f'Added {len(bonded_exclusions)} exclusions to Wang-Frenkel Force')
+        # exclusions from nb_exclusions
+        if nb_exclusions is None:
+            nb_exclusions = []
+        else:
+            # exclusion from boned:
+            bonded_exclusions_set = set(bonded_exclusions) # use set for faster lookup
+            new_exclusions = [excl for excl in nb_exclusions if excl not in bonded_exclusions_set]
+            print(f'Adding {len(new_exclusions)} exclusions to Wang-Frenkel Force')
+            # Add exclusions with progress reporting for large lists
+            if len(new_exclusions) > 10000:
+                import sys
+                chunk_size = len(new_exclusions) // 10
+                for idx, exclusion in enumerate(new_exclusions):
+                    self.wang_Frenkel_Force.addExclusion(exclusion[0], exclusion[1])
+                    if (idx + 1) % chunk_size == 0:
+                        progress = 100 * (idx + 1) / len(new_exclusions)
+                        print(f"  Progress: {progress:.1f}% ({idx + 1}/{len(new_exclusions)})", end='\r')
+                        sys.stdout.flush()
+                print()  # New line after progress
+            else:
+                for exclusion in new_exclusions:
+                    self.wang_Frenkel_Force.addExclusion(exclusion[0], exclusion[1])
+            print(f"Added {len(new_exclusions)} exclusions")
 
     """ Functions for creating OpenMM system object """
 

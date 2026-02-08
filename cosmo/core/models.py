@@ -18,7 +18,10 @@ class models:
     def buildHPSModel(structure_file: str,
                       minimize: bool = False,
                       model: str = 'hps_urry',
-                      box_dimension: Any = None):
+                      box_dimension: Any = None,
+                      except_chains: list = None,
+                      nb_exclusions: list = None,
+                      frozen_indices: list = None):
         """
         This is a method for building a coarse-grained model for protein and
         nucleic-acid systems using the HPS (hydrophobic-polar scale) force field.
@@ -80,7 +83,7 @@ class models:
         p_atoms = sum(1 for atom in cosmo_model.atoms if atom.name == 'P')
         print(f'Added {cosmo_model.n_atoms} atoms ({ca_atoms} CA, {p_atoms} P)')
 
-        cosmo_model.getBonds()
+        cosmo_model.getBonds(except_chains=except_chains)
         print('Added ' + str(cosmo_model.n_bonds) + ' bonds')
 
         print("Setting CA/P masses to their average residue mass.")
@@ -150,16 +153,16 @@ class models:
         else:
             use_pbc = False
 
-        cosmo_model.addYukawaForces(use_pbc)
+        cosmo_model.addYukawaForces(use_pbc, nb_exclusions=nb_exclusions)
         print('Added Yukawa Force')
         print('-' * 30)
 
         if model in ['hps_kr', 'hps_urry', 'hps_ss']:
-            cosmo_model.addAshbaughHatchForces(use_pbc)
+            cosmo_model.addAshbaughHatchForces(use_pbc, nb_exclusions=nb_exclusions)
             print('Added PairWise Force')
             print('-' * 30)
         elif model in ['mpipi']:
-            cosmo_model.addWangFrenkelForces(use_pbc)
+            cosmo_model.addWangFrenkelForces(use_pbc, nb_exclusions=nb_exclusions)
             print('Added Wang-Frenkel Force')
             print('-' * 30)
         print('')
@@ -170,6 +173,11 @@ class models:
         print('Creating System Object:')
         # print('______________________')
         cosmo_model.createSystemObject(minimize=minimize, check_bond_distances=True)
+
+        if frozen_indices:
+            print(f'Freezing {len(frozen_indices)} atoms from moving...')
+            for idx in frozen_indices:
+                cosmo_model.system.setParticleMass(idx, 0.0 * unit.dalton)
         print('cosmo system Object created')
         print('')
 
