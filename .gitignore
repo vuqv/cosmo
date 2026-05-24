@@ -10,3 +10,4 @@
 **/.idea/
 /docs/_build/
 **/traj/*
+**/.DS_Store
