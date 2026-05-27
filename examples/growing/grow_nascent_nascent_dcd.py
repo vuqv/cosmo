@@ -11,8 +11,15 @@ This script:
    - Runs simulation for 1000 steps
    - Saves outputs (complex_l{N}_final.pdb, complex_l{N}.dcd, etc.)
 
-This variant writes only nascent-chain atoms to each PSF/DCD trajectory pair
-while keeping the simulation and final PDB output for the whole system.
+Script variants:
+- grow_nascent.py: original behavior. The PSF and DCD both contain the whole
+  ribosome + nascent-chain system.
+- grow_nascent_nascent_dcd.py: OpenMM 8.3+ variant. The simulation still uses
+  the whole system, but the PSF/DCD trajectory pair contains only the nascent
+  chain by using DCDReporter(atomSubset=...).
+- grow_nascent_nascent_dcd_openmm82.py: OpenMM 8.2-compatible variant. It also
+  writes a nascent-chain-only PSF/DCD pair, but uses a custom DCDFile-based
+  reporter because OpenMM 8.2 DCDReporter does not support atomSubset.
 """
 
 import os

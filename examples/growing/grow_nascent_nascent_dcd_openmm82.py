@@ -44,6 +44,142 @@ from cosmo.utils.ctf_utils import codon_translation_time
 warnings.filterwarnings("ignore", category=OpenMMWarning)
 
 
+def _particle_property_by_atom_index(atoms, values):
+    if isinstance(values, list):
+        return {atom.index: values[i] for i, atom in enumerate(atoms)}
+    return {atom.index: values for atom in atoms}
+
+
+def write_subset_psf(cosmo_model, atom_indices, output_file):
+    """
+    Write a PSF containing only the selected atoms, in the same order as atom_indices.
+    """
+    atom_indices = list(atom_indices)
+    atoms_by_index = {atom.index: atom for atom in cosmo_model.atoms}
+    selected_atoms = [atoms_by_index[atom_index] for atom_index in atom_indices]
+    index_map = {atom.index: i + 1 for i, atom in enumerate(selected_atoms)}
+    masses = _particle_property_by_atom_index(cosmo_model.atoms, cosmo_model.particles_mass)
+    charges = _particle_property_by_atom_index(cosmo_model.atoms, cosmo_model.particles_charge)
+
+    bonds = []
+    for atom1, atom2 in cosmo_model.topology.bonds():
+        if atom1.index in index_map and atom2.index in index_map:
+            bonds.append((index_map[atom1.index], index_map[atom2.index]))
+
+    with open(output_file, 'w') as f:
+        f.write("PSF CHEQ EXT XPLOR\n\n")
+        f.write("         1 !NTITLE\n\n\n")
+        f.write(f"{len(selected_atoms):10d} !NATOM\n")
+        for psf_index, atom in enumerate(selected_atoms, start=1):
+            residue = atom.residue
+            segid = residue.chain.id or 'A'
+            resid = residue.id or str(psf_index)
+            resname = residue.name
+            atom_name = atom.name
+            atom_type = atom_name
+            charge = float(charges[atom.index])
+            mass = float(masses[atom.index])
+            f.write(
+                f"{psf_index:10d} {segid:<8s} {resid:<8s} {resname:<8s} "
+                f"{atom_name:<8s} {atom_type:<8s} {charge:14.6f} {mass:13.4f}           \n"
+            )
+
+        f.write(f"\n{len(bonds):10d} !NBOND: bonds\n")
+        bond_numbers = [number for bond in bonds for number in bond]
+        for i in range(0, len(bond_numbers), 8):
+            f.write(''.join(f"{number:10d}" for number in bond_numbers[i:i + 8]) + "\n")
+
+        f.write("\n         0 !NTHETA: angles\n\n\n")
+        f.write("         0 !NPHI: dihedrals\n\n\n")
+        f.write("         0 !NIMPHI: impropers\n\n\n")
+        f.write("         0 !NDON: donors\n\n\n")
+        f.write("         0 !NACC: acceptors\n\n\n")
+        f.write("         0 !NNB\n\n")
+        for i in range(0, len(selected_atoms), 8):
+            f.write(''.join(f"{0:10d}" for _ in selected_atoms[i:i + 8]) + "\n")
+        f.write("\n         0         0 !NGRP NST2\n\n")
+
+
+def create_subset_topology(source_topology, atom_indices):
+    """
+    Create an OpenMM Topology with only the selected atoms and internal bonds.
+    """
+    selected_indices = set(atom_indices)
+    subset_topology = mm.app.Topology()
+    subset_topology.setPeriodicBoxVectors(source_topology.getPeriodicBoxVectors())
+
+    atom_map = {}
+    chain_map = {}
+    residue_map = {}
+
+    for chain in source_topology.chains():
+        for residue in chain.residues():
+            for atom in residue.atoms():
+                if atom.index not in selected_indices:
+                    continue
+                if chain not in chain_map:
+                    chain_map[chain] = subset_topology.addChain(id=chain.id)
+                if residue not in residue_map:
+                    residue_map[residue] = subset_topology.addResidue(
+                        residue.name,
+                        chain_map[chain],
+                        id=residue.id,
+                        insertionCode=residue.insertionCode,
+                    )
+                atom_map[atom] = subset_topology.addAtom(
+                    atom.name,
+                    atom.element,
+                    residue_map[residue],
+                    id=atom.id,
+                    formalCharge=getattr(atom, 'formalCharge', None),
+                )
+
+    for atom1, atom2 in source_topology.bonds():
+        if atom1 in atom_map and atom2 in atom_map:
+            subset_topology.addBond(atom_map[atom1], atom_map[atom2])
+
+    return subset_topology
+
+
+class SubsetDCDReporter:
+    """
+    DCD reporter for OpenMM 8.2, which lacks DCDReporter(atomSubset=...).
+    """
+
+    def __init__(self, file, report_interval, topology, atom_indices, append=False, enforcePeriodicBox=None):
+        self._reportInterval = report_interval
+        self._append = append
+        self._enforcePeriodicBox = enforcePeriodicBox
+        self._atomIndices = list(atom_indices)
+        self._topology = create_subset_topology(topology, self._atomIndices)
+        self._out = open(file, 'r+b' if append else 'wb')
+        self._dcd = None
+
+    def __del__(self):
+        try:
+            self._out.close()
+        except Exception:
+            pass
+
+    def describeNextReport(self, simulation):
+        steps = self._reportInterval - simulation.currentStep % self._reportInterval
+        return {'steps': steps, 'periodic': self._enforcePeriodicBox, 'include': ['positions']}
+
+    def report(self, simulation, state):
+        if self._dcd is None:
+            self._dcd = mm.app.DCDFile(
+                self._out,
+                self._topology,
+                simulation.integrator.getStepSize(),
+                self._reportInterval,
+                self._reportInterval,
+                self._append,
+            )
+        positions = state.getPositions(asNumpy=True)
+        subset_positions = [positions[i] for i in self._atomIndices]
+        self._dcd.writeModel(subset_positions, periodicBoxVectors=state.getPeriodicBoxVectors())
+
+
 def append_amino_acid_to_complex(input_pdb, output_pdb, res_name, res_num, chain_id='8', position=(0.0, 0.0, 0.0)):
     """
     Append a new CA atom for an amino acid to an existing PDB file.
@@ -205,10 +341,10 @@ def run_single_iteration(complex_pdb, output_prefix, frozen_indices, except_chai
     # Create trajectory directory if it doesn't exist
     os.makedirs(traj_dir, exist_ok=True)
     
-    # Write topology PSF file to traj folder
+    # Write nascent-chain-only topology PSF file to match the subset DCD.
     psf_file = os.path.join(traj_dir, f'{output_prefix}.psf')
-    hps_model.dumpTopology(psf_file)
-    print(f"Topology written to {psf_file}")
+    write_subset_psf(hps_model, nascent_atom_indices, psf_file)
+    print(f"Nascent-chain topology written to {psf_file}")
     
     # Setup platform
     if device == 'GPU':
@@ -229,10 +365,17 @@ def run_single_iteration(complex_pdb, output_prefix, frozen_indices, except_chai
     # Setup reporters - all files go to traj folder
     checkpoint_file = os.path.join(traj_dir, f'{output_prefix}.chk')
     simulation.reporters.append(mm.app.CheckpointReporter(checkpoint_file, nstxout))
-    # DCD file goes to traj folder
+    # DCD file goes to traj folder; only the mobile nascent chain is written.
     dcd_file = os.path.join(traj_dir, f'{output_prefix}.dcd')
     simulation.reporters.append(
-        mm.app.DCDReporter(dcd_file, nstxout, enforcePeriodicBox=bool(pbc), append=False)
+        SubsetDCDReporter(
+            dcd_file,
+            nstxout,
+            hps_model.topology,
+            nascent_atom_indices,
+            enforcePeriodicBox=bool(pbc),
+            append=False,
+        )
     )
     # Log file goes to traj folder
     log_file = os.path.join(traj_dir, f'{output_prefix}.log')
