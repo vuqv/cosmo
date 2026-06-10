@@ -356,7 +356,7 @@ parameters = {
         }
 
     },
-    "hps_ss": {
+    "hps_ss": {  # eps_di is in kj/mol
         "bond_length_protein": 0.382,
         "bond_length_nucleic": 0.5,  # nm
         "bond_force_constant": 8368.0,  # kj/mol/nm^2
@@ -366,140 +366,140 @@ parameters = {
             "radii": 0.504,
             "charge": 0.0,
             "hps": 0.522942,
-            "eps_di": -2.59  # parameter control torsion angle.
+            "eps_di": -10.83656  # = -2.59 kcal/mol  # parameter control torsion angle.
         },
         "ARG": {
             "mass": 156.20,
             "radii": 0.656,
             "charge": 1.0,
             "hps": 0.478824,
-            "eps_di": -1.37
+            "eps_di": -5.73208  # = -1.37 kcal/mol
         },
         "ASN": {
             "mass": 114.10,
             "radii": 0.568,
             "charge": 0.0,
             "hps": 0.508236,
-            "eps_di": -0.42
+            "eps_di": -1.75728  # = -0.42 kcal/mol
         },
         "ASP": {
             "mass": 115.10,
             "radii": 0.558,
             "charge": -1.0,
             "hps": 0.214119,
-            "eps_di": -0.80
+            "eps_di": -3.3472  # = -0.80 kcal/mol
         },
         "CYS": {
             "mass": 103.10,
             "radii": 0.548,
             "charge": 0.0,
             "hps": 0.56706,
-            "eps_di": -0.15
+            "eps_di": -0.6276  # = -0.15 kcal/mol
         },
         "GLU": {
             "mass": 129.10,
             "radii": 0.592,
             "charge": -1.0,
             "hps": -0.08,
-            "eps_di": -1.80
+            "eps_di": -7.5312  # = -1.80 kcal/mol
         },
         "GLN": {
             "mass": 128.10,
             "radii": 0.602,
             "charge": 0.0,
             "hps": 0.478824,
-            "eps_di": -1.25
+            "eps_di": -5.23  # = -1.25 kcal/mol
         },
         "GLY": {
             "mass": 57.05,
             "radii": 0.450,
             "charge": 0.0,
             "hps": 0.49353,
-            "eps_di": 0.65
+            "eps_di": 2.7196  # = 0.65 kcal/mol
         },
         "HIS": {
             "mass": 137.10,
             "radii": 0.608,
             "charge": 0.0,
             "hps": 0.684707,
-            "eps_di": 0.8
+            "eps_di": 3.3472  # = 0.8 kcal/mol
         },
         "ILE": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
             "hps": 0.625883,
-            "eps_di": -1.39
+            "eps_di": -5.81576  # = -1.39 kcal/mol
         },
         "LEU": {
             "mass": 113.20,
             "radii": 0.618,
             "charge": 0.0,
             "hps": 0.640589,
-            "eps_di": -2.05
+            "eps_di": -8.5772  # = -2.05 kcal/mol
         },
         "LYS": {
             "mass": 128.20,
             "radii": 0.636,
             "charge": 1.0,
             "hps": 0.302354,
-            "eps_di": -0.95
+            "eps_di": -3.9748  # = -0.95 kcal/mol
         },
         "MET": {
             "mass": 131.20,
             "radii": 0.618,
             "charge": 0.0,
             "hps": 0.596471,
-            "eps_di": -1.60
+            "eps_di": -6.6944  # = -1.60 kcal/mol
         },
         "PHE": {
             "mass": 147.20,
             "radii": 0.636,
             "charge": 0.0,
             "hps": 0.74353,
-            "eps_di": -0.68
+            "eps_di": -2.84512  # = -0.68 kcal/mol
         },
         "PRO": {
             "mass": 97.12,
             "radii": 0.556,
             "charge": 0.0,
             "hps": 0.678824,
-            "eps_di": 3.70
+            "eps_di": 15.4808  # = 3.70 kcal/mol
         },
         "SER": {
             "mass": 87.08,
             "radii": 0.518,
             "charge": 0.0,
             "hps": 0.508236,
-            "eps_di": -0.69
+            "eps_di": -2.88696  # = -0.69 kcal/mol
         },
         "THR": {
             "mass": 101.10,
             "radii": 0.562,
             "charge": 0.0,
             "hps": 0.508236,
-            "eps_di": -0.30
+            "eps_di": -1.2552  # = -0.30 kcal/mol
         },
         "TRP": {
             "mass": 186.20,
             "radii": 0.678,
             "charge": 0.0,
             "hps": 0.92,
-            "eps_di": -1.15
+            "eps_di": -4.8116  # = -1.15 kcal/mol
         },
         "TYR": {
             "mass": 163.20,
             "radii": 0.646,
             "charge": 0.0,
             "hps": 0.817059,
-            "eps_di": -0.68
+            "eps_di": -2.84512  # = -0.68 kcal/mol
         },
         "VAL": {
             "mass": 99.07,
             "radii": 0.586,
             "charge": 0.0,
             "hps": 0.584707,
-            "eps_di": -0.75
+            "eps_di": -3.138  # = -0.75 kcal/mol
         }
     },
     "mpipi": {
@@ -932,7 +932,7 @@ parameters = {
 }
 """
         HPS_SS = HPS-Urry with angle and torsion potential.
-        eps_di is parameter control the dihedral potential. Here we implemented the (i,i+4) assignment and 1-1001-1
+        eps_di (in kj/mol) is parameter control the dihedral potential. Here we implemented the (i,i+4) assignment and 1-1001-1
         mixing rule. 
         torsion angle made by residue (i, i+3)
         residue (i-1) and (i+4) are preceding and succeeding residues
