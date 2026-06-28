@@ -88,10 +88,15 @@ class SimulationConfig:
     # input
     pdb_file: Optional[str] = None
 
-    # output: files are written as <protein_code><suffix> (e.g. ASYN.dcd,
-    # ASYN_init.pdb, ASYN.psf), preserving COSMO's historical naming.
+    # output: all generated files go to <output_dir>/<outname><suffix>, so a run
+    # is one self-contained folder (default traj/traj.dcd, traj.log, traj.psf,
+    # traj.chk, traj_init.pdb, traj_final.pdb, ...). This mirrors the sibling
+    # `topo` project. `protein_code` is the legacy COSMO output prefix; when set
+    # (and `outname` is not) it is used as `outname` for backward compatibility.
+    output_dir: str = 'traj'
+    outname: str = 'traj'
     protein_code: Optional[str] = None
-    checkpoint: Optional[str] = None   # explicit override; defaults to <protein_code>.chk
+    checkpoint: Optional[str] = None   # explicit override; defaults to <output_dir>/<outname>.chk
 
     # hardware
     device: str = 'CPU'
@@ -115,18 +120,29 @@ class SimulationConfig:
                     box_dimension=self.box_dimension)
 
     def output_path(self, suffix: str = '') -> str:
-        """Path for a generated output file: ``<protein_code><suffix>``.
+        """Path for a generated output file: ``<output_dir>/<outname><suffix>``.
 
-        Examples: ``output_path('.dcd')`` -> ``ASYN.dcd``;
-        ``output_path('_init.pdb')`` -> ``ASYN_init.pdb``.
+        Examples (defaults): ``output_path('.dcd')`` -> ``traj/traj.dcd``;
+        ``output_path('_init.pdb')`` -> ``traj/traj_init.pdb``.
+
+        Built with :class:`pathlib.Path` but returned as ``str`` so it can be
+        passed directly to OpenMM/parmed writers.
         """
-        return f'{self.protein_code}{suffix}'
+        return str(Path(self.output_dir) / f'{self.outname}{suffix}')
 
     def checkpoint_path(self) -> str:
         """Resolved checkpoint path: the explicit ``checkpoint`` option if given,
-        otherwise ``<protein_code>.chk``.
+        otherwise ``<output_dir>/<outname>.chk``.
         """
         return self.checkpoint if self.checkpoint else self.output_path('.chk')
+
+    def prepare_output_dir(self) -> None:
+        """Ensure ``output_dir`` exists.
+
+        ``Path.mkdir(parents=True, exist_ok=True)`` creates any missing parents
+        and is a no-op if the folder already exists.
+        """
+        Path(self.output_dir).mkdir(parents=True, exist_ok=True)
 
     def writes_forcefield(self) -> bool:
         """Whether this model dumps a ``_ff.dat`` force-field file.
@@ -244,8 +260,17 @@ def read_simulation_config(config_file: str, verbose: bool = True) -> Simulation
 
     cfg.pdb_file = params['pdb_file']
     log(f'  pdb_file: {cfg.pdb_file}')
-    cfg.protein_code = params['protein_code']
-    log(f'  output_prefix: {cfg.protein_code}')
+
+    # Output location (topo-style): all files go to <output_dir>/<outname>.*.
+    # `protein_code` is the legacy prefix; if given and `outname` is not, it is
+    # used as `outname` so existing control files keep their basename.
+    cfg.protein_code = params.get('protein_code', cfg.protein_code)
+    cfg.output_dir = params.get('output_dir', cfg.output_dir)
+    if 'outname' in params:
+        cfg.outname = params['outname']
+    elif cfg.protein_code:
+        cfg.outname = cfg.protein_code
+    log(f'  output: {cfg.output_path("")}.* (dir={cfg.output_dir}, name={cfg.outname})')
     cfg.checkpoint = params.get('checkpoint', cfg.checkpoint)
 
     cfg.device = params.get('device', cfg.device)

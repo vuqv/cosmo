@@ -50,13 +50,13 @@ the merged file is clean.
 ```bash
 python run_simulation.py -f md.ini
 ```
-Outputs are named `complex.*` (see Tutorial 1/4 for the full file list). The
+Outputs go to `traj/complex.*` (see Tutorial 1/4 for the full file list). The
 build log reports **two chains** and uses the `hps_kr` force field, which scores
 the protein–protein, protein–RNA, and RNA–RNA contacts together.
 
 ### 3. Watch them interact
 ```bash
-vmd complex.psf complex.dcd
+vmd traj/complex.psf traj/complex.dcd
 ```
 With attractive protein–RNA interactions the two chains associate rather than
 drifting apart — the elementary event behind RNP condensate formation.

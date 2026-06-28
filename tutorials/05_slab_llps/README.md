@@ -44,7 +44,7 @@ You do not know the right box size a priori, so you build it in stages
 python run_simulation.py -f md_npt.ini
 ```
 Watch the box dimensions in the build/run log shrink as the barostat drives the
-system toward `ref_p = 1 bar` at `ref_t = 310 K`. Outputs are `NON.*`.
+system toward `ref_p = 1 bar` at `ref_t = 310 K`. Outputs go to `traj/NON.*`.
 
 ### 2. Stage 2 — build the elongated box (manual)
 Read the final box edge from stage 1 and make a stage-2 config that keeps `x`,`y`
@@ -53,9 +53,9 @@ and stretches `z`, e.g.:
 pbc = yes
 box_dimension = [L, L, 3L]   ; substitute the equilibrated L from stage 1
 pcoupl = no                  ; NVT from here on
-restart = yes                ; continue from NON.chk
+restart = yes                ; continue from traj/NON.chk
 ```
-(You start stage 2 from `NON_final.pdb` / `NON.chk`.)
+(You start stage 2 from `traj/NON_final.pdb` / `traj/NON.chk`.)
 
 ### 3. Stage 3 — production NVT & read off the phase diagram
 Run a long NVT simulation, then compute the **density profile along `z`**,

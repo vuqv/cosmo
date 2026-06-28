@@ -55,7 +55,8 @@ model = hps_urry     # the force field (Tutorial 2 compares the four)
 ref_t = 300          # temperature in Kelvin
 pbc = no             # no periodic box (single chain, no solvent)
 pdb_file = asyn.pdb
-protein_code = asyn  # output files are named asyn.*
+output_dir = traj    # all outputs go to this folder ...
+outname = asyn       # ... named asyn.* (so: traj/asyn.dcd, traj/asyn.log, ...)
 device = CPU         # runs anywhere; switch to GPU if you have CUDA
 minimize = yes       # relax the input coordinates before stepping
 ```
@@ -70,22 +71,22 @@ of chains, each force term added in order, force-field dump), minimizes, then
 steps the dynamics. It ends with `Finished in … seconds`.
 
 ### 4. Inspect the outputs
-All generated files are written to the current folder, named `<protein_code>.*`
-(here `asyn.*`):
+All generated files land in one run folder, `output_dir` (here `traj/`, created
+automatically), named `<outname>.*` (here `asyn.*`):
 
 | File | What it is |
 |------|------------|
-| `asyn.log` | Fixed-width, space-aligned energy/temperature log (one line every `nstlog` steps). |
-| `asyn.dcd` | Trajectory (coordinates every `nstxout` steps) — open with VMD/MDAnalysis. |
-| `asyn.chk` | Binary checkpoint (positions + velocities) for restarting (Tutorial 4). |
-| `asyn.psf` | Topology of the coarse-grained model (load alongside the DCD in analysis tools). |
-| `asyn_init.pdb` | The coarse-grained starting structure (one bead per residue). |
-| `asyn_final.pdb` | Last conformation; reuse it to seed a follow-up run. |
-| `asyn_ff.dat` | Per-residue σ/ε/charge force-field table (HPS models only). |
+| `traj/asyn.log` | Fixed-width, space-aligned energy/temperature log (one line every `nstlog` steps). |
+| `traj/asyn.dcd` | Trajectory (coordinates every `nstxout` steps) — open with VMD/MDAnalysis. |
+| `traj/asyn.chk` | Binary checkpoint (positions + velocities) for restarting (Tutorial 4). |
+| `traj/asyn.psf` | Topology of the coarse-grained model (load alongside the DCD in analysis tools). |
+| `traj/asyn_init.pdb` | The coarse-grained starting structure (one bead per residue). |
+| `traj/asyn_final.pdb` | Last conformation; reuse it to seed a follow-up run. |
+| `traj/asyn_ff.dat` | Per-residue σ/ε/charge force-field table (HPS models only). |
 
 Peek at the log:
 ```bash
-head asyn.log
+head traj/asyn.log
 ```
 The columns are step, time (ps), potential / kinetic / total energy (kJ/mol),
 temperature (K), speed, and remaining time. A stable temperature near 300 K and
@@ -93,12 +94,13 @@ a non-exploding potential energy mean the run is healthy.
 
 ## Try next
 
-- Open the trajectory in VMD: `vmd asyn.psf asyn.dcd`. Watch the disordered
-  chain expand and collapse — there is no single folded state.
+- Open the trajectory in VMD: `vmd traj/asyn.psf traj/asyn.dcd`. Watch the
+  disordered chain expand and collapse — there is no single folded state.
 - Bump `md_steps` to `100000` for a longer ensemble, and compute the radius of
   gyration (R_g) over the trajectory with MDAnalysis.
 - Move on to **Tutorial 2** to see how the four force fields differ on this same
   chain.
 
-> Tip: a re-run overwrites the `asyn.*` files in this folder. To keep a run,
-> copy them aside or change `protein_code` (e.g. `protein_code = asyn_T300`).
+> Tip: a re-run overwrites the `traj/asyn.*` files. To keep a run, copy the
+> folder aside or change `outname`/`output_dir` (e.g. `outname = asyn_T300`, or
+> `output_dir = runs/T300`).

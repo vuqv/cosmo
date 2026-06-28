@@ -1,53 +1,151 @@
-Models 
+Models
 =========================================================
 
-The models class contains three methods for automatic setting up predefined potentials.
+The :code:`models` class builds predefined coarse-grained (CG) force fields by
+initialising a :code:`system` object with the right parameters. Every model is a
+**one-bead-per-residue** representation: proteins are mapped to a bead at each
+alpha carbon (``CA``) and nucleic acids to a bead at each phosphate (``P``).
 
-It works by initializing a system class with the necessary force field parameters.
-
-Coarse grained, CA/P model
+Supported models
 ++++++++++++++++++++++++++++++++++++++++
 
-The coarse grained method represents proteins as beads centered at the alpha
-carbons of each residue and nucleic acids as beads centered at the phosphate P
-atom of each nucleotide.
+.. list-table::
+   :header-rows: 1
+   :widths: 16 26 30 28
 
-It uses harmonic potentials to hold the covalent connectivity and geometry of the beads. 
+   * - Model
+     - Short-range pairwise term
+     - Components
+     - Notes
+   * - ``hps_urry``
+     - Ashbaugh–Hatch (Urry hydropathy)
+     - protein, DNA
+     - Default / recommended for IDPs
+   * - ``hps_kr``
+     - Ashbaugh–Hatch (Kapcha–Rossy)
+     - protein, RNA, phospho-protein
+     - Nucleic-acid + PTM parameters
+   * - ``hps_ss``
+     - Ashbaugh–Hatch + bonded (angle, torsion)
+     - protein
+     - Adds secondary-structure bonded terms
+   * - ``mpipi``
+     - Wang–Frenkel
+     - **protein, RNA**
+     - Near-quantitative LLPS; full RNA support
 
-Torsional geometries are modeled with a periodic torsion potential. 
+To build a model, call:
 
-Native contacts are represented through the use of Lennard-Jones potentials that allow to form and break non-bonded interactions, permitting complete and local unfolding of the structures.
+.. code-block:: python
 
-To create a CA/P model, call:
-:code:`cosmo.core.models.buildCoarseGrainModel(structure_file, model='hps_urry')`
+    import cosmo
+    model = cosmo.models.buildCoarseGrainModel(structure_file, model='hps_urry')
 
-Here, pdb_file is the path to the PDB format structure of the protein.
-hps_scale is hydropathy scale that are going to be used. :code:`urry` or :code:`kr`
+where ``structure_file`` is a PDB structure and ``model`` selects one of the
+force fields above. The method keeps only the ``CA``/``P`` beads, assigns
+per-residue masses, charges and force-field parameters, and adds the bonded and
+non-bonded forces. The sections below give the functional form and parameters of
+each term.
 
-The force field equations are:
+Which model uses which term
+++++++++++++++++++++++++++++++++++++++++
+
+The models do **not** all share the same potential. Only ``hps_ss`` adds the
+angle and torsion (bonded secondary-structure) terms, and only ``mpipi`` uses the
+Wang–Frenkel short-range term instead of Ashbaugh–Hatch. The electrostatics term
+is common to all. Each potential section below applies only to the models marked
+here.
+
+.. list-table::
+   :header-rows: 1
+   :widths: 34 14 14 14 14
+
+   * - Energy term
+     - ``hps_urry``
+     - ``hps_kr``
+     - ``hps_ss``
+     - ``mpipi``
+   * - Harmonic bond
+     - ✓
+     - ✓
+     - ✓
+     - ✓
+   * - Gaussian angle
+     - –
+     - –
+     - ✓
+     - –
+   * - Gaussian torsion
+     - –
+     - –
+     - ✓
+     - –
+   * - Ashbaugh–Hatch pairwise (vdW)
+     - ✓
+     - ✓
+     - ✓
+     - –
+   * - Wang–Frenkel pairwise (vdW)
+     - –
+     - –
+     - –
+     - ✓
+   * - Debye–Hückel electrostatics
+     - ✓
+     - ✓
+     - ✓
+     - ✓
+
+The corresponding Hamiltonians are therefore:
 
 .. math::
-	H_A = \sum_{bonds}V_{bond}+\sum_{i,j}\Phi_{ij}^{vdw}+\sum_{i,j}\Phi_{i,j}^{el}
-
-If hps_ss model is used, the Hamiltonian is:
+	H_{\mathrm{hps\_urry/kr}} = \sum_{bonds}V_{bond}+\sum_{i,j}\Phi_{ij}^{vdw,AH}+\sum_{i,j}\Phi_{i,j}^{el}
 
 .. math::
-	H_{hps-ss} = \sum_{bonds}V_{bond}+\sum_{angle}V_{angle}+\sum_{torsion}V_{torsion}+\sum_{i,j}\Phi_{ij}^{vdw}+\sum_{i,j}\Phi_{i,j}^{el}
+	H_{\mathrm{hps\_ss}} = \sum_{bonds}V_{bond}+\sum_{angle}V_{angle}+\sum_{torsion}V_{torsion}+\sum_{i,j}\Phi_{ij}^{vdw,AH}+\sum_{i,j}\Phi_{i,j}^{el}
+
+.. math::
+	H_{\mathrm{mpipi}} = \sum_{bonds}V_{bond}+\sum_{i,j}\Phi_{ij}^{WF}+\sum_{i,j}\Phi_{i,j}^{el}
+
+where :math:`\Phi^{vdw,AH}` is the Ashbaugh–Hatch term and :math:`\Phi^{WF}` is the
+Wang–Frenkel term documented below.
 
 
 The Bonded potential:
 ++++++++++++++++++++++
 
+All models connect consecutive beads with a harmonic bond:
+
 .. math::
         V_{bond} = \frac{k_b}{2}(r-r_0)^2
 
-Here the default values are:
+The spring constant and equilibrium length are model-dependent:
 
-    :math:`k_b= 8368 kJ/(mol \times nm^2),\\
-    r_0=0.382 nm`
+.. list-table::
+   :header-rows: 1
+   :widths: 22 30 24 24
+
+   * - Model
+     - :math:`k_b` (kJ mol\ :sup:`-1` nm\ :sup:`-2`)
+     - :math:`r_0` protein (nm)
+     - :math:`r_0` nucleic (nm)
+   * - ``hps_urry`` / ``hps_kr`` / ``hps_ss``
+     - 8368
+     - 0.382
+     - 0.5
+   * - ``mpipi``
+     - 8030  (= 8.03 J mol\ :sup:`-1` pm\ :sup:`-2`)
+     - 0.381
+     - 0.5
+
+Nucleic-acid (``P``–``P``) bonds use the nucleic equilibrium length of 0.5 nm;
+protein (``CA``–``CA``) bonds use the protein value.
 
 Angle Potential
 +++++++++++++++
+
+**Applies to:** ``hps_ss`` only.
+
 .. math::
     U_{angle}(\theta) = \frac{-1}{\gamma}
     \ln \left[ e^{ -\gamma[ k_{\alpha} (\theta-\theta_{\alpha})^2+\epsilon_{\alpha} ]} +e^{ -\gamma k_{\beta} (\theta-\theta_{\beta})^2 } \right]
@@ -61,6 +159,8 @@ Parameters:
 
 Torsion Potential
 ++++++++++++++++++
+
+**Applies to:** ``hps_ss`` only.
 
 .. math::
     U_{torsion}(\theta) = -\ln\left[ U_{torsion, \alpha}(\theta, \epsilon_d) + U_{torsion, \beta}(\theta, \epsilon_d)\right]
@@ -92,8 +192,11 @@ Parameters:
     e_2 = 0.4 \ \mathrm{kcal}/\mathrm{mol}
 
 
-The Pairwise potential:
-+++++++++++++++++++++++
+The Pairwise potential (Ashbaugh–Hatch):
+++++++++++++++++++++++++++++++++++++++++
+
+**Applies to:** ``hps_urry``, ``hps_kr``, ``hps_ss``. The ``mpipi`` model uses the
+Wang–Frenkel term instead (see *The Mpipi model* below).
 
 .. math::
         \Phi_{i,j}^{vdw}(r) = step(2^{1/6}\sigma_{ij}-r) \times \left( 4\epsilon\left[\left(\frac{\sigma_{ij}}{r}\right)^{12}- \left(\frac{\sigma_{ij}}{r}\right)^{6}\right]+(1-\mu\times\lambda_{ij}^{0}+\Delta)\times\epsilon\right)
@@ -120,8 +223,102 @@ while it is :code:`1-4` for hps-ss, which we exclude 3 bonds.
 
 The cut-off distance for Lennard-Jone potential: :math:`2.0 nm`
 
+The Mpipi model (Wang–Frenkel)
+++++++++++++++++++++++++++++++++++++++++
+
+The ``mpipi`` model (Joseph *et al.*, *Nat. Comput. Sci.* **1**, 732–743, 2021)
+replaces the Ashbaugh–Hatch term with the **Wang–Frenkel** potential and
+represents each amino acid or nucleotide by a single bead with a mass, charge,
+and a tabulated set of pairwise parameters. Its total energy is
+
+.. math::
+        E_{\mathrm{Mpipi}} = E_{bond} + E_{elec} + E_{pair}
+
+where :math:`E_{bond}` is the harmonic bond above and :math:`E_{elec}` is the
+Debye–Hückel term below. The short-range pairwise energy between beads of types
+:math:`i` and :math:`j` at separation :math:`r` is
+
+.. math::
+        \Phi_{ij}^{WF}(r) = \varepsilon_{ij}\,\alpha_{ij}
+        \left[\left(\frac{\sigma_{ij}}{r}\right)^{2\mu_{ij}} - 1\right]
+        \left[\left(\frac{R_{ij}}{r}\right)^{2\mu_{ij}} - 1\right]^{2\nu_{ij}}
+
+.. math::
+        \alpha_{ij} = 2\nu_{ij}\left(\frac{R_{ij}}{\sigma_{ij}}\right)^{2\mu_{ij}}
+        \left[\frac{2\nu_{ij}+1}{2\nu_{ij}\left(\left(\frac{R_{ij}}{\sigma_{ij}}\right)^{2\mu_{ij}}-1\right)}\right]^{2\nu_{ij}+1}
+
+The Wang–Frenkel potential is **finite-ranged**: it vanishes smoothly
+(quadratically) at :math:`r = R_{ij}`, so no truncation/shifting is needed. The
+parameters are:
+
+* :math:`\varepsilon_{ij}, \sigma_{ij}, \mu_{ij}` — tabulated **per interacting
+  pair** (not from a mixing rule), from Supplementary Tables 11 (protein–protein)
+  and 12 (interactions with RNA).
+* :math:`\nu_{ij} = 1` for every pair.
+* :math:`R_{ij} = 3\,\sigma_{ij}` — the per-pair interaction range.
+* :math:`\mu_{ij} = 2` for protein–protein pairs, **except**
+  :math:`\mu_{\mathrm{V\!-\!I}} = 4` and :math:`\mu_{\mathrm{I\!-\!I}} = 11`;
+  :math:`\mu_{ij} = 3` for every pair that involves an RNA bead.
+
+Because the interaction range is per-pair, the neighbour-list cutoff is set
+automatically to :math:`\max_{ij} R_{ij}` (the largest :math:`3\sigma_{ij}` in the
+parameter table; ≈ 2.55 nm once RNA beads are present), so no pair is silently
+truncated.
+
+Charges follow the Mpipi convention: charged amino acids carry
+:math:`q = \pm 0.75\,e`, histidine :math:`q = +0.375\,e`, and each RNA bead
+:math:`q = -0.75\,e`.
+
+RNA / nucleic-acid support
+++++++++++++++++++++++++++++++++++++++++
+
+The ``mpipi`` model supports RNA out of the box. RNA is represented by one bead
+per nucleotide placed at the phosphate (``P``) atom, with the four bases
+``A``, ``C``, ``G``, ``U`` carrying standard nucleotide masses and charge
+:math:`-0.75\,e`:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 14 22 18 18
+
+   * - Base
+     - mass (g mol\ :sup:`-1`)
+     - charge (:math:`e`)
+     - bead id
+   * - A
+     - 329.2
+     - −0.75
+     - 20
+   * - C
+     - 305.2
+     - −0.75
+     - 21
+   * - G
+     - 345.2
+     - −0.75
+     - 22
+   * - U
+     - 306.2
+     - −0.75
+     - 23
+
+Common residue-name aliases are accepted on input and resolve to the same beads:
+``RA``/``RC``/``RG``/``RU`` and ``ADE``/``CYT``/``GUA``/``URA``. Protein–RNA and
+RNA–RNA Wang–Frenkel parameters (with :math:`\mu = 3`) come from Supplementary
+Table 12; the RNA bond length is the nucleic value of 0.5 nm. A worked
+protein + RNA example is given in the *protein–RNA complex* tutorial.
+
+.. note::
+
+   The original Mpipi paper describes the RNA parameters as an *initial set*;
+   the authors flag the RNA bond and angular constants in particular for future
+   refinement. COSMO uses the published values.
+
 The Debye-Huckle potential has following form:
 ++++++++++++++++++++++++++++++++++++++++++++++
+
+Electrostatics is shared by all models (it acts on the per-residue charges):
+
 .. math::
         \Phi_{ij}^{el}(r) = \frac{q_{i}q_{j}}{4\pi\epsilon_0 D r}e^{-\kappa r}
 
@@ -134,7 +331,16 @@ where, :math:`q_i, q_j` are charge of residues :math:`i, j`
 The dielectric constant here is fixed, but it can be temperature dependent as the function:
 :math:`\frac{5321}{T}+233.76-0.9297T+0.1417\times 10^{-2}\times T^2 - 0.8292\times 10^{-6}\times T^3`
 
-:math:`\kappa`: inverse Debye length, at 100mM NaCl has values of :math:`1 nm^{-1}`
+:math:`\kappa`: inverse Debye length. The screening length :math:`\kappa^{-1}` is
+**model-dependent**:
+
+* HPS family (``hps_urry`` / ``hps_kr`` / ``hps_ss``):
+  :math:`\kappa = 1\ \mathrm{nm}^{-1}` (:math:`\kappa^{-1} = 1.0` nm, ~100 mM NaCl).
+* ``mpipi``: :math:`\kappa = 1.26\ \mathrm{nm}^{-1}`
+  (:math:`\kappa^{-1} = 0.795` nm, 150 mM), per Joseph *et al.* 2021.
+
+Models not listed fall back to 1.0 nm. The value is stored in
+``cosmo.parameters.model_parameters.debye_length``.
 
 The cut-off distance for Electrostatics interactions: :math:`3.5 nm`
 

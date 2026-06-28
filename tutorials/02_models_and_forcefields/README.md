@@ -37,15 +37,15 @@ terms. Define additional models in `cosmo/parameters/model_parameters.py`.
 ```bash
 python run_simulation.py -f md.ini       # model = hps_urry
 ```
-You get the usual `asyn.*` outputs (see Tutorial 1).
+You get the usual `traj/asyn.*` outputs (see Tutorial 1).
 
 ### 2. Swap the model and re-run
 Edit the one line in `md.ini`:
 ```ini
 model = mpipi          # then hps_kr, then hps_ss
 ```
-and (to avoid overwriting) change `protein_code` to match, e.g.
-`protein_code = asyn_mpipi`. Re-run after each change. Watch the build log: each
+and (to avoid overwriting) change `outname` to match, e.g.
+`outname = asyn_mpipi`. Re-run after each change. Watch the build log: each
 model prints a **different set of force terms** as it assembles the system —
 `hps_ss` adds angle/torsion groups; `mpipi` reports a Wang–Frenkel force where the
 others report Ashbaugh–Hatch.

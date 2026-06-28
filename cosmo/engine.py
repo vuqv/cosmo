@@ -68,6 +68,10 @@ def build_model(cfg):
     cosmo.core.system.system
         The built model (carries ``.system``, ``.topology`` and ``.positions``).
     """
+    # All outputs go to cfg.output_dir (default traj/); create it up front so the
+    # provenance dumps below and every later writer land in the run folder.
+    cfg.prepare_output_dir()
+
     hps_model = models.buildCoarseGrainModel(cfg.pdb_file, **cfg.build_kwargs())
 
     # Provenance dumps (same set and naming as the historical runner).

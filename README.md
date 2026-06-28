@@ -99,10 +99,10 @@ pbc = yes
 box_dimension = 30 ; [30, 30, 60]
 
 ; input
-protein_code = ASYN
 pdb_file = asyn.pdb
-; output
-checkpoint = asyn.chk
+; output  (all files -> <output_dir>/<outname>.*, default traj/traj.*)
+output_dir = traj
+outname = asyn
 ; use GPU/CPU
 device = GPU
 ; if CPU is specified, then use ppn

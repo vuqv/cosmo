@@ -83,7 +83,8 @@ A full reference for `md.ini` options lives in
 - Settings are deliberately **small and fast** (`md_steps = 5000`, `device = CPU`)
   so each example finishes in seconds. They are demos, not production runs — for
   real science you would increase `md_steps` to millions and use a GPU.
-- Output files are written to the run folder, named `<protein_code>.*`
-  (e.g. `asyn.dcd`, `asyn.log`, `asyn.psf`), and are **not** committed — you
-  generate them by running the tutorial. A re-run overwrites them, so change
-  `protein_code` (or copy the files aside) to keep a run.
+- Each run writes all its files to one self-contained folder,
+  `<output_dir>/<outname>.*` (default `traj/`, e.g. `traj/asyn.dcd`,
+  `traj/asyn.log`, `traj/asyn.psf`). These are **not** committed — you generate
+  them by running the tutorial. A re-run overwrites them, so change `outname` /
+  `output_dir` (or copy the folder aside) to keep a run.

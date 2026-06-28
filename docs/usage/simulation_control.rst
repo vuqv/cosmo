@@ -30,10 +30,10 @@ An example of how config file of simulation looks like.
         box_dimension = 30 ; [30, 30, 60]
 
         ; input
-        protein_code = FUS_100chains
         pdb_file = FUS_100chains.pdb
-        ; output
-        checkpoint = FUS_100chains.chk
+        ; output  (all files -> <output_dir>/<outname>.*, default traj/traj.*)
+        output_dir = traj
+        outname = FUS_100chains
         ;Use GPU/CPU
         device = GPU
         ; If CPU is specified, then use ppn variable
@@ -152,16 +152,28 @@ File input/output
 
 ::
 
-    protein_code    (string)
-                    String for output prefix, i.e {protein_code}.dcd, {protein_code}.log
+    output_dir      (string, default: traj)
+                    Folder that all generated files are written to. A run is one
+                    self-contained directory; it is created automatically.
+    ------------------------------------------------------------------------------------
+    outname         (string, default: traj)
+                    Basename for the generated files, i.e. <output_dir>/<outname>.dcd,
+                    <output_dir>/<outname>.log, <output_dir>/<outname>.psf, etc.
+                    (so the defaults give traj/traj.dcd, traj/traj.log, ...).
+    ------------------------------------------------------------------------------------
+    protein_code    (string, optional, legacy)
+                    Legacy output prefix. When set and `outname` is not given, it is
+                    used as `outname` (so e.g. protein_code = ASYN writes traj/ASYN.dcd).
+                    Prefer `output_dir`/`outname` for new control files.
     ------------------------------------------------------------------------------------
     pdb_file        (string)
                     [.pdb, .cif] Input structure for loading topology and initial coordinate
     ------------------------------------------------------------------------------------
-    checkpoint      (string)
-                    [.chk] Checkpoint file name, here I ask you to provide it explicitly since
-                            because checkpoint can be used to load state or save state.
-                            in case if you restart simulation with different name, you have to provide it.
+    checkpoint      (string, optional)
+                    [.chk] Explicit checkpoint path. If omitted it defaults to
+                    <output_dir>/<outname>.chk. Provide it explicitly only when you need
+                    a fixed checkpoint name (e.g. restarting from a different run name);
+                    a checkpoint can be used both to save and to load simulation state.
 
 Simulation platform
 +++++++++++++++++++++

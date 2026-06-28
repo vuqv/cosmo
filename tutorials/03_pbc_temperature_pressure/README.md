@@ -41,13 +41,13 @@ for any multi-chain / condensate run (Tutorials 5–6).
 ```bash
 python run_simulation.py -f md_nvt.ini
 ```
-Outputs are named `asyn_nvt.*`. The box stays 30 nm on a side the whole run.
+Outputs go to `traj/asyn_nvt.*`. The box stays 30 nm on a side the whole run.
 
 ### 2. Run NPT
 ```bash
 python run_simulation.py -f md_npt.ini
 ```
-Outputs are named `asyn_npt.*`. In the build log you'll see the barostat being
+Outputs go to `traj/asyn_npt.*`. In the build log you'll see the barostat being
 added (it is **not** present in the NVT run). Over the run the box dimensions
 drift as the barostat equilibrates the volume toward `ref_p = 1 bar`.
 
