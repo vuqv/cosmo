@@ -718,8 +718,13 @@ class system:
         None
         """
         print("Setting Coulomb interaction ...")
-        # currently, just use debye-length at [NaCl]=100mM
-        lD = 1.0 * unit.nanometer
+        # Debye screening length is model-dependent (see model_parameters): the
+        # HPS family uses ~1.0 nm ([NaCl] = 100 mM); Mpipi uses 0.795 nm
+        # (kappa = 1.26 nm^-1, 150 mM) per Joseph et al. 2021. Unlisted models
+        # fall back to DEFAULT_DEBYE_LENGTH.
+        lD = model_parameters.debye_length.get(
+            self.model, model_parameters.DEFAULT_DEBYE_LENGTH) * unit.nanometer
+        print(f"Using Debye screening length: {lD}")
         electric_factor = 138.935458 * unit.kilojoule_per_mole * unit.nanometer / unit.elementary_charge ** 2
         yukawa_cutoff = 3.5 * unit.nanometer
         epsilon_r = 80.0
@@ -895,8 +900,6 @@ class system:
         http://docs.openmm.org/7.2.0/api-c++/generated/OpenMM.Discrete2DFunction.html
         """
         print("Setting PairWise interaction ...")
-        print("Cutoff for Wang-Frenkel potential is 3\u03C3")
-        wang_frenkel_cutoff = 2.5 * unit.nanometer
 
         """
         In the model module, we only call this function when the model is mpipi so the following condition likely to be
@@ -918,6 +921,14 @@ class system:
 
         table_rc = model_parameters.parameters[self.model]['rc_ij']
         table_rc_ravel = table_rc.ravel().tolist()
+
+        # The per-pair interaction range is R_ij = 3*sigma_ij (encoded in rc_table
+        # and enforced by step(rc-r) in the energy). The global neighbour-list
+        # cutoff must therefore be at least the largest R_ij over all pairs,
+        # otherwise the farthest-reaching pairs (e.g. RNA G-G, 3*sigma = 2.55 nm)
+        # would be silently truncated. Take it directly from the table.
+        wang_frenkel_cutoff = float(table_rc.max()) * unit.nanometer
+        print(f"Cutoff for Wang-Frenkel potential is 3\u03C3 (max R_ij = {wang_frenkel_cutoff})")
 
         # number of atom types in model. currently with protein, there are 20.
         n_atom_types = table_sigma.shape[0]

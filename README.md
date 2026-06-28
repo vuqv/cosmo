@@ -22,7 +22,7 @@ Currently, these models are supported:
 | `hps_kr`   | protein, RNA, phosphorylation protein | protein, p-protein, RNA | protein / RNA |
 | `hps_urry` | protein, DNA                          | protein                 | protein |
 | `hps_ss`   | protein                               | protein                 | protein |
-| `mpipi`    | protein, RNA                          | protein                 | protein |
+| `mpipi`    | protein, RNA                          | protein, RNA            | protein / RNA |
 
 COSMO can be used to study single-chain conformations, LLPS, and related phenomena.
 

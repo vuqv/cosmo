@@ -19,15 +19,15 @@
   "hps_ss": {
     "Harmonic Bond Energy": 1.8674616142036708,
     "Gaussian Angle Energy": 1282.4490388024785,
-    "Gaussian Torsion Energy": -166.1496045946704,
+    "Gaussian Torsion Energy": -166.14960506266576,
     "Yukawa Energy": 3.0298189421674437,
     "PairWise Energy": -0.8596377450592515,
-    "Total": 1120.33707701912
+    "Total": 1120.3370765511245
   },
   "mpipi": {
     "Harmonic Bond Energy": 0.35076562343183626,
-    "Yukawa Energy": 4.1318785758888685,
-    "PairWire Energy": -34.12720938597412,
-    "Total": -29.644565186653416
+    "Yukawa Energy": 3.2445384492860674,
+    "PairWire Energy": -34.127209048594146,
+    "Total": -30.53190497587624
   }
 }

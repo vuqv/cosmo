@@ -53,6 +53,15 @@ import numpy as np
 protein_list = ["MET", "GLY", "LYS", "THR", "ARG", "ALA", "ASP", "GLU", "TYR", "VAL", "LEU", "GLN", "TRP", "PHE", "SER",
                 "HIS", "ASN", "PRO", "CYS", "ILE", "ALY", "SEP", "TPO", "PTR"]
 nucleic_list = ["A", "C", "G", "U"]
+
+# Debye screening length (nm) per model, used by the Debye-Hückel (Yukawa) term.
+# Mpipi specifies kappa = 1.26 nm^-1 (kappa^-1 = 795 pm) at 150 mM monovalent
+# salt (Joseph et al., Nat. Comput. Sci. 2021, SI Table 10). The HPS family uses
+# ~1.0 nm. Models not listed fall back to DEFAULT_DEBYE_LENGTH.
+DEFAULT_DEBYE_LENGTH = 1.0
+debye_length = {
+    "mpipi": 0.795,
+}
 parameters = {
     "hps_kr": {
         "bond_length_protein": 0.38,  # nm
@@ -505,7 +514,7 @@ parameters = {
     "mpipi": {
         "bond_length_protein": 0.381,
         "bond_length_nucleic": 0.5,  # RNA
-        "bond_force_constant": 8030.0,  # kj/mol/nm^2
+        "bond_force_constant": 8030.0,  # kJ/mol/nm² = 8.03 J/mol/pm² (Mpipi paper)
         "bonded_exclusions_index": 1,
         "MET": {
             "mass": 131.20,
@@ -943,9 +952,100 @@ parameters = {
 """
 
 """
-mpipi model from paper: 
+mpipi model from paper:
       Physics-driven coarse-grained model for biomolecular phase separation with near-quantitative accuracy.
       Mass of residues is similar to other model.
       id: residue id type, used in tabulated function in WF potential
       change: all charge residues have charge +/- 0.75e, H is 0.375e. charge unit is e.
   """
+
+# ---------------------------------------------------------------------------
+# RNA support for the Mpipi model (Joseph et al., Nat. Comput. Sci. 2021).
+#
+# Source: Supplementary Table 12 (Wang-Frenkel parameters for interactions with
+# RNA bases). RNA is represented by one bead per nucleotide (A, C, G, U) carrying
+# charge -0.75e and standard nucleotide masses. The protein Wang-Frenkel tables
+# (ids 0-19, Supplementary Table 11) are left untouched; here we extend them to
+# 24x24 by adding the amino-acid<->RNA (Table 12, mu = 3) and RNA<->RNA blocks.
+# nu = 1 and the interaction range R_ij = 3*sigma_ij hold for every pair, exactly
+# as for protein.
+# ---------------------------------------------------------------------------
+
+# Standard nucleotide-monophosphate residue masses (g/mol), matching hps_kr.
+_MPIPI_RNA_BEADS = {  # name: (id, mass)
+    "A": (20, 329.2),
+    "C": (21, 305.2),
+    "G": (22, 345.2),
+    "U": (23, 306.2),
+}
+# Common residue-name aliases accepted on input (all map to the canonical bead).
+_MPIPI_RNA_ALIASES = {
+    "RA": "A", "RC": "C", "RG": "G", "RU": "U",
+    "ADE": "A", "CYT": "C", "GUA": "G", "URA": "U",
+}
+
+# Amino-acid <-> RNA Wang-Frenkel parameters (Supplementary Table 12).
+# Rows are the 20 amino acids in id order (M G K T R A D E Y V L Q W F S H N P C I);
+# columns are the RNA bases in id order (A C G U).
+_MPIPI_AA_RNA_EPS = np.array(
+    [[1.153872, 0.783588, 1.16224, 0.720828], [1.272919, 0.902635, 1.281287, 0.839875], [0.666658, 0.444487, 0.671678, 0.406831], [1.13545, 0.765166, 1.143818, 0.702406], [2.518417, 1.777849, 2.535153, 1.652329], [1.174616, 0.804332, 1.182984, 0.741572], [1.236573, 0.866289, 1.244941, 0.803529], [1.250225, 0.879941, 1.258593, 0.817181], [1.948041, 1.577757, 1.956409, 1.514997], [1.082773, 0.712489, 1.091141, 0.649729], [1.094112, 0.723828, 1.10248, 0.661068], [1.490441, 1.120157, 1.498809, 1.057397], [2.222327, 1.852043, 2.230695, 1.789279], [1.890419, 1.520135, 1.898787, 1.457375], [1.199971, 0.829687, 1.208339, 0.766927], [1.12804, 0.757756, 1.136408, 0.694996], [1.476634, 1.106354, 1.485002, 1.04359], [1.235698, 0.865414, 1.244066, 0.80265], [1.216105, 0.845821, 1.224473, 0.783061], [1.071932, 0.701644, 1.0803, 0.638884]]
+)
+_MPIPI_AA_RNA_SIG = np.array(
+    [[0.745398, 0.734398, 0.748897, 0.731898], [0.656756, 0.645756, 0.660255, 0.643255], [0.755567, 0.744567, 0.759067, 0.742067], [0.716453, 0.705453, 0.719953, 0.702953], [0.763953, 0.752953, 0.767453, 0.750453], [0.685504, 0.674504, 0.689004, 0.672004], [0.713176, 0.702176, 0.716676, 0.699676], [0.730884, 0.719884, 0.734384, 0.717384], [0.758682, 0.747682, 0.762182, 0.745182], [0.7353, 0.7243, 0.7388, 0.7218], [0.748704, 0.737704, 0.752204, 0.735204], [0.735893, 0.724893, 0.739393, 0.722393], [0.775327, 0.764327, 0.778827, 0.761827], [0.753478, 0.742478, 0.756978, 0.739978], [0.692634, 0.681634, 0.696134, 0.679134], [0.738889, 0.727889, 0.742389, 0.725389], [0.718168, 0.707168, 0.721668, 0.704668], [0.712308, 0.701308, 0.715808, 0.698808], [0.708218, 0.697218, 0.711718, 0.694718], [0.768084, 0.757084, 0.771584, 0.754584]]
+)
+# RNA <-> RNA Wang-Frenkel parameters (Supplementary Table 12), order A C G U.
+_MPIPI_RNA_RNA_EPS = np.array(
+    [[2.142208, 1.771924, 2.150576, 1.709164], [1.771924, 1.40164, 1.780292, 1.33888], [2.150576, 1.780292, 2.158944, 1.717532], [1.709164, 1.33888, 1.717532, 1.27612]]
+)
+_MPIPI_RNA_RNA_SIG = np.array(
+    [[0.844, 0.833, 0.8475, 0.8305], [0.833, 0.822, 0.8365, 0.8195], [0.8475, 0.8365, 0.851, 0.834], [0.8305, 0.8195, 0.834, 0.817]]
+)
+
+
+def _extend_mpipi_with_rna():
+    """Add RNA beads/aliases and extend the Mpipi Wang-Frenkel tables to 24x24.
+
+    Idempotent and self-checking: asserts the protein 20x20 block is preserved,
+    the tables stay symmetric, and R_ij == 3*sigma_ij for every pair.
+    """
+    mp = parameters["mpipi"]
+
+    # 1. RNA residue beads (charge -0.75e) + aliases sharing the same bead.
+    for name, (rid, mass) in _MPIPI_RNA_BEADS.items():
+        mp[name] = {"mass": mass, "charge": -0.75, "id": rid}
+    for alias, canon in _MPIPI_RNA_ALIASES.items():
+        mp[alias] = dict(mp[canon])
+        if alias not in nucleic_list:
+            nucleic_list.append(alias)
+
+    # 2. Extend the 20x20 protein WF tables to 24x24 (protein block untouched).
+    eps20, sig20, mu20 = mp["eps_ij"], mp["sigma_ij"], mp["mu_ij"]
+
+    def _assemble(p20, aa_rna, rna_rna):
+        m = np.zeros((24, 24))
+        m[:20, :20] = p20
+        m[:20, 20:] = aa_rna
+        m[20:, :20] = aa_rna.T
+        m[20:, 20:] = rna_rna
+        return m
+
+    eps24 = _assemble(eps20, _MPIPI_AA_RNA_EPS, _MPIPI_RNA_RNA_EPS)
+    sig24 = _assemble(sig20, _MPIPI_AA_RNA_SIG, _MPIPI_RNA_RNA_SIG)
+    # mu = 3 for every RNA-involving pair; protein-protein block keeps Table 11.
+    mu24 = np.full((24, 24), 3.0)
+    mu24[:20, :20] = mu20
+    nu24 = np.ones((24, 24))
+    rc24 = 3.0 * sig24
+
+    # 3. Consistency checks.
+    assert eps24.shape == (24, 24)
+    assert np.allclose(eps24, eps24.T) and np.allclose(sig24, sig24.T)
+    assert np.allclose(mu24, mu24.T) and np.allclose(rc24, 3.0 * sig24)
+    assert not np.isnan(eps24).any() and not np.isnan(sig24).any()
+    assert np.allclose(eps24[:20, :20], eps20) and np.allclose(sig24[:20, :20], sig20)
+
+    mp["eps_ij"], mp["sigma_ij"] = eps24, sig24
+    mp["mu_ij"], mp["nu_ij"], mp["rc_ij"] = mu24, nu24, rc24
+
+
+_extend_mpipi_with_rna()
