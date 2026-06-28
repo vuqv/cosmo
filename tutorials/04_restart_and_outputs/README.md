@@ -68,6 +68,7 @@ With `output_dir = traj` and `outname = asyn`, a run writes:
 | `traj/asyn_init.pdb` | at build time | The coarse-grained **starting** structure (one bead per residue). |
 | `traj/asyn_final.pdb` | at finalize | The **last** conformation. Reuse it as the input PDB to seed a fresh run. |
 | `traj/asyn_ff.dat` | at build time (HPS models only) | Per-residue σ / ε / charge table actually used by the force field — handy for verifying parameters. |
+| `traj/asyn_runinfo.log` | at setup + finalize | Run provenance (INI-style): software versions, hardware, GPU/CUDA, planned/final steps, and wall-clock timing. Pure side channel for reproducibility. |
 
 > **Analysis quickstart (MDAnalysis):**
 > ```python
@@ -80,6 +81,8 @@ With `output_dir = traj` and `outname = asyn`, a run writes:
 
 - Restart a *third* time by bumping `md_steps` again (e.g. 6000) — the trajectory
   keeps growing.
-- Try seeding a brand-new run from `traj/asyn_final.pdb` instead of `asyn.pdb`
-  (set `pdb_file = traj/asyn_final.pdb`, `restart = no`).
+- Seed a brand-new run from a previous run's last frame: set
+  `init_position = traj/asyn_final.pdb` (keep `pdb_file` for the topology,
+  `restart = no`). Unlike a restart, this starts a fresh step clock with new
+  Boltzmann velocities but from those coordinates.
 - Move to **Tutorial 5** for a multi-chain slab simulation of phase separation.

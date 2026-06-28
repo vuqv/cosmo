@@ -83,6 +83,7 @@ automatically), named `<outname>.*` (here `asyn.*`):
 | `traj/asyn_init.pdb` | The coarse-grained starting structure (one bead per residue). |
 | `traj/asyn_final.pdb` | Last conformation; reuse it to seed a follow-up run. |
 | `traj/asyn_ff.dat` | Per-residue σ/ε/charge force-field table (HPS models only). |
+| `traj/asyn_runinfo.log` | Run provenance: software versions, hardware, GPU, timing. |
 
 Peek at the log:
 ```bash

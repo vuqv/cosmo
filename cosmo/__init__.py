@@ -20,7 +20,7 @@ The first class, geometry, contains methods to calculate the geometrical paramet
 
 The library is open-source and offers flexibility.
 """
-__all__ = ['system', 'models', 'build_structure', 'engine', 'mdrun',
+__all__ = ['system', 'models', 'build_structure', 'runinfo', 'engine', 'mdrun',
            'read_simulation_config', 'SimulationConfig']
 
 from .core import geometry
@@ -29,6 +29,7 @@ from .core import system
 from .parameters import model_parameters
 from .reporter import cosmoReporter
 from .utils import build_structure
+from .utils import runinfo
 from .utils.config import read_simulation_config, SimulationConfig
 # engine/mdrun use cosmo.core only at call time; imported after core is in place.
 from . import engine

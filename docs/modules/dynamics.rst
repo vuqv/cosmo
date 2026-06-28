@@ -14,7 +14,9 @@ or a module:
 The runner is intentionally thin: control-file parsing lives in
 :func:`cosmo.read_simulation_config` (returning a :class:`cosmo.SimulationConfig`)
 and the build / setup / run / finalize steps live in :mod:`cosmo.engine`, so a
-custom workflow can reuse the same pieces.
+custom workflow can reuse the same pieces. Each run also writes a
+``<outname>_runinfo.log`` provenance file (software versions, hardware, GPU,
+timing) via :mod:`cosmo.utils.runinfo`.
 
 Runner
 ------------------------------------------------------------
@@ -34,4 +36,10 @@ Engine
 ------------------------------------------------------------
 
 .. automodule:: cosmo.engine
+    :members:
+
+Run provenance
+------------------------------------------------------------
+
+.. automodule:: cosmo.utils.runinfo
     :members:

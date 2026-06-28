@@ -61,7 +61,12 @@ class SimulationConfig:
     dt: Any = field(default_factory=lambda: 0.01 * unit.picoseconds)
     nstxout: int = 10
     nstlog: int = 10
-    nstcomm: int = 100
+    # checkpoint write frequency; falls back to nstxout when None (topo parity).
+    nstchk: Optional[int] = None
+    # center-of-mass motion removal interval; None = off (topo parity). Set it
+    # for single-chain runs; leave off (or large) for multi-chain / slab runs
+    # where COM removal would couple the drift of independent chains.
+    nstcomm: Optional[int] = None
     model: str = 'hps_urry'
 
     # log formatting (cosmoReporter fixed-width columns). precision=None keeps
@@ -87,6 +92,9 @@ class SimulationConfig:
 
     # input
     pdb_file: Optional[str] = None
+    # optional starting coordinates (e.g. a previous run's _final.pdb); when set,
+    # used as-is instead of pdb_file's coordinates for a fresh run (topo parity).
+    init_position: Optional[str] = None
 
     # output: all generated files go to <output_dir>/<outname><suffix>, so a run
     # is one self-contained folder (default traj/traj.dcd, traj.log, traj.psf,
@@ -135,6 +143,10 @@ class SimulationConfig:
         otherwise ``<output_dir>/<outname>.chk``.
         """
         return self.checkpoint if self.checkpoint else self.output_path('.chk')
+
+    def checkpoint_interval(self) -> int:
+        """Steps between checkpoint writes: ``nstchk`` if set, else ``nstxout``."""
+        return self.nstchk if self.nstchk else self.nstxout
 
     def prepare_output_dir(self) -> None:
         """Ensure ``output_dir`` exists.
@@ -215,8 +227,15 @@ def read_simulation_config(config_file: str, verbose: bool = True) -> Simulation
     log(f'  nstxout: {cfg.nstxout}')
     cfg.nstlog = int(params.get('nstlog', cfg.nstlog))
     log(f'  nstlog: {cfg.nstlog}')
-    cfg.nstcomm = int(params.get('nstcomm', cfg.nstcomm))
-    log(f'  nstcomm: {cfg.nstcomm}')
+    if 'nstchk' in params:
+        cfg.nstchk = int(params['nstchk'])
+    log(f'  nstchk: {cfg.nstchk if cfg.nstchk else f"(defaults to nstxout={cfg.nstxout})"}')
+    nstcomm_val = params.get('nstcomm', None)
+    cfg.nstcomm = None if str(nstcomm_val).strip().lower() in ('none', '') else int(nstcomm_val)
+    if cfg.nstcomm is None:
+        log('  nstcomm: off (center-of-mass motion removal not set)')
+    else:
+        log(f'  nstcomm: every {cfg.nstcomm} steps')
     cfg.model = params.get('model', cfg.model)
     log(f'  model: {cfg.model}')
 
@@ -260,6 +279,9 @@ def read_simulation_config(config_file: str, verbose: bool = True) -> Simulation
 
     cfg.pdb_file = params['pdb_file']
     log(f'  pdb_file: {cfg.pdb_file}')
+    cfg.init_position = params.get('init_position', cfg.init_position)
+    if cfg.init_position:
+        log(f'  init_position: {cfg.init_position}')
 
     # Output location (topo-style): all files go to <output_dir>/<outname>.*.
     # `protein_code` is the legacy prefix; if given and `outname` is not, it is

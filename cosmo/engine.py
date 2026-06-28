@@ -25,6 +25,7 @@ from openmm import unit
 
 from .core import models
 from .reporter import cosmoReporter
+from .utils import runinfo
 
 
 @dataclass
@@ -42,11 +43,17 @@ class RunContext:
         on a restart).
     nsteps_remain : int
         Steps still to run to reach ``cfg.md_steps``.
+    checkpoint : str
+        Resolved checkpoint path for this run.
+    runinfo_path : str
+        Path of the ``_runinfo.log`` provenance file for this run.
     """
     simulation: object
     restart_active: bool
     done_steps: int
     nsteps_remain: int
+    checkpoint: object = None
+    runinfo_path: object = None
 
 
 def build_model(cfg):
@@ -138,12 +145,13 @@ def setup_simulation(cfg, built, control_file=None, shift_positions=True):
     built : cosmo.core.system.system
         Output of :func:`build_model` / :func:`build_system`.
     control_file : str, optional
-        Unused here; accepted for signature parity with the runner.
+        Path to the control file, recorded in the run-metadata header.
     shift_positions : bool, optional (default: True)
         Shift the input coordinates so the minimum corner is at the origin.
         Set False when the absolute coordinate frame is meaningful (e.g. a
         co-translational run that restrains atoms relative to a fixed point).
-        Ignored on restart (coordinates come from the checkpoint).
+        Ignored on restart (coordinates come from the checkpoint) and when
+        ``init_position`` is given (those coordinates are used as-is).
 
     Returns
     -------
@@ -154,35 +162,70 @@ def setup_simulation(cfg, built, control_file=None, shift_positions=True):
     simulation = mm.app.Simulation(built.topology, built.system, integrator,
                                    platform, properties)
 
+    checkpoint = cfg.checkpoint_path()
+
     if cfg.restart:
-        simulation.loadCheckpoint(cfg.checkpoint_path())
+        simulation.loadCheckpoint(checkpoint)
         done_steps = simulation.context.getState().getStepCount()
         print(f"Restarting from step: {done_steps}")
         nsteps_remain = cfg.md_steps - done_steps
         restart_active = True
+        coord_source = f"checkpoint ({checkpoint})"
+        vel_source = f"checkpoint ({checkpoint})"
     else:
-        if shift_positions:
-            # Shift coordinates so the minimum corner sits at the origin.
-            xyz = np.array(built.positions / unit.nanometer)
-            xyz[:, 0] -= np.amin(xyz[:, 0])
-            xyz[:, 1] -= np.amin(xyz[:, 1])
-            xyz[:, 2] -= np.amin(xyz[:, 2])
-            built.positions = xyz * unit.nanometer
+        if cfg.init_position:
+            # Explicit starting coordinates (e.g. a previous run's _final.pdb).
+            # Used as-is -- no shift, since the absolute frame is deliberate.
+            init_pos = mm.app.PDBFile(cfg.init_position).getPositions()
+            if len(init_pos) != built.system.getNumParticles():
+                raise SystemExit(
+                    f"init_position '{cfg.init_position}' has {len(init_pos)} atoms but "
+                    f"the system has {built.system.getNumParticles()}; they must match.")
+            built.positions = init_pos
+            coord_source = f"init_position ({cfg.init_position})"
+        else:
+            if shift_positions:
+                # Shift coordinates so the minimum corner sits at the origin.
+                xyz = np.array(built.positions / unit.nanometer)
+                xyz[:, 0] -= np.amin(xyz[:, 0])
+                xyz[:, 1] -= np.amin(xyz[:, 1])
+                xyz[:, 2] -= np.amin(xyz[:, 2])
+                built.positions = xyz * unit.nanometer
+            coord_source = f"pdb_file ({cfg.pdb_file})"
         simulation.context.setPositions(built.positions)
         simulation.context.setVelocitiesToTemperature(cfg.ref_t)
         done_steps = 0
         nsteps_remain = cfg.md_steps
         restart_active = False
+        vel_source = f"Boltzmann distribution at {cfg.ref_t}"
+
+    # Record run provenance (package versions, hardware, GPU, timing) to a
+    # side-channel <outname>_runinfo.log -- does not affect the simulation.
+    runinfo_path = cfg.output_path('_runinfo.log')
+    runinfo.write_run_start(
+        runinfo_path,
+        control_file=control_file,
+        checkpoint_file=checkpoint,
+        restart=restart_active,
+        steps_planned=nsteps_remain,
+        simulation=simulation,
+        use_gpu=(cfg.device == 'GPU'),
+        ppn=cfg.ppn,
+        coord_source=coord_source,
+        vel_source=vel_source,
+    )
+    print(f"Writing run metadata to {runinfo_path}")
 
     return RunContext(simulation=simulation, restart_active=restart_active,
-                      done_steps=done_steps, nsteps_remain=nsteps_remain)
+                      done_steps=done_steps, nsteps_remain=nsteps_remain,
+                      checkpoint=checkpoint, runinfo_path=runinfo_path)
 
 
 def attach_reporters(cfg, simulation, append=False, total_steps=None):
     """Attach checkpoint, trajectory and log reporters to ``simulation``.
 
-    Replaces any existing reporters. Files are written as ``<protein_code>.chk``,
-    ``<protein_code>.dcd`` and ``<protein_code>.log``.
+    Replaces any existing reporters. Files are written to
+    ``<output_dir>/<outname>.{chk,dcd,log}``.
 
     Parameters
     ----------
@@ -199,9 +242,11 @@ def attach_reporters(cfg, simulation, append=False, total_steps=None):
     if total_steps is None:
         total_steps = cfg.md_steps
 
+    # Checkpoint frequency (nstchk) is independent of the trajectory frequency
+    # (nstxout); it falls back to nstxout when not set in the config.
     simulation.reporters = []
     simulation.reporters.append(
-        mm.app.CheckpointReporter(cfg.checkpoint_path(), cfg.nstxout))
+        mm.app.CheckpointReporter(cfg.checkpoint_path(), cfg.checkpoint_interval()))
     simulation.reporters.append(
         mm.app.DCDReporter(cfg.output_path('.dcd'), cfg.nstxout,
                            enforcePeriodicBox=bool(cfg.pbc), append=append))
@@ -247,4 +292,9 @@ def finalize_simulation(cfg, ctx, topology, start_time, write_pdb=None):
     else:
         write_pdb(topology, last_frame, final_path)
     simulation.saveCheckpoint(cfg.checkpoint_path())
+
+    # Close the run-metadata side channel with timing + final-state info.
+    if ctx.runinfo_path is not None:
+        runinfo.write_run_end(ctx.runinfo_path, simulation=simulation,
+                              start_epoch=start_time, final_structure=final_path)
     print(f"Finished in {(time.time() - start_time):.2f} seconds")
