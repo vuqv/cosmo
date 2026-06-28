@@ -72,6 +72,16 @@ Run control
     ------------------------------------------------------------------------------------
     nstcomm:    (int)
                 (100) frequency for center of mass motion removal
+    ------------------------------------------------------------------------------------
+    log_precision: (int or none)
+                (4) number of decimal places for floating-point columns in the
+                fixed-width ``.log`` file. Use ``none`` to keep OpenMM's full
+                repr precision.
+    ------------------------------------------------------------------------------------
+    log_width:  (int or none)
+                (14) minimum width (right-justified) of each column in the
+                fixed-width ``.log`` file, so columns line up. Use ``none`` to
+                disable fixed-width alignment (plain two-space separator).
 
 Model parameter
 +++++++++++++++

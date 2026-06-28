@@ -64,6 +64,11 @@ class SimulationConfig:
     nstcomm: int = 100
     model: str = 'hps_urry'
 
+    # log formatting (cosmoReporter fixed-width columns). precision=None keeps
+    # OpenMM's full repr precision; width=None disables fixed-width alignment.
+    log_precision: Optional[int] = 4
+    log_width: Optional[int] = 14
+
     # temperature coupling
     tcoupl: bool = True
     ref_t: Any = 300.0          # kelvin when tcoupl is on
@@ -198,6 +203,18 @@ def read_simulation_config(config_file: str, verbose: bool = True) -> Simulation
     log(f'  nstcomm: {cfg.nstcomm}')
     cfg.model = params.get('model', cfg.model)
     log(f'  model: {cfg.model}')
+
+    # Log formatting: precision/width accept an int or the word 'none'/'' to
+    # disable (None) -- precision=None keeps full repr precision, width=None
+    # disables fixed-width alignment.
+    prec_val = params.get('log_precision', None)
+    if prec_val is not None:
+        cfg.log_precision = None if str(prec_val).strip().lower() in ('none', '') else int(prec_val)
+    width_val = params.get('log_width', None)
+    if width_val is not None:
+        cfg.log_width = None if str(width_val).strip().lower() in ('none', '') else int(width_val)
+    log(f'  log columns: precision={cfg.log_precision if cfg.log_precision is not None else "full"}, '
+        f'width={cfg.log_width if cfg.log_width is not None else "auto"}')
 
     cfg.tcoupl = bool(strtobool(str(params.get('tcoupl', cfg.tcoupl))))
     if cfg.tcoupl:

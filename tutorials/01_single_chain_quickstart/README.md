@@ -75,7 +75,7 @@ All generated files are written to the current folder, named `<protein_code>.*`
 
 | File | What it is |
 |------|------------|
-| `asyn.log` | Tab-separated energy/temperature log (one line every `nstlog` steps). |
+| `asyn.log` | Fixed-width, space-aligned energy/temperature log (one line every `nstlog` steps). |
 | `asyn.dcd` | Trajectory (coordinates every `nstxout` steps) — open with VMD/MDAnalysis. |
 | `asyn.chk` | Binary checkpoint (positions + velocities) for restarting (Tutorial 4). |
 | `asyn.psf` | Topology of the coarse-grained model (load alongside the DCD in analysis tools). |

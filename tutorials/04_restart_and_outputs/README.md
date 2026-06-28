@@ -60,7 +60,7 @@ With `protein_code = asyn`, a run writes:
 
 | File | When | What it is / how to use it |
 |------|------|----------------------------|
-| `asyn.log` | during run, every `nstlog` steps | Tab-separated table: step, time (ps), potential/kinetic/total energy (kJ/mol), temperature (K), speed (ns/day), remaining time. Plot it to check stability. |
+| `asyn.log` | during run, every `nstlog` steps | Fixed-width, space-aligned table (`#`-commented header): step, time (ps), potential/kinetic/total energy (kJ/mol), temperature (K), speed (ns/day), remaining time. Parse with `cosmo.reporter.readOpenMMReporterFile`; plot it to check stability. |
 | `asyn.dcd` | during run, every `nstxout` steps | Binary trajectory (coordinates only). Load with `asyn.psf` in VMD/MDAnalysis. |
 | `asyn.chk` | during run, every `nstxout` steps | Binary checkpoint (positions + velocities). The input to a restart. |
 | `asyn.psf` | at build time | CHARMM-style topology of the coarse-grained model (beads, bonds, charges). Pair it with the DCD for analysis. |

@@ -24,6 +24,7 @@ import openmm as mm
 from openmm import unit
 
 from .core import models
+from .reporter import cosmoReporter
 
 
 @dataclass
@@ -200,12 +201,18 @@ def attach_reporters(cfg, simulation, append=False, total_steps=None):
     simulation.reporters.append(
         mm.app.DCDReporter(cfg.output_path('.dcd'), cfg.nstxout,
                            enforcePeriodicBox=bool(cfg.pbc), append=append))
+    # cosmoReporter writes a clean, fixed-width log: each float column uses
+    # log_precision decimals and every column is padded to log_width characters so
+    # the columns line up. Columns are separated by two spaces (aligned and still
+    # machine-parsable via cosmo.reporter.readOpenMMReporterFile).
     simulation.reporters.append(
-        mm.app.StateDataReporter(
-            cfg.output_path('.log'), cfg.nstlog, step=True, time=True,
+        cosmoReporter(
+            cfg.output_path('.log'), cfg.nstlog,
+            precision=cfg.log_precision, width=cfg.log_width,
+            step=True, time=True,
             potentialEnergy=True, kineticEnergy=True, totalEnergy=True,
             temperature=True, remainingTime=True, speed=True,
-            totalSteps=total_steps, separator='\t', append=append))
+            totalSteps=total_steps, separator='  ', append=append))
 
 
 def finalize_simulation(cfg, ctx, topology, start_time, write_pdb=None):
