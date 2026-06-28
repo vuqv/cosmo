@@ -8,139 +8,112 @@ import openmm.unit as unit
 
 class models:
     """
-    A class to hold functions for the automated generation of default cosmo models.
+    A class to hold functions for the automated generation of default COSMO models.
 
     Methods
     -------
     """
 
     @staticmethod
-    def buildHPSModel(structure_file: str,
-                      minimize: bool = False,
-                      model: str = 'hps_urry',
-                      box_dimension: Any = None,
-                      frozen_indices: list = None,
-                      except_chains: list = None,
-                      nb_exclusions: list = None):
+    def buildCoarseGrainModel(structure_file: str,
+                              minimize: bool = False,
+                              model: str = 'hps_urry',
+                              box_dimension: Any = None,
+                              frozen_indices: list = None,
+                              except_chains: list = None,
+                              nb_exclusions: list = None,
+                              check_forces: bool = True):
         """
-        This is a method for building a coarse-grained model for protein and
-        nucleic-acid systems using the HPS (hydrophobic-polar scale) force field.
-        The method takes as input a structure file, as well as optional parameters
-        for whether to minimize the initial structure, the HPS scale to use
-        (options include 'hps_urry', 'hps_ss', 'hps_kr', and 'mpipi'), and the
-        dimensions of the periodic boundary conditions box. The method uses the
-        COSMO system class to keep CA atoms for proteins and P atoms for RNA/DNA,
-        then sets up the geometric parameters of the model (adding bonds and
-        setting masses and charges of CA/P atoms based on residue type). Depending
-        on the chosen HPS scale, it also sets the radii, hydropathy scale, or atom
-        types of CA/P atoms based on residue type. The method then adds bond,
-        angle, and torsional forces to the system, and uses periodic boundary
-        conditions if the box_dimension parameter is provided.
+        Build a CA/P coarse-grained model for protein and nucleic-acid systems
+        using an HPS (hydropathy-scale) force field.
 
-        Creates a CA/P coarse-grained :code:`COSMO` system class object with
-        default initialized parameters.
+        Creates an alpha-carbon (protein) / phosphate (nucleic-acid) system with
+        harmonic bonds, Yukawa electrostatics, and a short-range non-bonded
+        potential whose form depends on the chosen model: Ashbaugh-Hatch (LJ 12-6)
+        for the HPS-scale models, Wang-Frenkel for ``mpipi``. The ``hps_ss`` model
+        additionally adds Gaussian angle and torsion bonded terms.
 
         Parameters
         ----------
-        structure_file : string [required]
+        structure_file : str
             Path to the input structure file.
-        minimize : boolean (False)
-            If True, the initial structure will undergo energy minimization.
-        model : string [Optional, hps_urry]
-            HPS scale. Available options are 'hps_urry', 'hps_ss', 'hps_kr', and 'mpipi'.
-        box_dimension : float or array (None)
-            If box_dimension is supplied, a PBC will be used.
-            If a float is given, a cubic box will be used.
-            If an array of (3,1) is given, a rectangular box with the given dimension will be used.
-            If not specified, PBC will not be used.
-        frozen_indices : list (None)
-            List of atom indices to freeze.
-        except_chains : list (None)
+        minimize : bool, optional (default: False)
+            If True, run energy minimization on the initial structure.
+        model : str, optional (default: 'hps_urry')
+            HPS scale. Available options: 'hps_urry', 'hps_ss', 'hps_kr', 'mpipi'.
+        box_dimension : float or array, optional
+            If set, use PBC (cubic if float, rectangular if [x, y, z]). If not
+            specified, PBC is not used.
+        frozen_indices : list, optional
+            List of atom indices to freeze (mass set to zero).
+        except_chains : list, optional
             List of chain IDs to exclude from bonding.
-        nb_exclusions : list (None)
+        nb_exclusions : list, optional
             List of pairs of atom indices to exclude from nonbonded forces.
+        check_forces : bool, optional (default: True)
+            If True, run the build-time large-force / initial-energy check on the
+            input structure. Set False when restarting from a checkpoint, where
+            the input-structure energy is irrelevant (the loaded state, not the
+            PDB geometry, is what gets simulated).
+
         Returns
         -------
-        cosmo : :code:`COSMO.system`
-            Initialized COSMO.system class with default options for defining
-            a coarse-grained CA/P force field.
+        cosmo_model : cosmo.core.system
+            Initialized CA/P coarse-grained system ready for simulation.
         """
 
-        # common for all model:
-        print(f'Generating CA/P coarse-grained model for structure from file {structure_file}')
         print('')
+        print('=' * 66)
+        print('[ System build ]')
+        print('=' * 66)
+        print(f'Building CA/P coarse-grained model (model={model}) from {structure_file}')
+
         cosmo_model = system(structure_file, model)
-        print("Checking input structure file ...")
-        print("Be sure that you do not have missing residues in the initial structure. At the moment, I will not take "
-              "care of that")
 
-        # Set up geometric parameters of the model
-        print('Setting up geometrical parameters ...')
-        print('-' * 70)
-        print('Keeping only alpha carbon and phosphate P atoms in topology')
+        # Build CA/P topology: keep only alpha-carbon (protein) and phosphate
+        # (nucleic-acid) beads, then collect atoms and bonds.
         cosmo_model.coarseGrainingStructure()
-
-        print(f'There are {cosmo_model.n_chains} chain(s) in the input file.')
-
-        # Common for all
         cosmo_model.getAtoms()
+        cosmo_model.getBonds(except_chains=except_chains)
+
         ca_atoms = sum(1 for atom in cosmo_model.atoms if atom.name == 'CA')
         p_atoms = sum(1 for atom in cosmo_model.atoms if atom.name == 'P')
-        print(f'Added {cosmo_model.n_atoms} atoms ({ca_atoms} CA, {p_atoms} P)')
+        print(f'  chains={cosmo_model.n_chains}  atoms={cosmo_model.n_atoms} '
+              f'({ca_atoms} CA, {p_atoms} P)  bonds={cosmo_model.n_bonds}')
 
-        cosmo_model.getBonds(except_chains=except_chains)
-        print('Added ' + str(cosmo_model.n_bonds) + ' bonds')
-
-        print("Setting CA/P masses to their average residue mass.")
+        # Per-residue particle properties (mass, charge, and -- depending on the
+        # model family -- excluded-volume radius + hydropathy, or the mpipi atom
+        # type).
         cosmo_model.setMassPerResidueType()
-
-        print("Setting CA/P charge to their residue charge.")
         cosmo_model.setChargePerResidueType()
-
-        # difference for each model
-        if model in ['hps_kr', 'hps_urry', 'hps_ss']:
-            print("Setting CA/P atom radii to their statistical residue radius.")
+        if model in ('hps_kr', 'hps_urry', 'hps_ss'):
             cosmo_model.setRadiusPerResidueType()
-
-            print(f"Setting CA/P hydropathy scale to their residue, Using {model} scale.")
             cosmo_model.setHPSPerResidueType()
-
-        elif model in ['mpipi']:
-            print(f"Setting CA/P atom type to their residue type, using {model} model.")
+            print(f'  per-residue: mass, charge, radius, hydropathy ({model} scale)')
+        elif model in ('mpipi',):
             cosmo_model.setCAIDPerResidueType()
+            print(f'  per-residue: mass, charge, atom type ({model})')
 
-        # add forces to system
-        print('Adding default bond force constant:', end=' ')
+        # Set particle interactions and add forces to the system. Force-group
+        # insertion order below is significant (each force gets a group index in
+        # this order) and must be kept in sync with the reporter / benchmark.
         cosmo_model.setBondForceConstants()
-        print('')
-        print('-' * 70)
-
-        print('Adding Forces:')
         cosmo_model.addHarmonicBondForces()
-        print('Added Harmonic Bond Forces')
-        print('-' * 30)
 
-        if model == "hps_ss":
-            # this model has angle bonded potential.
-            # angle
+        if model == 'hps_ss':
+            # hps_ss adds bonded angle + torsion terms on top of hps_urry.
             cosmo_model.getAngles()
-            print(f'Added {cosmo_model.n_angles} angles ')
             cosmo_model.addGaussianAngleForces()
-            print('Added Gaussian Angle Forces')
-            print('-' * 30)
-
-            # torsional
             cosmo_model.getTorsions()
-            print(f'Added {cosmo_model.n_torsions} torsion angles ')
             cosmo_model.addGaussianTorsionForces()
-            print('Add Gaussian Torsion Forces')
-            print('-' * 30)
+            print(f'  bonded extras: {cosmo_model.n_angles} angles, '
+                  f'{cosmo_model.n_torsions} torsions (Gaussian)')
 
         if box_dimension:
             use_pbc = True
             if isinstance(box_dimension, list):
                 """
-                OpenMM use this to write dimension in PDB and dcd file. Require one-argument, so zip box dimension into 
+                OpenMM use this to write dimension in PDB and dcd file. Require one-argument, so zip box dimension into
                 one variable.
                 Rectangular box, given parameter is array of three number
                 """
@@ -159,31 +132,42 @@ class models:
             use_pbc = False
 
         cosmo_model.addYukawaForces(use_pbc, nb_exclusions=nb_exclusions)
-        print('Added Yukawa Force')
-        print('-' * 30)
 
-        if model in ['hps_kr', 'hps_urry', 'hps_ss']:
+        # Short-range non-bonded potential: Ashbaugh-Hatch (LJ 12-6) for the
+        # HPS-scale models, Wang-Frenkel for mpipi.
+        if model in ('hps_kr', 'hps_urry', 'hps_ss'):
             cosmo_model.addAshbaughHatchForces(use_pbc, nb_exclusions=nb_exclusions)
-            print('Added PairWise Force')
-            print('-' * 30)
-        elif model in ['mpipi']:
+            nb_name = 'Ashbaugh-Hatch (PairWise)'
+        elif model in ('mpipi',):
             cosmo_model.addWangFrenkelForces(use_pbc, nb_exclusions=nb_exclusions)
-            print('Added Wang-Frenkel Force')
-            print('-' * 30)
-        print('')
-        print('-' * 70)
+            nb_name = 'Wang-Frenkel'
 
-        # Generate the system object and add previously generated forces
+        extra = ', Gaussian angle+torsion' if model == 'hps_ss' else ''
+        print(f'  forces: harmonic bond, Yukawa, {nb_name}{extra}  '
+              f'(pbc={use_pbc})')
 
-        print('Creating System Object:')
-        # print('______________________')
-        cosmo_model.createSystemObject(minimize=minimize, check_bond_distances=True)
+        # Generate the system object and add the previously generated forces. The
+        # bond-distance check always runs (it validates the built geometry); the
+        # large-force / initial-energy check is skipped when check_forces is False
+        # (e.g. restarting from a checkpoint, where the loaded state -- not the
+        # input PDB geometry -- is what gets simulated).
+        cosmo_model.createSystemObject(minimize=minimize, check_bond_distances=True,
+                                       check_large_forces=check_forces)
 
         if frozen_indices:
-            print(f'Freezing {len(frozen_indices)} atoms from moving...')
+            print(f'  freezing {len(frozen_indices)} atoms from moving')
             for idx in frozen_indices:
                 cosmo_model.system.setParticleMass(idx, 0.0 * unit.dalton)
-        print('cosmo system Object created')
+
+        print('System build complete')
         print('')
 
         return cosmo_model
+
+    # Deprecated alias. Retained only so the frozen ``examples/growing/`` scripts
+    # keep working until they are rewritten (see TODO). New code should call
+    # ``buildCoarseGrainModel`` (the name used by the sibling ``topo`` project).
+    @staticmethod
+    def buildHPSModel(*args, **kwargs):
+        """Deprecated alias for :meth:`buildCoarseGrainModel`."""
+        return models.buildCoarseGrainModel(*args, **kwargs)

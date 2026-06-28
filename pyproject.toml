@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cosmo"
+version = "0.1.0"
+description = "COarse-grained Simulation of intrinsically disordered prOteins (HPS / Mpipi models), built on OpenMM."
+readme = "README.md"
+requires-python = ">=3.9"
+# Runtime dependencies of `import cosmo`. Floors are the oldest versions known
+# to work; no upper caps (runs on current releases, e.g. numpy 2.x / openmm 8.x).
+# Analysis-only packages used by scripts/ (scipy, matplotlib, numba, ...) are
+# intentionally not listed here; see requirements.txt.
+dependencies = [
+    "numpy>=1.22",
+    "openmm>=7.7",
+    "parmed>=3.4",
+    "MDAnalysis>=2.2",
+    "mdtraj>=1.9.7",
+    "pandas>=1.4",
+]
+
+[project.scripts]
+# Canonical simulation runner: `cosmo-mdrun -f md.ini`
+cosmo-mdrun = "cosmo.mdrun:mdrun"
+# Back-compat alias for the historical name; routes to the same runner.
+cosmo-simulation = "cosmo.mdrun:mdrun"
+
+[tool.setuptools.packages.find]
+# Only ship the importable package (not examples/docs/scripts at the repo root).
+include = ["cosmo*"]

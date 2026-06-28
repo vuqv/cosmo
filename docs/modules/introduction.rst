@@ -9,7 +9,7 @@ COSMO is divided in four main classes:
 
 1. :code:`system`
 2. :code:`models`
-3. :code:`dynamics`
+3. :code:`engine` (the simulation runner; see *Running simulations*)
 4. :code:`geometry`
 
 ------------------
@@ -25,7 +25,8 @@ to build model, allows to easily set up CG models.
 
 ------------------
 
-:code:`dynamics` class auto read the parameter controls, build the model and run simulation.
+:code:`engine` (with :code:`cosmo.read_simulation_config` and the :code:`cosmo-mdrun`
+runner) reads the parameter controls, builds the model and runs the simulation.
 
 ------------------
 

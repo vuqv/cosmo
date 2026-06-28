@@ -19,7 +19,7 @@ Torsional geometries are modeled with a periodic torsion potential.
 Native contacts are represented through the use of Lennard-Jones potentials that allow to form and break non-bonded interactions, permitting complete and local unfolding of the structures.
 
 To create a CA/P model, call:
-:code:`cosmo.core.models.buildHPSModel(structure_file, model='hps_urry')`
+:code:`cosmo.core.models.buildCoarseGrainModel(structure_file, model='hps_urry')`
 
 Here, pdb_file is the path to the PDB format structure of the protein.
 hps_scale is hydropathy scale that are going to be used. :code:`urry` or :code:`kr`
@@ -141,4 +141,4 @@ The cut-off distance for Electrostatics interactions: :math:`3.5 nm`
 .. autoclass:: cosmo.core.models
 
         .. automethod:: __init__
-        .. automethod:: cosmo.core.models.buildHPSModel
+        .. automethod:: cosmo.core.models.buildCoarseGrainModel

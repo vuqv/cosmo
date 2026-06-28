@@ -24,7 +24,7 @@ protein_code = f'{pdbname}'
 pdb_file = f'{pdbname}.pdb'
 
 # Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
-cgModel = cosmo.models.buildHPSModel(pdb_file)
+cgModel = cosmo.models.buildCoarseGrainModel(pdb_file)
 
 # dump Forcefield File
 cgModel.dumpForceFieldData('forcefield.dat')

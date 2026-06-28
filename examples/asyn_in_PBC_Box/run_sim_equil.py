@@ -28,9 +28,9 @@ pdb_file = f'{pdbname}.pdb'
 
 # Create an sbmOpenMM.system() object and store it in "sbmCAModelModel" variable.
 # No PBC
-# cgModel = cosmo.models.buildHPSModel(pdb_file, model='kr')
+# cgModel = cosmo.models.buildCoarseGrainModel(pdb_file, model='kr')
 # With PBC, or can call: box_dimension= [Lx, Ly, Lz]
-cgModel = cosmo.models.buildHPSModel(pdb_file, model='kr', box_dimension=40)
+cgModel = cosmo.models.buildCoarseGrainModel(pdb_file, model='kr', box_dimension=40)
 if device == 'GPU':
     # Run simulation on CUDA
     platform = Platform.getPlatformByName('CUDA')

@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "pdb_file": "../examples/standard_example/asyn.pdb",
+    "openmm_version": "8.2",
+    "note": "Initial (un-minimized) potential energy by force group, no PBC, Reference platform. Regenerate only from known-correct code."
+  },
+  "hps_urry": {
+    "Harmonic Bond Energy": 1.8674616142036708,
+    "Yukawa Energy": 7.391440267527964,
+    "PairWise Energy": -37.61418218283983,
+    "Total": -28.3552803011082
+  },
+  "hps_kr": {
+    "Harmonic Bond Energy": 0.02675059423409199,
+    "Yukawa Energy": 7.345561912691323,
+    "PairWise Energy": -59.35952372835909,
+    "Total": -51.987211221433675
+  },
+  "hps_ss": {
+    "Harmonic Bond Energy": 1.8674616142036708,
+    "Gaussian Angle Energy": 1282.4490388024785,
+    "Gaussian Torsion Energy": -166.1496045946704,
+    "Yukawa Energy": 3.0298189421674437,
+    "PairWise Energy": -0.8596377450592515,
+    "Total": 1120.33707701912
+  },
+  "mpipi": {
+    "Harmonic Bond Energy": 0.35076562343183626,
+    "Yukawa Energy": 4.1318785758888685,
+    "PairWire Energy": -34.12720938597412,
+    "Total": -29.644565186653416
+  }
+}

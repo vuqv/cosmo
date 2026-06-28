@@ -29,7 +29,9 @@ COSMO can be used to study single-chain conformations, LLPS, and related phenome
 ## Documentation and tutorials
 
 - Documentation: https://vuqv.github.io/cosmo/
-- Tutorial: ```coming soon```
+- Tutorials: hands-on, ready-to-run examples in [`tutorials/`](tutorials/) (start
+  with [tutorial 1](tutorials/01_single_chain_quickstart/); see the
+  [tutorials overview](tutorials/README.md)).
 - Additional notes: https://vuqv.github.io/
 
 ## Requirements
@@ -53,8 +55,13 @@ Notes:
    - Conda may pick a newer CUDA toolkit by default. Choose a version compatible with
      your NVIDIA driver.
 4) Download this repository to a target path, for example: `PATH_TO_CODE/cosmo/`
-5) Add the module to your Python path in `.bashrc`:
-   `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
+5) Install COSMO. Two options:
+   - **pip (recommended)** — from the repo root (the directory with `pyproject.toml`),
+     an editable install also registers the `cosmo-mdrun` console command:
+     `pip install -e .`
+   - **PYTHONPATH (no install)** — add the repo root to your Python path in `.bashrc`:
+     `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
+     (the `python -m cosmo.mdrun` module form still works without the console command)
 
 Remember to replace `PATH_TO_CODE` with your actual path.
 
@@ -107,22 +114,24 @@ minimize = yes ; if not restart, then minimize will be loaded
 
 ## Running a simulation
 
-Option 1: run from an example directory:
+All you need is a control file (`md.ini`). The canonical runner reads it, builds
+the coarse-grained model, runs the simulation, and writes the trajectory, log,
+checkpoint and final structure. The following are equivalent — pick whichever
+suits your install:
 
-1) Go to `examples/standard_example/`.
-2) Edit `md.ini`.
-3) Run: `python run_simulation.py -f md.ini`
+```bash
+cosmo-mdrun -f md.ini            # console command (after `pip install -e .`)
+python -m cosmo.mdrun -f md.ini  # module form, works with the PYTHONPATH install
+```
 
-Option 2: use the `cosmo-simulation.py` wrapper:
+To run from an example directory (e.g. `examples/standard_example/`), edit its
+`md.ini` and run any of the commands above; a thin `run_simulation.py` wrapper is
+also provided there, so `python run_simulation.py -f md.ini` does the same thing.
 
-1) Set the Python path at the top of `cosmo-simulation.py` to your environment:
-   `$HOME/anaconda3/envs/py310/bin/python`
-2) Make it executable:
-   `chmod +x /PATH_TO_COSMO/cosmo-simulation.py`
-3) Add an alias in `.bashrc`, for example:
-   `alias cosmo-simulation='$HOME/work3/code/cosmo/cosmo/cosmo-simulation.py'`
-4) In your simulation directory, prepare a control file.
-5) Run: `cosmo-simulation -f md.ini`
+> The runner is `cosmo.mdrun.mdrun`. Control-file parsing lives in
+> `cosmo.read_simulation_config` and the build/run steps in `cosmo.engine`, so you
+> can also drive a custom workflow from Python (see `examples/growing/` and
+> `examples/change_eps_onthefly/` for specialized runners that use these pieces).
 
 ## Windows
 

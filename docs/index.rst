@@ -11,16 +11,21 @@ This documentation is currently being generated as we finalize
 .. toctree::
    :maxdepth: 1
    :caption: Contents:
-   
+
    modules/introduction
    usage/simulation_control
    modules/parameters
    modules/system
    modules/models
    modules/dynamics
-   
 
-   
+.. toctree::
+   :maxdepth: 2
+   :caption: Tutorials
+
+   tutorials/index
+
+
 
 Changelog
 ==========

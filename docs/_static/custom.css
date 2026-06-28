@@ -1,0 +1,24 @@
+/* COSMO docs — Furo full-width customizations.
+ *
+ * Furo caps the article column at --content-width (default 46em) for
+ * readability. We widen it so the content uses the full available page width
+ * (set via html_theme_options light/dark_css_variables -> --content-width:100%),
+ * and relax the per-article max-width that Furo applies on top of it.
+ */
+
+.content,
+article {
+    max-width: 100% !important;
+}
+
+/* Keep comfortable side gutters now that the column is full-width. */
+article {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+}
+
+/* Let wide tables and code blocks scroll horizontally instead of overflowing. */
+.content table,
+.highlight pre {
+    overflow-x: auto;
+}

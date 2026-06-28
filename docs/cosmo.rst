@@ -8,7 +8,6 @@ Subpackages
    :maxdepth: 4
 
    cosmo.core
-   cosmo.dynamics
    cosmo.parameters
    cosmo.reporter
 
