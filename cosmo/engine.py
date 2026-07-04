@@ -4,7 +4,7 @@ Shared build / setup / run / finalize machinery for the COSMO runner.
 This is the reusable core that the CLI runner (:mod:`cosmo.mdrun`) orchestrates.
 Splitting it out of the old monolithic ``cosmo.dynamics.Dynamics.run`` (and the
 copy-pasted ``run_simulation.py`` scripts) means a custom driver can reuse the
-exact same steps:
+exact same steps::
 
     cfg   = cosmo.read_simulation_config("md.ini")
     built = cosmo.engine.build_system(cfg)

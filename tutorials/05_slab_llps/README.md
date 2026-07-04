@@ -23,7 +23,7 @@ runs. On CPU the demo is slow; treat it as a mechanism walk-through.
 ## The slab method, in three stages
 
 You do not know the right box size a priori, so you build it in stages
-(see `examples/slab_simulations/Readme.md` for the original protocol):
+(staged build protocol):
 
 1. **Start big, then compress (NPT).** Put all chains in a generously large cubic
    box and run **NPT** (`pcoupl = yes`) so the Monte Carlo barostat shrinks the

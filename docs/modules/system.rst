@@ -1,31 +1,46 @@
-System 
-========================================================= 
+System
+======
 
-A class containing methods and parameters for generating CG systems to be simulated using the OpenMM interface.
-    It offers flexibility to create default and custom CG systems and to easily modify their parameters.
+A class of methods and parameters for generating COSMO coarse-grained systems to be
+simulated with OpenMM. It is typically constructed via
+:func:`cosmo.models.buildCoarseGrainModel`, which sets bonds, (optional) angles and
+torsions, Debye-Hückel electrostatics, and the short-range non-bonded force.
+
+.. seealso::
+
+   :doc:`models` for the force fields and the functional form of each potential,
+   and :doc:`../usage/simulation_control` for how to run a simulation.
 
 .. autoclass:: cosmo.core.system
 
-        .. automethod:: __init__
-        .. automethod:: cosmo.core.system.getAtoms
-        .. automethod:: cosmo.core.system.getBonds
-        .. automethod:: cosmo.core.system.setBondForceConstants
-        .. automethod:: cosmo.core.system.setParticlesMasses
-        .. automethod:: cosmo.core.system.setParticlesRadii
-        .. automethod:: cosmo.core.system.setParticlesCharge
-        .. automethod:: cosmo.core.system.setParticlescosmo
-        .. automethod:: cosmo.core.system.addYukawaForces
-        .. automethod:: cosmo.core.system.addAshbaughHatchForces
-        .. automethod:: cosmo.core.system.createSystemObject
-        .. automethod:: cosmo.core.system.checkBondDistances
-        .. automethod:: cosmo.core.system.checkLargeForces
-        .. automethod:: cosmo.core.system.addParticles
-        .. automethod:: cosmo.core.system.addSystemForces
-        .. automethod:: cosmo.core.system.dumpStructure
-        .. automethod:: cosmo.core.system.dumpTopology
-        .. automethod:: cosmo.core.system.dumpForceFieldData
-        .. automethod:: cosmo.core.system.setMassPerResidueType
-        .. automethod:: cosmo.core.system.setRadiusPerResidueType
-        .. automethod:: cosmo.core.system.setChargePerResidueType
-        .. automethod:: cosmo.core.system.setHPSPerResidueType
-        .. automethod:: cosmo.core.system._setParameters
+   .. automethod:: __init__
+   .. automethod:: getAtoms
+   .. automethod:: getBonds
+   .. automethod:: getAngles
+   .. automethod:: getTorsions
+   .. automethod:: setBondForceConstants
+   .. automethod:: setParticlesMass
+   .. automethod:: setParticlesRadii
+   .. automethod:: setParticlesCharge
+   .. automethod:: setParticlesHPS
+   .. automethod:: setParticleTypeID
+   .. automethod:: setMassPerResidueType
+   .. automethod:: setRadiusPerResidueType
+   .. automethod:: setChargePerResidueType
+   .. automethod:: setHPSPerResidueType
+   .. automethod:: setCAIDPerResidueType
+   .. automethod:: addHarmonicBondForces
+   .. automethod:: addGaussianAngleForces
+   .. automethod:: addGaussianTorsionForces
+   .. automethod:: addYukawaForces
+   .. automethod:: addAshbaughHatchForces
+   .. automethod:: addWangFrenkelForces
+   .. automethod:: addParticles
+   .. automethod:: addSystemForces
+   .. automethod:: createSystemObject
+   .. automethod:: checkBondDistances
+   .. automethod:: checkLargeForces
+   .. automethod:: coarseGrainingStructure
+   .. automethod:: dumpStructure
+   .. automethod:: dumpTopology
+   .. automethod:: dumpForceFieldData

@@ -1,52 +1,30 @@
-"""
-Dictionary contains parameters for cosmo model.
-First level is the model name
+r"""Model-parameter tables for the COSMO coarse-grained models.
 
-* HPS-Kr scale was taken from:
+The module-level ``parameters`` dict is keyed first by model name; each model maps
+residue/bead names to their mass, charge, collision radius, hydropathy, etc.
 
-    Dignon, G. L., Zheng, W., Kim, Y. C., Best, R. B., ; Mittal, J. (2018).
-    Sequence determinants of protein phase behavior from a coarse-grained model.
-    PLoS Computational Biology, 1–23.
-    https://doi.org/10.1101/238170
+**Sources.**
 
-* Parameter for Nucleic acids (KR scale):
+* **HPS-Kr scale** -- Dignon, Zheng, Kim, Best & Mittal (2018), PLoS Comput. Biol.,
+  https://doi.org/10.1101/238170
+* **Nucleic-acid parameters (KR scale)** -- Regy et al. (2020), Nucleic Acids Res.
+  48(22), 12593, https://doi.org/10.1093/nar/gkaa1099
+* **Phospho-residues (KR scale)** -- Perdikari et al. (2021), Biophys. J. 120(7),
+  1187, https://doi.org/10.1016/j.bpj.2021.01.034
+* **Urry scale** -- Regy et al. (2021), Protein Sci. 30(7), 1371,
+  https://doi.org/10.1002/pro.4094
 
-Regy, R. M., Dignon, G. L., Zheng, W., Kim, Y. C., Mittal, J. (2020).
-Sequence dependent phase separation of protein-polynucleotide mixtures elucidated using molecular simulations.
-Nucleic Acids Research, 48(22), 12593–12603.
-https://doi.org/10.1093/nar/gkaa1099
+**Urry-scale hydropathy (lambda).** The Urry parameters are the original values
+shifted by 0.08 (linear, so KR and Urry share one equation with the right params):
 
-* Phosphorylation version of some residues for KR scale are taken from:
+.. math::
 
-Perdikari, T. M., Jovic, N., Dignon, G. L., Kim, Y. C., Fawzi, N. L.,  Mittal, J. (2021).
-A predictive coarse-grained model for position-specific effects of post-translational modifications.
-Biophysical Journal, 120(7), 1187–1197.
-https://doi.org/10.1016/j.bpj.2021.01.034
-
-Note on hps (lambda) in urry scale:
------------------------------------
-
-# These parameters were shifted by 0.08 from original parameters directly.
-
-in the original paper:
-Regy, R. M., Thompson, J., Kim, Y. C., ; Mittal, J. (2021).
-Improved coarse-grained model for studying sequence dependent phase separation of disordered proteins.
-Protein Science, 30(7), 1371–1379. https://doi.org/10.1002/pro.4094
-
-..math::
-    \\lambda_{ij} = \\muy \\lambda_0_ij - \\delta
-
-    \\muy=1, \\delta= 0.08 is the optimal set for the set of 42 proteins they studied.
-    \\lambda_{ij} = \\lambda0_{ij} - 0.08 = 0.5*(\\lambda_i+\\lambda_j) - 0.08 = 0.5(\\lambda_i -0.08 + \\lambda_j-0.08)
-
-In both version, KR and Urry, we can tune directly lambda parameter in Urry by 0.08 so we can use only one equation for
-two model (choose parameter when passing model parameter)
+    \lambda_{ij} = \mu\,\lambda^0_{ij} - \Delta , \qquad \mu = 1,\ \Delta = 0.08
 
 Attributes
 ----------
-parameters:
-    dictionary contains model parameters.
-
+parameters : dict
+    The model-parameter tables (keyed by model name).
 """
 import numpy as np
 
@@ -939,25 +917,15 @@ parameters = {
 
     }
 }
-"""
-        HPS_SS = HPS-Urry with angle and torsion potential.
-        eps_di (in kj/mol) is parameter control the dihedral potential. Here we implemented the (i,i+4) assignment and 1-1001-1
-        mixing rule. 
-        torsion angle made by residue (i, i+3)
-        residue (i-1) and (i+4) are preceding and succeeding residues
-        1-1001-1 means:
-            weight of residues (i-1), (i), (i+3) and (i+4) are 1
-            weight of residues (i+1), (i+2) are 0
-
-"""
-
-"""
-mpipi model from paper:
-      Physics-driven coarse-grained model for biomolecular phase separation with near-quantitative accuracy.
-      Mass of residues is similar to other model.
-      id: residue id type, used in tabulated function in WF potential
-      change: all charge residues have charge +/- 0.75e, H is 0.375e. charge unit is e.
-  """
+# Notes (kept as comments, not bare string literals, so autodoc does not attach them
+# as the `parameters` dict's docstring):
+#   hps_ss = hps_urry with angle + torsion potentials. eps_di (kJ/mol) controls the
+#   dihedral; the (i, i+4) assignment and 1-1001-1 mixing rule are used -- torsion made
+#   by residues (i, i+3); residues (i-1)/(i+4) are the preceding/succeeding residues;
+#   1-1001-1 = weights of (i-1),(i),(i+3),(i+4) are 1 and (i+1),(i+2) are 0.
+#   mpipi model (Joseph et al.): a physics-driven CG model for biomolecular phase
+#   separation; `id` is the residue-type id used in the tabulated WF potential; charged
+#   residues carry +/- 0.75e (His +0.375e).
 
 # ---------------------------------------------------------------------------
 # RNA support for the Mpipi model (Joseph et al., Nat. Comput. Sci. 2021).
@@ -1049,3 +1017,42 @@ def _extend_mpipi_with_rna():
 
 
 _extend_mpipi_with_rna()
+
+
+# ---------------------------------------------------------------------------
+# O'Brien 12-10-6 excluded-volume radii (Rmin/2, nm) for the ribosome<->nascent
+# interaction used by ``cosmo.csp``.
+#
+# Inherited **verbatim from the sibling topo package** (topo.parameters.model_parameters
+# -- the structure-based CG collision radii of O'Brien et al. 2011/2012). Added to the
+# ``hps_kr`` model only: the CSP nascent chain runs on hps_kr, and its IDP<->IDP
+# interaction is unchanged (the hps_kr Ashbaugh-Hatch potential). These ``Rmin_2`` values
+# are consumed *only* by the ribosome<->nascent 12-10-6 excluded volume
+# (cosmo.csp.ribosome, sum combining rule R = Rmin/2_i + Rmin/2_j), never by the HPS pair
+# potential. The rRNA ``P``/``R``/``BR`` beads (which cosmo does not otherwise
+# parameterise) are added as scenery-only entries carrying just Rmin/2 + charge.
+# ---------------------------------------------------------------------------
+_OBRIEN_RMIN_2_NM = {
+    "ALA": 0.2862278, "ARG": 0.3704125, "ASN": 0.3199017, "ASP": 0.3142894,
+    "CYS": 0.3030648, "GLN": 0.3423509, "GLU": 0.3367386, "GLY": 0.2525540,
+    "HIS": 0.3423509, "ILE": 0.3423509, "LEU": 0.3423509, "LYS": 0.3535755,
+    "MET": 0.3423509, "PHE": 0.3535755, "PRO": 0.3086771, "SER": 0.2918401,
+    "THR": 0.3142894, "TRP": 0.3816371, "TYR": 0.3591879, "VAL": 0.3311263,
+}
+# rRNA CG beads (O'Brien 3/4-bead P/R/BR): Rmin/2 (nm) + charge for the rigid-ribosome
+# excluded volume / electrostatics. Scenery-only -- not typed into the HPS pair tables.
+_OBRIEN_RNA_RMIN_2_BEADS = {
+    "P":  {"Rmin_2": 0.644766, "charge": -1.0},
+    "R":  {"Rmin_2": 0.523140, "charge": 0.0},
+    "BR": {"Rmin_2": 0.534244, "charge": 0.0},
+}
+for _rn, _rm in _OBRIEN_RMIN_2_NM.items():
+    if _rn in parameters["hps_kr"]:
+        parameters["hps_kr"][_rn]["Rmin_2"] = _rm
+# HIS tautomer aliases share HIS's Rmin/2 (if present in the table).
+for _t in ("HSD", "HSE", "HSP"):
+    if _t in parameters["hps_kr"]:
+        parameters["hps_kr"][_t]["Rmin_2"] = _OBRIEN_RMIN_2_NM["HIS"]
+# Add the rRNA scenery beads to hps_kr (Rmin/2 + charge only).
+for _bn, _bp in _OBRIEN_RNA_RMIN_2_BEADS.items():
+    parameters["hps_kr"].setdefault(_bn, dict(_bp))

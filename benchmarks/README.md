@@ -2,7 +2,7 @@
 
 A lightweight regression test that guards the physics of each force field.
 It builds a coarse-grained model from a reference structure
-(`examples/standard_example/asyn.pdb`, alpha-synuclein), evaluates the potential
+(`benchmarks/asyn.pdb`, alpha-synuclein), evaluates the potential
 energy of the **initial, un-minimized** coordinates, and decomposes it into the
 individual force groups. The recorded values become a known-correct reference;
 after changing the code you re-run in *check* mode to confirm the energies are
@@ -44,7 +44,7 @@ Useful options:
 
 | Option | Default | Meaning |
 |--------|---------|---------|
-| `--pdb PATH` | `examples/standard_example/asyn.pdb` | input structure |
+| `--pdb PATH` | `benchmarks/asyn.pdb` | input structure |
 | `--reference PATH` | `benchmarks/reference_energies.json` | reference file |
 | `--models M [M ...]` | all four | subset to test |
 | `--rtol FLOAT` | `1e-4` | relative tolerance |

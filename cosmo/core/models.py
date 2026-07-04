@@ -163,11 +163,3 @@ class models:
         print('')
 
         return cosmo_model
-
-    # Deprecated alias. Retained only so the frozen ``examples/growing/`` scripts
-    # keep working until they are rewritten (see TODO). New code should call
-    # ``buildCoarseGrainModel`` (the name used by the sibling ``topo`` project).
-    @staticmethod
-    def buildHPSModel(*args, **kwargs):
-        """Deprecated alias for :meth:`buildCoarseGrainModel`."""
-        return models.buildCoarseGrainModel(*args, **kwargs)

@@ -35,7 +35,7 @@ Check the current code against the stored reference (default)::
 
 Options::
 
-    --pdb PATH        input structure (default: ../examples/standard_example/asyn.pdb)
+    --pdb PATH        input structure (default: ./asyn.pdb, alpha-synuclein)
     --reference PATH  reference JSON (default: ./reference_energies.json)
     --models M [M..]  subset of models to test (default: all supported)
     --rtol FLOAT      relative tolerance (default: 1e-4)
@@ -71,7 +71,7 @@ import cosmo  # noqa: E402
 # protein such as alpha-synuclein (asyn.pdb).
 DEFAULT_MODELS = ["hps_urry", "hps_kr", "hps_ss", "mpipi"]
 
-DEFAULT_PDB = os.path.join(_REPO_ROOT, "examples", "standard_example", "asyn.pdb")
+DEFAULT_PDB = os.path.join(_HERE, "asyn.pdb")
 DEFAULT_REFERENCE = os.path.join(_HERE, "reference_energies.json")
 
 

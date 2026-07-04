@@ -67,7 +67,7 @@ Remember to replace `PATH_TO_CODE` with your actual path.
 
 ## Example
 
-The standard example is at `examples/standard_example`. You will need a control file
+A ready-to-run example is at `tutorials/01_single_chain_quickstart`. You will need a control file
 (for example, `md.ini`). See the parameter reference here:
 https://vuqv.github.io/docs-cosmo/usage/simulation_control.html
 
@@ -124,14 +124,14 @@ cosmo-mdrun -f md.ini            # console command (after `pip install -e .`)
 python -m cosmo.mdrun -f md.ini  # module form, works with the PYTHONPATH install
 ```
 
-To run from an example directory (e.g. `examples/standard_example/`), edit its
+To run from a tutorial directory (e.g. `tutorials/01_single_chain_quickstart/`), edit its
 `md.ini` and run any of the commands above; a thin `run_simulation.py` wrapper is
 also provided there, so `python run_simulation.py -f md.ini` does the same thing.
 
 > The runner is `cosmo.mdrun.mdrun`. Control-file parsing lives in
 > `cosmo.read_simulation_config` and the build/run steps in `cosmo.engine`, so you
-> can also drive a custom workflow from Python (see `examples/growing/` and
-> `examples/change_eps_onthefly/` for specialized runners that use these pieces).
+> can also drive a custom workflow from Python (see `cosmo/translation/` — the
+> co-translational synthesis runner — for a specialized driver built on these pieces).
 
 ## Windows
 

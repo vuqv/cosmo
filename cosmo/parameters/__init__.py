@@ -1,15 +1,13 @@
-r"""
-Module defines model parameters.
-At the moment, two main models are supported:
-    * cosmo-kr
+r"""Model parameters for the COSMO coarse-grained models.
 
-    *cosmo-urry.
+At the moment the main supported models are:
 
-Other model parameter can be easily defined here such as M2 from Lindorff-larsen
+* ``hps_kr`` -- HPS with the Kapcha-Rossy hydropathy scale.
+* ``hps_urry`` -- HPS with the Urry hydropathy scale.
 
-Tesei, G., Schulze, T. K., Crehuet, R., & Lindorff-larsen, K. (2021).
-Accurate model of liquid-liquid phase behaviour of intrinsically-disordered proteins from data-driven optimization of
-single-chain properties. BioRxiv, 1–9.
+Other model parameters can be easily defined here (e.g. the M2 model of Tesei,
+Schulze, Crehuet & Lindorff-Larsen, *Nat. Comput. Sci.* 2021, from data-driven
+optimization of single-chain properties).
 """
 
 from .model_parameters import parameters

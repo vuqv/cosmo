@@ -1,5 +1,5 @@
 cosmo package
-===========
+=============
 
 Subpackages
 -----------
@@ -10,6 +10,7 @@ Subpackages
    cosmo.core
    cosmo.parameters
    cosmo.reporter
+   cosmo.csp
 
 Module contents
 ---------------
@@ -18,3 +19,4 @@ Module contents
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
