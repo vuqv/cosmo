@@ -135,7 +135,8 @@ html_theme_options = {
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 html_css_files = ['custom.css']
-html_logo = "_static/logo.svg"
+html_logo = "_static/logo.svg"        # the bead-chain mark; Furo shows it above the title
+html_favicon = "_static/favicon.svg"  # same mark, for the browser tab
 html_title = "COSMO"
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.

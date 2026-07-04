@@ -1,21 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="cosmo">
-  <title>cosmo</title>
-  <desc>A disordered one-bead-per-residue chain: the coarse-grained model of
-  intrinsically disordered proteins. Sibling to topo (folded proteins) -- same teal
-  frame, a disordered chain in place of an ordered contact map.</desc>
   <defs>
-    <linearGradient id="cosmoSeq" x1="24" y1="30" x2="76" y2="70" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#0e8f86"/>
-      <stop offset="1" stop-color="#d9891f"/>
+    <linearGradient id="fav" x1="24" y1="30" x2="76" y2="70" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0e8f86"/><stop offset="1" stop-color="#d9891f"/>
     </linearGradient>
   </defs>
-  <!-- rounded frame (shared with topo) -->
   <rect x="12" y="12" width="76" height="76" rx="16" fill="none" stroke="#0e8f86" stroke-width="4.5"/>
-  <!-- disordered backbone: a random-coil, one-bead-per-residue chain -->
   <polyline points="27,60 30,44 40,35 51,31 58,41 51,53 43,64 56,68 68,61 73,46"
             fill="none" stroke="#0e8f86" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
-  <!-- beads shaded N->C along a teal->orange gradient (sequence / hydropathy) -->
-  <g fill="url(#cosmoSeq)">
+  <g fill="url(#fav)">
     <circle cx="27" cy="60" r="5"/><circle cx="30" cy="44" r="5"/><circle cx="40" cy="35" r="5"/>
     <circle cx="51" cy="31" r="5"/><circle cx="58" cy="41" r="5"/><circle cx="51" cy="53" r="5"/>
     <circle cx="43" cy="64" r="5"/><circle cx="56" cy="68" r="5"/><circle cx="68" cy="61" r="5"/>
