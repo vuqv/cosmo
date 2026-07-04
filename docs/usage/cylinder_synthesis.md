@@ -44,7 +44,7 @@ vmd -e synth_out_cyl/movie.tcl
 ```
 
 `cosmo-cylinder` writes, per residue `L`, a standalone trajectory under `<outdir>/L_<L>/`,
-an optional post-elongation phase (`ejection/` or `stallation/`), and a per-residue
+optional post-synthesis free runs (`ejection/` then `dissociation/`), and a per-residue
 dwell-time log `<outdir>/dwell_times.dat`.
 
 ---
@@ -89,8 +89,9 @@ A/P tRNA tether and no translocation switch — the chain simply extrudes forwar
 (1) No `ribosome` PDB — the tunnel is analytic, its geometry set by the `tunnel_*` keys.
 (2) **One MD segment per residue** (no peptidyl-transfer / translocation / tRNA-binding
 sub-stages), so `time_stage_1` / `time_stage_2` are inherited but **unused** — the whole
-codon dwell is a single segment. (3) The post-synthesis phase is `post_elongation` +
-`post_elongation_steps` (one phase, ejection *or* stallation). (4) The explicit-ribosome
+codon dwell is a single segment. (3) The post-synthesis free runs are `ejection_steps`
+then `dissociation_steps` (same keywords as the explicit-ribosome runner, both drop the
+C-terminus restraint). (4) The explicit-ribosome
 knobs (`optimize_ptc_geometry`, `trna_tether`, `tunnel_wall`, `ptc_offset`) do not apply.
 (5) Purely steric — no ribosome electrostatics.
 ```
@@ -136,9 +137,9 @@ tunnel_center      = 0.0, 0.0 ; tunnel axis (y0, z0) (nm)
 tunnel_k           = 8368    ; wall stiffness (kJ/mol/nm^2 = 20 kcal/mol/A^2)
 tunnel_mouth_round = 0.2     ; mouth-corner fillet radius rho (nm)
 
-; --- post-elongation ---
-post_elongation       = ejection   ; 'ejection' (release restraint) or 'stallation' (stay threaded)
-post_elongation_steps = 40         ; 0 -> skip
+; --- post-synthesis free runs (both release the C-terminus restraint) ---
+ejection_steps     = 40   ; release restraint -> chain diffuses out the exit; 0 -> skip
+dissociation_steps = 40   ; second free run -> chain drifts fully clear; 0 -> skip
 
 ; --- hardware / output ---
 device = CPU ; ppn = 1 ; outdir = synth_out_cyl
@@ -159,8 +160,8 @@ device = CPU ; ppn = 1 ; outdir = synth_out_cyl
 
 | Key | Default | Meaning |
 |-----|---------|---------|
-| `post_elongation` | `stallation` | `ejection` releases the C-terminus restraint so the finished chain diffuses out the exit (+x); `stallation` keeps the restraint so it stays threaded. |
-| `post_elongation_steps` | `0` | Length of that phase (steps); `0` = skip. Use a **long** run so the chain can clear the tunnel. |
+| `ejection_steps` | `0` | Free run with the C-terminus restraint released so the finished chain diffuses out the exit (+x); `0` = skip. Use a **long** run so the chain can clear the tunnel. |
+| `dissociation_steps` | `0` | Second free run (restraint still off) so the chain drifts fully clear of the exit; `0` = skip. |
 
 ### Shared kinetics & MD keys
 
@@ -186,7 +187,8 @@ from its **whole** codon dwell, not a three-way split.
 │   ├── traj.dcd            # (nascent-only) trajectory for that length
 │   ├── traj_final.pdb      # last conformation (seeds the next residue)
 │   └── traj.log, traj.psf, ...
-├── ejection/ | stallation/ # post-elongation phase (if post_elongation_steps > 0)
+├── ejection/               # free run, restraint off (if ejection_steps > 0)
+├── dissociation/           # second free run (if dissociation_steps > 0)
 └── dwell_times.dat         # per-residue: codon, sampled dwell (s), ns, integration steps
 ```
 

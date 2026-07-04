@@ -133,11 +133,12 @@ class CylinderParams(RunParams):
     tunnel_center_nm: Tuple[float, float] = (0.0, 0.0)   # (y0, z0): tunnel axis
     tunnel_k: float = TUNNEL_CYL_K         # wall stiffness (kJ/mol/nm^2)
     tunnel_mouth_round_nm: float = 0.2     # mouth-corner fillet radius rho
-    # Post-elongation phase (once the chain reaches its final length; 0 = skip).
-    # 'ejection' releases the C-terminus restraint (the protein diffuses out the exit);
-    # 'stallation' keeps it (the chain stays threaded/stalled). The tunnel stays on.
-    post_elongation: str = "stallation"
-    post_elongation_steps: int = 0
+    # Post-synthesis free runs (once the chain reaches its final length; 0 = skip).
+    # Both drop the C-terminus restraint: 'ejection' lets the finished protein diffuse
+    # out the exit, then 'dissociation' continues it as a second free run. The analytic
+    # tunnel stays on throughout (the only way out is the exit).
+    ejection_steps: int = 0
+    dissociation_steps: int = 0
 
 
 # --------------------------------------------------------------------------
@@ -156,15 +157,15 @@ def run_length(L: int, *, full_pdb: str,
     The System is the nascent chain only (no ribosome beads); the analytic tunnel
     (:func:`add_tunnel_cylinder`) supplies all ribosome confinement.
 
-    The same routine drives an elongation step and the post-elongation phase
-    (ejection / stallation); these arguments tailor it:
+    The same routine drives an elongation step and the post-synthesis free runs
+    (ejection / dissociation); these arguments tailor it:
 
     - ``seed_override`` : use these ``(L, 3)`` nm coordinates directly (the fully
       synthesized structure) instead of cold-start / new-residue placement.
-    - ``restrain`` : if False, drop the C-terminus restraint (ejection -- the finished
-      protein is released and free to diffuse out the exit).
+    - ``restrain`` : if False, drop the C-terminus restraint (ejection/dissociation --
+      the finished protein is released and free to diffuse out the exit).
     - ``out_subdir`` : output folder under ``out_root`` (default ``L_<L>``); e.g.
-      ``ejection`` / ``stallation``.
+      ``ejection`` / ``dissociation``.
     - ``n_steps_override`` : run this many steps instead of ``params.n_steps`` (the
       kinetic driver passes the per-residue codon-dwell step count here).
     - ``label`` : console-summary text.
@@ -384,29 +385,34 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
     print(f"Done. Synthesized {L0} -> {L_max}. Per-length outputs under {out_path}/")
     print(f"Per-residue dwell-time table: {dwell_log}")
 
-    # Post-elongation phase: once the chain reaches its final length, either release the
-    # C-terminus restraint and let the finished protein diffuse out the exit (ejection)
-    # or keep it threaded/stalled (stallation). Continues the length-L_max system from
-    # the final synthesized structure; the analytic tunnel stays on (only way out is the
-    # exit).
-    if params.post_elongation_steps > 0:
-        phase = params.post_elongation.strip().lower()
-        if phase not in ("ejection", "stallation"):
-            raise ValueError(f"post_elongation must be 'ejection' or 'stallation', "
-                             f"got {params.post_elongation!r}.")
-        restrain = phase == "stallation"
+    # Post-synthesis free runs: once the chain reaches its final length, release the
+    # C-terminus restraint and let the finished protein diffuse out the exit (ejection),
+    # then continue as a second free run so it drifts fully clear (dissociation). Both
+    # continue the length-L_max system from the previous final structure; the analytic
+    # tunnel stays on (only way out is the exit).
+    if params.ejection_steps > 0:
         print()
-        print(f"=== Post-elongation: {phase} (L = {L_max}, "
-              f"{params.post_elongation_steps} steps, C-terminus restraint "
-              f"{'ON' if restrain else 'OFF -> free diffusion'}) "
-              f"-> {out_path / phase}/ ===")
+        print(f"=== Ejection (L = {L_max}, {params.ejection_steps} steps, "
+              f"C-terminus restraint OFF -> free diffusion) -> {out_path / 'ejection'}/ ===")
+        prev_final = run_length(
+            L_max, full_pdb=full_pdb, prev_final=None, out_root=out_path, params=params,
+            cterm_seed=cterm_seed, x_lo=x_lo, x_exit=x_exit, seed_override=prev_final,
+            restrain=False, out_subdir="ejection",
+            n_steps_override=params.ejection_steps,
+            label=f"Ejection (L = {L_max})")
+        print(f"Done. Ejection written to {out_path / 'ejection'}/")
+
+    if params.dissociation_steps > 0:
+        print()
+        print(f"=== Dissociation (L = {L_max}, {params.dissociation_steps} steps, "
+              f"C-terminus restraint OFF) -> {out_path / 'dissociation'}/ ===")
         run_length(
             L_max, full_pdb=full_pdb, prev_final=None, out_root=out_path, params=params,
             cterm_seed=cterm_seed, x_lo=x_lo, x_exit=x_exit, seed_override=prev_final,
-            restrain=restrain, out_subdir=phase,
-            n_steps_override=params.post_elongation_steps,
-            label=f"Post-elongation: {phase} (L = {L_max})")
-        print(f"Done. {phase.capitalize()} written to {out_path / phase}/")
+            restrain=False, out_subdir="dissociation",
+            n_steps_override=params.dissociation_steps,
+            label=f"Dissociation (L = {L_max})")
+        print(f"Done. Dissociation written to {out_path / 'dissociation'}/")
 
 
 # --------------------------------------------------------------------------
@@ -447,8 +453,8 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     - **Tunnel geometry**: ``tunnel_radius`` (nm), ``tunnel_length`` (nm),
       ``tunnel_x_lo`` (nm), ``tunnel_center`` (``"y0,z0"`` nm), ``tunnel_k``
       (kJ/mol/nm^2), ``tunnel_mouth_round`` (nm).
-    - **Post-synthesis**: ``post_elongation`` (``ejection`` | ``stallation``) and
-      ``post_elongation_steps`` (0 = skip).
+    - **Post-synthesis**: ``ejection_steps`` / ``dissociation_steps`` -- free runs
+      with the C-terminus restraint released (0 = skip).
 
     Inline ``#``/``;`` comments are ignored. **Units:** OpenMM defaults.
     """
@@ -548,10 +554,10 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     if opt("tunnel_mouth_round") is not None:
         p.tunnel_mouth_round_nm = float(opt("tunnel_mouth_round"))
     # --- post-elongation ---
-    if opt("post_elongation") is not None:
-        p.post_elongation = opt("post_elongation")
-    if opt("post_elongation_steps") is not None:
-        p.post_elongation_steps = as_int(opt("post_elongation_steps"))
+    if opt("ejection_steps") is not None:
+        p.ejection_steps = as_int(opt("ejection_steps"))
+    if opt("dissociation_steps") is not None:
+        p.dissociation_steps = as_int(opt("dissociation_steps"))
 
     if p.uniform_codon_time is None and mrna is None:
         raise ValueError(
@@ -571,8 +577,11 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
         f"x_lo={p.tunnel_x_lo_nm} nm, center={p.tunnel_center_nm} nm, "
         f"k={p.tunnel_k} kJ/mol/nm^2, mouth_round={p.tunnel_mouth_round_nm} nm")
     log(f"  mechanics: restraint_k={p.restraint_k} kJ/mol/nm^2, minimize={p.minimize}")
-    log(f"  post-elongation: {p.post_elongation if p.post_elongation_steps > 0 else 'off'}"
-        + (f" ({p.post_elongation_steps} steps)" if p.post_elongation_steps > 0 else ""))
+    if p.ejection_steps or p.dissociation_steps:
+        log(f"  post-synthesis: ejection={p.ejection_steps} steps, "
+            f"dissociation={p.dissociation_steps} steps")
+    else:
+        log("  post-synthesis: off")
     log(f"  integrator: dt={p.dt_ps} ps, ref_t={p.ref_t} K, tau_t={p.tau_t} /ps, nstout={p.nstout}")
     log(f"  hardware/output: device={p.device}, ppn={p.ppn}, outdir={outdir}")
 
