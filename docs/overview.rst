@@ -74,8 +74,8 @@ translocation-coupled forces matter to your question.
    without accounting for those missing terms.
 
 Runnable proof-of-concept examples (α-synuclein) live in ``sandbox/validate/``
-(``csp.ini`` and ``cylinder.ini``); see also ``tutorials/09_translation_cylinder/`` and
-``tutorials/10_translation_kinetics/``.
+(``csp.ini`` and ``cylinder.ini``); see also ``tutorials/07_csp_cylinder/`` and
+``tutorials/08_csp_cg_ribosome/``.
 
 .. rubric:: Reference
 
@@ -91,5 +91,4 @@ Runnable proof-of-concept examples (α-synuclein) live in ``sandbox/validate/``
    ``topo.csp``. It shares the codon kinetics, the three-stage protocol, the cylinder
    model, and the O'Brien 12-10-6 ribosome excluded volume, but the nascent chain is a
    **sequence-based IDP** (HPS / mpipi) rather than a structure-based Gō model — so
-   there is no STRIDE, native-contact map, or ``domain.yaml``. The older single-stage
-   ``cosmo.translation`` (``cosmo-elongate``) package remains available in parallel.
+   there is no STRIDE, native-contact map, or ``domain.yaml``.

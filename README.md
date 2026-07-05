@@ -130,8 +130,8 @@ also provided there, so `python run_simulation.py -f md.ini` does the same thing
 
 > The runner is `cosmo.mdrun.mdrun`. Control-file parsing lives in
 > `cosmo.read_simulation_config` and the build/run steps in `cosmo.engine`, so you
-> can also drive a custom workflow from Python (see `cosmo/translation/` — the
-> co-translational synthesis runner — for a specialized driver built on these pieces).
+> can also drive a custom workflow from Python (see `cosmo/csp/` — the co-translational
+> synthesis subsystem — for a specialized driver built on these pieces).
 
 ## Windows
 

@@ -17,49 +17,34 @@ concepts involved. Work through them in order.
 | 5 | [Slab simulation of phase separation (LLPS)](./05_slab_llps/) | The slab method for condensates: NPT-compress, elongate, NVT, and read coexisting densities off ρ(z) to map a phase diagram. |
 | 6 | [Protein–RNA complex](./06_protein_rna_complex/) | Multi-component systems: assembling a mixed protein + RNA input and the nucleic-acid-capable models. |
 
-### Co-translational synthesis series (7–12)
+### Co-translational synthesis series (7–8)
 
-Tutorials 7–12 are an **advanced, research-oriented series** on
+Tutorials 7–8 are an **advanced, research-oriented series** on
 **co-translational protein synthesis**: instead of folding a full-length chain in
 bulk, the nascent chain is grown **N→C, one residue at a time**, at the ribosome's
 peptidyl-transferase center (PTC) and extruded down the exit tunnel. Each length is
 built, seeded from the previous one, restrained at the new C-terminus, minimized,
 run, and saved (`synth_out/L_<L>/`), so the final structure of one length seeds the
-next. They share the elongation machinery (`cosmo.translation`,
-`cosmo-elongate` / `cosmo-elongate-movie`) and differ only in **how the ribosome /
-exit tunnel is modeled** — the open research question of the series.
+next. They share the `cosmo.csp` synthesis machinery (`cosmo-csp` / `cosmo-cylinder`
+/ `cosmo-csp-movie`) with codon-resolved O'Brien kinetics, and differ only in **how
+the ribosome / exit tunnel is modeled**.
 
 | # | Tutorial | Ribosome / tunnel model | Outcome |
 |---|----------|-------------------------|---------|
-| 7 | [Translation (explicit ribosome)](./07_translation/) | v1: tRNA **anchors only**; v2: **rigid explicit ribosome** (topo 3/4-bead P/R/BR rRNA) with a **soft** excluded-volume wall (`ribo_eps`/`ribo_rna_radii` hand-tuned so the chain can thread the tight CG bore). | Chain **collapses** into a globule at the PTC. |
-| 8 | [Translation, COSMO RNA + full HPS](./08_translation_cosmo_rna/) | Explicit ribosome with **cosmo 1-bead/nucleotide** rRNA and the **full Ashbaugh–Hatch HPS** potential (a hard, physically-parameterized wall; `model = hps_kr`, no fudge factors). | **Solves it** — the hard, full-size wall gives real radial confinement; the chain stays extended (Rg ≈ 3.6 nm at L=140) and extrudes to ~12 nm in +x. |
-| 9 | [Translation through an analytic tunnel](./09_translation_cylinder/) | **No ribosome beads** — an analytic **cylindrical bore through an infinite wall** ("hole in a wall") gives radial confinement; fast, never jams (`cylinder.py`). | Chain stays **extended** and **threads out** the exit; an optional **ejection** phase clears the tunnel into the cytosol. |
-| 10 | [Translation kinetics (frozen ribosome)](./10_translation_kinetics/) | **Full frozen explicit CG ribosome** with a PTC at the origin and a forward "piston" wall; port of the legacy `growing_reference/`. Constant steps/residue now; **per-codon kinetics** is a planned follow-up. | Grows + extrudes through the real ribosome; full **ejection** depends on chain length vs. tunnel depth. |
-| 11 | [Continuous Synthesis — analytic tunnel (`cosmo-cylinder`)](./11_csp_cylinder/) | **`cosmo.csp`, no ribosome beads** — an analytic cylindrical bore confines the chain radially; one MD segment per residue, per-codon O'Brien kinetics (mrna + *E. coli* table). | Codon-resolved synthesis + `ejection`/`dissociation` free runs; fast, never jams. |
-| 12 | [Continuous Synthesis — coarse-grained ribosome (`cosmo-csp`)](./12_csp_ribosome/) | **`cosmo.csp`, explicit rigid CG ribosome** (topo P/R/BR rep, 4576 beads) as scenery + A-/P-anchors; each cycle split into O'Brien's 3 kinetic sub-stages (peptidyl-transfer / translocation / tRNA-binding). | Codon-resolved synthesis on a real CG ribosome; nascent-only trajectories, ribosome overlaid in the movie. |
+| 7 | [Continuous Synthesis — analytic tunnel (`cosmo-cylinder`)](./07_csp_cylinder/) | **`cosmo.csp`, no ribosome beads** — an analytic cylindrical bore confines the chain radially; one MD segment per residue, per-codon O'Brien kinetics (mrna + *E. coli* table). | Codon-resolved synthesis + `ejection`/`dissociation` free runs; fast, never jams. |
+| 8 | [Continuous Synthesis — coarse-grained *E. coli* ribosome (`cosmo-csp`)](./08_csp_cg_ribosome/) | **`cosmo.csp`, explicit rigid CG ribosome** (E. coli 4V9D, topo P/R/BR rep, 4576 beads) as scenery + A-/P-anchors; each cycle split into O'Brien's 3 kinetic sub-stages (peptidyl-transfer / translocation / tRNA-binding). | Codon-resolved synthesis on a real CG ribosome; nascent-only trajectories, ribosome overlaid in the movie. |
 
-The arc of the series: tutorial 7's **soft**, hand-tuned excluded-volume wall lets
-the nascent IDP collapse at the PTC (Rg plateaus ~2 nm, extrusion stalls at ~7 nm).
-Tutorial 8 **fixes this** by building the ribosome wall from the real, consistent HPS
-pair potential (hard, full-size beads) — that supplies the radial confinement the
-soft wall lacks, so the chain stays extended (Rg ≈ 3.6 nm at L=140) and extrudes to
-~12 nm. Tutorials 9 and 10 reach the same goal with **alternative confinement
-geometries** — an analytic radial tunnel (9) and a frozen explicit ribosome with a
-forward ratchet (10) — and add an optional **post-elongation** phase (`ejection` to
-release and diffuse out, or `stallation` to stay threaded). Tutorials 11 and 12 then
-**consolidate** the two confinement paths into one package, `cosmo.csp` (mirroring
-the sibling `topo.csp`), with codon-resolved O'Brien kinetics — the canonical
-synthesis runner going forward, split by geometry: **11** is the analytic tunnel
-(`cosmo-cylinder`) and **12** is the explicit coarse-grained ribosome (`cosmo-csp`).
+The two tutorials split `cosmo.csp` (mirroring the sibling `topo.csp`) by confinement
+geometry: **11** is the analytic cylindrical bore (`cosmo-cylinder`) — fast, never
+jams — and **12** is the explicit rigid coarse-grained ribosome (`cosmo-csp`) with
+O'Brien's 3-stage per-codon kinetics. Both add optional post-synthesis `ejection` /
+`dissociation` free runs.
 
-The **ready-to-run files** for each tutorial (PDB, `md.ini` / `elongate.ini`,
-`run_simulation.py`) live in the matching folder here under `tutorials/`. The
-translation tutorials are launched differently from the `cosmo-mdrun` runs above:
-7 and 8 use `cosmo-elongate -f elongate.ini`, 9 uses `python cylinder.py -f
-elongate.ini` (analytic tunnel), 10 uses `python grow_nascent.py -f md.ini`
-(frozen ribosome), 11 uses `cosmo-cylinder -f cylinder.ini` (analytic tunnel), and
-12 uses `cosmo-csp -f csp.ini` (explicit ribosome). See each folder's `README.md`
-for the exact command and options.
+The **ready-to-run files** for each tutorial (PDB, `cylinder.ini` / `csp.ini`) live
+in the matching folder here under `tutorials/`. The synthesis tutorials are launched
+differently from the `cosmo-mdrun` runs above: 7 uses `cosmo-cylinder -f
+cylinder.ini` (analytic tunnel) and 8 uses `cosmo-csp -f csp.ini` (explicit
+ribosome). See each folder's `README.md` for the exact command and options.
 
 ---
 

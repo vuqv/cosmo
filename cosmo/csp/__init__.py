@@ -6,8 +6,8 @@ cosmo style on cosmo's **sequence-based IDP force field** (HPS / mpipi). It mirr
 sibling ``topo`` project's ``topo.csp`` package -- same module layout, class/function
 names and CLI -- but drops topo's structure-based Gō machinery (STRIDE, native
 contacts, ``domain.yaml`` nscales): a length-``L`` nascent model is just
-:func:`cosmo.models.buildCoarseGrainModel` on the first ``L`` residues (see
-``cosmo/translation/PLAN.md`` §2).
+:func:`cosmo.models.buildCoarseGrainModel` on the first ``L`` residues (all cosmo
+forces are sequence-local or pairwise-by-type, so the restriction is exact).
 
 It times every residue from its mRNA codon and splits it into peptidyl-transfer /
 translocation / tRNA-binding sub-stages, reusing the shared per-length MD engine

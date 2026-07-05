@@ -19,9 +19,10 @@ What it provides:
   C-terminus position restraint (:func:`add_cterm_restraint`), and small I/O helpers.
 
 Because cosmo's force field is sequence-based there is **no STRIDE, no native contact
-map and no build-once-subset machinery** (see ``cosmo/translation/PLAN.md`` §2): a
-length-``L`` model is simply :func:`cosmo.models.buildCoarseGrainModel` on the **first
-``L`` residues** of the nascent PDB.
+map and no build-once-subset machinery**: a length-``L`` model is simply
+:func:`cosmo.models.buildCoarseGrainModel` on the **first ``L`` residues** of the
+nascent PDB (all cosmo forces are sequence-local or pairwise-by-type, so the
+restriction is exact).
 
 Like topo, :func:`run_length` wraps each stage in a **per-stage dt-halving stability
 guard** (:data:`STABILITY_POTE_LIMIT_KJ` / :data:`STABILITY_MAX_ATTEMPTS`). The

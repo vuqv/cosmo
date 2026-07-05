@@ -5,8 +5,8 @@ elongation cycle of ``continuous_synthesis_v6.py`` -- expressed in cosmo style, 
 cosmo's sequence-based IDP force field (HPS / mpipi). It mirrors the sibling ``topo``
 project's ``topo/csp/protocol.py`` but drops topo's structure-based Gō machinery
 (STRIDE, native-contact precompute, ``domain.yaml`` nscales): a length-``L`` model is
-just :func:`cosmo.models.buildCoarseGrainModel` on the first ``L`` residues (see
-``cosmo/translation/PLAN.md`` §2).
+just :func:`cosmo.models.buildCoarseGrainModel` on the first ``L`` residues (all cosmo
+forces are sequence-local or pairwise-by-type, so the restriction is exact).
 
 What is reused vs. new:
 
@@ -113,7 +113,7 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     # CSP switches the C-terminus restraint target A->P across the three stages; that
     # is the position-restraint path. The O'Brien tRNA tether (in cosmo) always targets
     # the P-site bead and does not switch A/P, so it is incompatible with the 3-stage
-    # translocation -- force it off here (mirrors cosmo/translation/PLAN.md's CSP note).
+    # translocation -- force it off here.
     if ep.trna_tether:
         print("[csp] trna_tether is forced off: the 3-stage protocol uses the "
               "position-restraint path so the C-terminus target can switch A->P.")

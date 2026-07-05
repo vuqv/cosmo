@@ -26,15 +26,6 @@ implemented/tested. The HPS-scale models type residues by per-residue radius
 
 Ideas to revisit when there's time; not on the critical path.
 
-### Co-translational synthesis — remaining v2 extras (`cosmo/translation/`)
-The subsystem (v1 + v2, incl. the tRNA tether and tunnel wall) is done (see **Done**
-below); the post-elongation phase (ejection / stallation) is now implemented too
-(`cosmo/csp/`). One refinement remains. Full checklist in
-`tutorials/07_translation/TASKS.md` (phase 5b):
-
-* **Analysis** — Rg / native-contact fraction vs. nascent length; tutorial worked
-  example.
-
 ### Allow configurable `n_copies`
 Let `md.ini` configure the number of chain copies in the system. Two distinct
 modes, both worth supporting:
@@ -81,6 +72,7 @@ Design notes:
    `tests/test_mpipi_rna.py`.
 6. **Co-translational synthesis subsystem** (`cosmo/translation/`, mirrors
    `topo/translation/`) — replaces the removed `examples/growing/` prototype.
+   *(Later removed: superseded by the `cosmo/csp/` package — see item 9+ / `cosmo/csp/README.md`.)*
    * **Build step v1** — nascent-only elongation loop (`elongate.py`): per-length
      rebuild on the first `L` residues (sequence-based; no STRIDE/contacts),
      cold-start layout, A→P new-residue placement, C-terminus restraint to the

@@ -62,7 +62,7 @@ extensions = [
 ]
 
 # The tutorial index ``{include}``s the repo's GitHub-facing tutorial READMEs, whose
-# links are **repo-relative** (e.g. ``./07_translation/`` and ``../README.md``) so they
+# links are **repo-relative** (e.g. ``./07_csp_cylinder/`` and ``../README.md``) so they
 # work when browsing the tutorials on GitHub. MyST cannot resolve those as in-doc
 # cross-references, and the same READMEs jump heading levels (H1 -> H3). Neither is a
 # real docs defect, so silence just those two MyST warning categories to keep the build

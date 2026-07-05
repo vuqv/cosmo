@@ -18,8 +18,8 @@ field** (HPS / mpipi) instead of topo's structure-based Gō model. It therefore 
 topo's Gō machinery entirely: **no STRIDE, no native-contact map, no `domain.yaml`
 nscales, no build-once-subset**. A length-`L` nascent model is simply
 `cosmo.models.buildCoarseGrainModel` on the **first `L` residues** of the sequence (all
-cosmo forces are sequence-local or pairwise-by-type, so the restriction is exact — see
-[`cosmo/translation/PLAN.md`](../translation/PLAN.md) §2). Like topo, each stage is wrapped
+cosmo forces are sequence-local or pairwise-by-type, so the restriction is exact). Like
+topo, each stage is wrapped
 in a **per-stage dt-halving stability guard** (`STABILITY_POTE_LIMIT_KJ` /
 `STABILITY_MAX_ATTEMPTS` in `core.py`): the divergence it guards is **non-native excluded
 volume** (the new residue seeded at the fixed A-site landing in the stiff repulsive core of
@@ -28,8 +28,9 @@ cosmo *and* topo), not a native-contact well. A diverging stage (PotE → ~1e13 
 re-run at `dt/2` with `2×` steps (dwell `= n_steps · dt` preserved) until it integrates
 cleanly.
 
-> `cosmo.csp` is a **new, self-contained** package. The older `cosmo.translation`
-> (single-stage constant-schedule `cosmo-elongate`) is left in place and untouched.
+> `cosmo.csp` is a **self-contained** package and the sole co-translational synthesis
+> subsystem. It replaced the older single-stage `cosmo.translation` (`cosmo-elongate`)
+> package, which has been removed.
 
 ## What it does
 

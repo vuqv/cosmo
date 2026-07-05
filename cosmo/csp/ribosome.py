@@ -173,7 +173,7 @@ def load_ribosome(pdb_file: str, model: str = "hps_kr") -> Ribosome:
     ValueError
         If a parsed bead type has no Rmin_2, or no ATOM records are found.
     """
-    coords, radii, charges = [], [], []
+    coords, rmin_2, charges = [], [], []
     names, resnames, resids, segids = [], [], [], []
     with open(pdb_file) as fh:
         for line in fh:
@@ -187,12 +187,12 @@ def load_ribosome(pdb_file: str, model: str = "hps_kr") -> Ribosome:
             btype = _bead_type(name, resname)
             rm, q = _rmin2_charge(model, btype)
             coords.append((x / 10.0, y / 10.0, z / 10.0))
-            radii.append(rm); charges.append(q)
+            rmin_2.append(rm); charges.append(q)
             names.append(name); resnames.append(resname)
             resids.append(resid); segids.append(seg)
     if not coords:
         raise ValueError(f"no ATOM records parsed from ribosome file {pdb_file!r}.")
-    return Ribosome(np.asarray(coords, dtype=float), radii, charges,
+    return Ribosome(np.asarray(coords, dtype=float), rmin_2, charges,
                     names, resnames, resids, segids)
 
 

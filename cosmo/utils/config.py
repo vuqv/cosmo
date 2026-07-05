@@ -128,9 +128,7 @@ class SimulationConfig:
     def build_kwargs(self) -> dict:
         """Keyword arguments for :func:`cosmo.models.buildCoarseGrainModel`.
 
-        Passes ``minimize``, ``model``, ``box_dimension`` and ``constraints`` (the
-        builder's own defaults cover the optional ``frozen_indices`` / ``except_chains``
-        / ``nb_exclusions`` arguments).
+        Passes ``minimize``, ``model``, ``box_dimension`` and ``constraints``.
         """
         return dict(minimize=self.minimize, model=self.model,
                     box_dimension=self.box_dimension, constraints=self.constraints)

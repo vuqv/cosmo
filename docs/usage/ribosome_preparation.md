@@ -16,7 +16,7 @@ in `cosmo/csp/structures/`, in two coarse-grain representations:
 | File | Beads | rRNA rep | Used by |
 |------|------:|----------|---------|
 | `4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb` | 4 576 | topo P/R/BR | `cosmo-csp` (this is the one copied into the tutorials/sandbox as `ribosome_trunc.pdb`) |
-| `4v9d_50S_PtR_5jte_AtR_model_cg_cosmo_trunc.pdb` | 1 706 | cosmo rep | the single-stage `cosmo-elongate` runner |
+| `4v9d_50S_PtR_5jte_AtR_model_cg_cosmo_trunc.pdb` | 1 706 | cosmo rep | legacy cosmo 1-bead rep (no current runner; retained for reference) |
 
 Point the `ribosome` key of a `csp.ini` at a truncated structure — it is a plain path:
 

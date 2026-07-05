@@ -26,8 +26,7 @@ kinetics with the explicit ribosome replaced by a cylindrical bore — see
 layout, INI keys and CLI, but the nascent chain is an **intrinsically disordered protein**
 under the HPS / mpipi force field — so there is **no STRIDE, no native-contact map, no
 `domain.yaml`, and no build-once-subset machinery**. A length-`L` model is simply
-`cosmo.models.buildCoarseGrainModel` on the **first `L` residues** of the sequence. The
-older single-stage `cosmo.translation` (`cosmo-elongate`) package is left untouched.
+`cosmo.models.buildCoarseGrainModel` on the **first `L` residues** of the sequence.
 ```
 
 ---

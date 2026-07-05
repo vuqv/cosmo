@@ -4,7 +4,6 @@
 from typing import Any
 
 from .system import system
-import openmm.unit as unit
 
 class models:
     """
@@ -19,9 +18,6 @@ class models:
                               minimize: bool = False,
                               model: str = 'hps_urry',
                               box_dimension: Any = None,
-                              frozen_indices: list = None,
-                              except_chains: list = None,
-                              nb_exclusions: list = None,
                               constraints: Any = None,
                               check_forces: bool = True):
         """
@@ -45,12 +41,6 @@ class models:
         box_dimension : float or array, optional
             If set, use PBC (cubic if float, rectangular if [x, y, z]). If not
             specified, PBC is not used.
-        frozen_indices : list, optional
-            List of atom indices to freeze (mass set to zero).
-        except_chains : list, optional
-            List of chain IDs to exclude from bonding.
-        nb_exclusions : list, optional
-            List of pairs of atom indices to exclude from nonbonded forces.
         constraints : str or None, optional (default: None)
             Bond treatment. ``None`` (or ``'None'``) keeps **flexible harmonic bonds**
             -- the physically appropriate default for intrinsically disordered chains,
@@ -84,7 +74,7 @@ class models:
         # (nucleic-acid) beads, then collect atoms and bonds.
         cosmo_model.coarseGrainingStructure()
         cosmo_model.getAtoms()
-        cosmo_model.getBonds(except_chains=except_chains)
+        cosmo_model.getBonds()
 
         ca_atoms = sum(1 for atom in cosmo_model.atoms if atom.name == 'CA')
         p_atoms = sum(1 for atom in cosmo_model.atoms if atom.name == 'P')
@@ -162,15 +152,15 @@ class models:
         else:
             use_pbc = False
 
-        cosmo_model.addYukawaForces(use_pbc, nb_exclusions=nb_exclusions)
+        cosmo_model.addYukawaForces(use_pbc)
 
         # Short-range non-bonded potential: Ashbaugh-Hatch (LJ 12-6) for the
         # HPS-scale models, Wang-Frenkel for mpipi.
         if model in ('hps_kr', 'hps_urry', 'hps_ss'):
-            cosmo_model.addAshbaughHatchForces(use_pbc, nb_exclusions=nb_exclusions)
+            cosmo_model.addAshbaughHatchForces(use_pbc)
             nb_name = 'Ashbaugh-Hatch (PairWise)'
         elif model in ('mpipi',):
-            cosmo_model.addWangFrenkelForces(use_pbc, nb_exclusions=nb_exclusions)
+            cosmo_model.addWangFrenkelForces(use_pbc)
             nb_name = 'Wang-Frenkel'
 
         extra = ', Gaussian angle+torsion' if model == 'hps_ss' else ''
@@ -185,11 +175,6 @@ class models:
         # input PDB geometry -- is what gets simulated).
         cosmo_model.createSystemObject(minimize=minimize, check_bond_distances=True,
                                        check_large_forces=check_forces)
-
-        if frozen_indices:
-            print(f'  freezing {len(frozen_indices)} atoms from moving')
-            for idx in frozen_indices:
-                cosmo_model.system.setParticleMass(idx, 0.0 * unit.dalton)
 
         print('System build complete')
         print('')

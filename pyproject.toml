@@ -26,10 +26,6 @@ dependencies = [
 cosmo-mdrun = "cosmo.mdrun:mdrun"
 # Back-compat alias for the historical name; routes to the same runner.
 cosmo-simulation = "cosmo.mdrun:mdrun"
-# Co-translational synthesis (elongation) runner: `cosmo-elongate -f elongate.ini`
-cosmo-elongate = "cosmo.translation.elongate:elongate"
-# Stitch the per-length elongation trajectories into one VMD-playable movie.
-cosmo-elongate-movie = "cosmo.translation.make_movie:main"
 # O'Brien Continuous Synthesis Protocol (per-codon, 3-stage): `cosmo-csp -f csp.ini`
 cosmo-csp = "cosmo.csp.protocol:csp"
 # Cylinder ribosome model (analytic exit tunnel; one MD segment/residue, same
