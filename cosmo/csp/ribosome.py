@@ -166,7 +166,7 @@ def load_ribosome(pdb_file: str, model: str = "hps_kr") -> Ribosome:
     residue's formal charge in ``model``. Coordinates are converted from angstrom to nm.
 
     The ribosome CG PDB is the O'Brien 3/4-bead representation (protein Ca; rRNA
-    P/R/BR), produced by :mod:`cosmo.csp.cg_ribosome` + :mod:`cosmo.csp.truncate_ribosome`.
+    P/R/BR); prepare it with the sibling ``topo`` package's ribosome tooling.
 
     Raises
     ------

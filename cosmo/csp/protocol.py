@@ -125,9 +125,9 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     out_path.mkdir(parents=True, exist_ok=True)
 
     # --- rigid ribosome (always: the supplied file is rigid scenery) --------
-    # Loaded once; identical at every length. A cosmo CG ribosome PDB (O'Brien 3/4-bead
-    # P/R/BR rep, built by cosmo.csp.cg_ribosome + truncate_ribosome); per-bead Rmin/2 +
-    # charge from model_parameters. Loaded before the anchors, which are its beads.
+    # Loaded once; identical at every length. A CG ribosome PDB (O'Brien 3/4-bead
+    # P/R/BR rep, prepared with the sibling topo package); per-bead Rmin/2 + charge from
+    # model_parameters. Loaded before the anchors, which are its beads.
     ribo = load_ribosome(ribosome_pdb, model=ep.model)
     print(f"Rigid ribosome: {ribo.n} beads from {ribosome_pdb} "
           f"(mass-0 scenery; ribosome<->nascent 12-10-6 excluded volume + Yukawa on).")

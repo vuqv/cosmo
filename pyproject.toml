@@ -40,5 +40,6 @@ include = ["cosmo*"]
 
 [tool.setuptools.package-data]
 # Bundled data shipped inside the importable package: the default E. coli codon-time
-# table and the (truncated CG) ribosome structures used by cosmo.csp.
-"cosmo.csp" = ["data/*.txt", "structures/*.pdb"]
+# table used by cosmo.csp. (Ribosome structures are prepared with the sibling topo
+# package and supplied per-run; the tutorial bundles its own copy.)
+"cosmo.csp" = ["data/*.txt"]

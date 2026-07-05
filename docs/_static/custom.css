@@ -1,24 +1,46 @@
 /* COSMO docs — Furo full-width customizations.
  *
- * Furo caps the article column at --content-width (default 46em) for
- * readability. We widen it so the content uses the full available page width
- * (set via html_theme_options light/dark_css_variables -> --content-width:100%),
- * and relax the per-article max-width that Furo applies on top of it.
+ * Furo caps the article column at --content-width (default 46em) for readability.
+ * conf.py sets --content-width: 100% (via html_theme_options.light/dark_css_variables,
+ * key WITHOUT the leading `--` since Furo prepends it) so the article uses the full
+ * width between the sidebars; the rules below tune the drawers and tables.
  */
 
+/* Slightly narrower side drawers -> more room for the article + wide tables. */
+:root {
+    --sidebar-width: 15em;
+    --toc-width: 13em;
+}
+
+/* Belt-and-suspenders: force the article column to the full available width. */
 .content,
 article {
     max-width: 100% !important;
 }
 
-/* Keep comfortable side gutters now that the column is full-width. */
+/* Comfortable side gutters now that the column is full-width. */
 article {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
 }
 
-/* Let wide tables and code blocks scroll horizontally instead of overflowing. */
-.content table,
+/* Reference tables (the md.ini / csp.ini parameter summaries) use the full width;
+   long cells wrap instead of squeezing a column to a sliver, and any table still
+   wider than the page scrolls horizontally rather than clipping its last column. */
+.content table.docutils {
+    width: 100%;
+}
+.content table.docutils td,
+.content table.docutils th {
+    white-space: normal;
+    overflow-wrap: break-word;
+    vertical-align: top;
+}
+.content .table-wrapper {
+    overflow-x: auto;
+}
+
+/* Let wide code blocks scroll horizontally instead of overflowing. */
 .highlight pre {
     overflow-x: auto;
 }

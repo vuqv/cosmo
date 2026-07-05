@@ -99,10 +99,6 @@ STABILITY_MAX_ATTEMPTS = 6
 # O'Brien tRNA resting bond lengths (nm; 4.27 / 4.76 A) and orienting-angle stiffness.
 _PTC_D_A_NM, _PTC_D_P_NM = 0.427, 0.476
 _PTC_ANGLE_K_KJ = 25.0 * 4.184                  # = 104.6 kJ/mol/rad^2 (O'Brien)
-# Equilibrium peptide bond (nm). cosmo's CG protein bond is 3.8 A = 0.380 nm (the
-# hps_kr `bond_length_protein`), NOT topo's 3.81 A -- the runner passes the active
-# model's bond length; this constant is the default / hps_kr value.
-_PTC_PEPTIDE_NM = 0.380
 
 # Verbose banners are off by default (CSP runs many stages; the concise per-stage
 # summary line is enough). Set COSMO_CSP_VERBOSE=1 to restore the full build banners.
@@ -176,8 +172,8 @@ def _ptc_bead_index(ribo, segid: str, resid: int, name: str) -> int:
     raise ValueError(f"ribosome bead {segid}:{resid}@{name} not found.")
 
 
-def optimal_ptc_targets(ribo, *, aa_rmin_2_nm: float = 0.5, n_starts: int = 60,
-                        peptide_nm: float = _PTC_PEPTIDE_NM
+def optimal_ptc_targets(ribo, *, peptide_nm: float, aa_rmin_2_nm: float = 0.5,
+                        n_starts: int = 60
                         ) -> Tuple[np.ndarray, np.ndarray]:
     """Optimal A-site / P-site C-terminus restraint **target points** (nm).
 
@@ -185,7 +181,8 @@ def optimal_ptc_targets(ribo, *, aa_rmin_2_nm: float = 0.5, n_starts: int = 60,
     path). Returns ``(a_target, p_target)`` -- two **fixed points in space** (nm; NOT
     bonds; the CSP path restrains the C-terminus to a fixed point via
     :func:`add_cterm_restraint`) that sit exactly one **peptide bond** (``peptide_nm``,
-    default cosmo's 0.380 nm) apart and clear of the ribosome excluded volume. Seeding
+    the active model's ``bond_length_protein``) apart and clear of the ribosome excluded
+    volume. Seeding
     the new residue at ``a_target`` while the previous residue rests at ``p_target``
     makes the always-present peptide bond start at its equilibrium length -- so no
     residue is delivered ~0.9 nm (the raw tRNA-anchor separation) off equilibrium.
@@ -216,10 +213,11 @@ def optimal_ptc_targets(ribo, *, aa_rmin_2_nm: float = 0.5, n_starts: int = 60,
         residue).
     n_starts : int, optional
         Number of deterministic multistart initial orientations (default 60).
-    peptide_nm : float, optional
-        Equilibrium peptide-bond length (nm) held as the hard constraint. Default
-        :data:`_PTC_PEPTIDE_NM` (0.380 nm); the CSP runner passes the active model's
-        ``bond_length_protein``.
+    peptide_nm : float
+        Equilibrium peptide-bond length (nm) held as the hard constraint (**required**;
+        no default, so the model's value is never silently wrong). The CSP runner passes
+        the active model's ``bond_length_protein`` -- 0.380 nm for ``hps_kr``, 0.382 for
+        ``hps_urry``/``hps_ss``, 0.381 for ``mpipi``.
 
     Returns
     -------

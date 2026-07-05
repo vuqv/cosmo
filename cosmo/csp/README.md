@@ -61,12 +61,9 @@ steps    = int(t_sim_ns / (dt_ps * 1e-3))        # -> MD steps
 | `core.py` | shared per-length MD engine (a library): `RunParams`, `run_length` (build / seed / restrain / minimize / run / finalize), `read_anchor`, coordinate seeding. Reused by both runners. |
 | `protocol.py` | **the CSP runner** (`cosmo-csp`): per-codon, 3-stage loop + INI (`CSPConfig`, `read_csp_config`, `run_continuous_synthesis`, `csp()`). Calls `core.run_length` three times per residue. |
 | `cylinder.py` | **the cylinder runner** (`cosmo-cylinder`): analytic exit tunnel (a bore in an infinite wall, `add_tunnel_cylinder`) instead of explicit beads. Same codon kinetics, **one MD segment per residue** (no A/P sub-stages). |
-| `ribosome.py` | rigid CG ribosome scenery + ribosome↔nascent excluded volume / electrostatics; the tRNA tether and planar tunnel wall. |
-| `cg_ribosome.py` | all-atom → CG ribosome (both `rna_model` reps: topo P/R/BR or cosmo 1-bead). |
-| `truncate_ribosome.py` | crop the CG ribosome around the exit tunnel. |
+| `ribosome.py` | rigid CG ribosome scenery + ribosome↔nascent excluded volume / electrostatics; the tRNA tether and planar tunnel wall. Loads a CG ribosome PDB (topo P/R/BR rep) prepared with the sibling `topo` package. |
 | `movie.py` | stitch the per-residue/-stage trajectories into one VMD movie (`cosmo-csp-movie`; auto-detects the 3-stage vs flat layout). |
 | `data/` | bundled `ecoli_trans_times_310K.txt` — the default E. coli (310 K) codon-time table (organism-universal). |
-| `structures/` | truncated CG ribosomes (topo + cosmo rRNA reps). |
 
 ## Public API
 

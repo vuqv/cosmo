@@ -118,11 +118,14 @@ html_theme = 'furo'
 # links replace the old RTD "Edit on GitHub" / version machinery.
 html_theme_options = {
     'light_css_variables': {
-        # Let the article column use the full available width.
-        '--content-width': '100%',
+        # Let the article column use the full available width. Furo prepends ``--`` to
+        # each key, so the key here must NOT include it (``content-width`` ->
+        # ``--content-width``); writing ``--content-width`` yields an invalid
+        # ``----content-width`` that is silently ignored.
+        'content-width': '100%',
     },
     'dark_css_variables': {
-        '--content-width': '100%',
+        'content-width': '100%',
     },
     'navigation_with_keys': True,
     'source_repository': 'https://github.com/vuqv/cosmo/',

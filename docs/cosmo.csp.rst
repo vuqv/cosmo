@@ -48,22 +48,6 @@ cosmo.csp.ribosome module
    :show-inheritance:
    :undoc-members:
 
-cosmo.csp.cg\_ribosome module
------------------------------
-
-.. automodule:: cosmo.csp.cg_ribosome
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
-cosmo.csp.truncate\_ribosome module
------------------------------------
-
-.. automodule:: cosmo.csp.truncate_ribosome
-   :members:
-   :show-inheritance:
-   :undoc-members:
-
 cosmo.csp.movie module
 ----------------------
 
