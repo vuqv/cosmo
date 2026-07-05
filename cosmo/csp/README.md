@@ -86,20 +86,19 @@ positive number of seconds for a uniform codon time), `scale_factor`, `time_stag
 clamps), `ejection_steps` / `dissociation_steps` (post-synthesis free runs).
 
 **MD / ribosome keys:** `model` (nascent force field — **`hps_kr` default**), `dt`,
-`ref_t`, `tau_t`, `nstout`, `device`, `ppn`, `constraints`, `restraint_k`, `buffer`,
-`minimize`, `tunnel_wall`, `ptc_offset`, `optimize_ptc_geometry`. The wall plane is
-auto-derived from the structure; output is always nascent-only.
+`ref_t`, `tau_t`, `nstout`, `device`, `ppn`, `constraints` (default `None` — flexible
+bonds), `restraint_k`, `minimize`, `tunnel_wall`. The wall plane is auto-derived from the
+structure; output is always nascent-only.
 
-**`optimize_ptc_geometry` (opt-in).** By default the A-site seed / stage-1-2 restraint
-target and the P-site / stage-3 target are the raw `AtR`/`PtR`-76 `R` anchor beads
-offset by `ptc_offset` — which leaves them ~0.9 nm apart (the tRNA-bead separation), so
-each new residue's peptide bond starts badly stretched. With `optimize_ptc_geometry =
-yes`, `optimal_ptc_targets` instead places the A/P targets **exactly one peptide bond
+**PTC geometry (always optimized).** `optimal_ptc_targets` places the A-site seed /
+stage-1-2 restraint target and the P-site / stage-3 target **exactly one peptide bond
 apart** (the model's `bond_length_protein` — **0.380 nm** for `hps_kr`) and clear of the
 ribosome excluded volume, by minimizing the soft O'Brien tRNA-bond/angle/improper
-restraints + the 12-10-6 wall. The new residue is then delivered with its peptide bond
-at equilibrium (stage-1 energies drop by ~50×). The C-terminus is still held by a
-**position restraint** to these points (not a bond to the tRNA beads).
+restraints + the 12-10-6 wall. Each new residue is delivered with its peptide bond at
+equilibrium (stage-1 energies drop by ~50× versus seeding at the raw `AtR`/`PtR`-76 `R`
+anchor beads, which sit ~0.9 nm apart). The C-terminus is held by a **position
+restraint** to these points (not a bond to the tRNA beads). This is always on; there is
+no knob.
 
 **Ribosome ↔ nascent excluded volume — O'Brien 12-10-6.** The rigid ribosome interacts
 with the nascent chain through the O'Brien form

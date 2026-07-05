@@ -33,7 +33,7 @@ supplies the excluded-volume/electrostatic wall and the **A-/P-site anchors**. E
 elongation cycle is split into O'Brien's three kinetic sub-stages —
 **peptidyl-transfer → translocation → tRNA-binding** — with the new residue's
 C-terminus restraint switching **A→P** across them, so a residue is delivered to the
-A site and ratcheted into the P site. With `optimize_ptc_geometry = yes` the new
+A site and ratcheted into the P site. The PTC geometry is always optimized: the new
 residue is seeded one peptide bond (0.380 nm) from the C-terminus, EV-clear.
 
 ## Files

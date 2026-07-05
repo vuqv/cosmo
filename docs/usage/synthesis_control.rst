@@ -69,7 +69,8 @@ Example ``csp.ini``:
         nstout = 20          ; trajectory/log output interval (steps)
 
         ; --- ribosome / PTC mechanics ---
-        optimize_ptc_geometry = yes    ; place A/P targets one peptide bond (0.380 nm) apart, EV-clear
+        ; PTC geometry is always optimized (A/P targets one peptide bond, 0.380 nm,
+        ; apart and EV-clear) -- no knob. Bonds stay flexible (constraints = None).
         restraint_k = 83680  ; C-terminus harmonic restraint (kJ/mol/nm^2)
         minimize    = yes    ; energy-minimize each seeded structure before its MD
         ; tunnel_wall = yes  ; one-sided tunnel floor (default on; plane auto-derived)
@@ -245,15 +246,11 @@ consumed by :func:`~cosmo.csp.core.run_length`).
    * - ``constraints``
      - str
      - ``None``
-     - Bond treatment. ``None`` (flexible harmonic bonds) is what CSP uses; the new residue is seeded off equilibrium and the harmonic bond + minimization absorb it.
+     - Bond treatment. ``None`` (flexible harmonic bonds) is the deliberate default: cosmo's soft HPS/mpipi potentials have no stiff native-Gō wells, so there is no rigid-constraint stability path (unlike topo's Gō model). The always-on PTC optimization still seeds each new residue at equilibrium, so the seeded structure minimizes cleanly.
    * - ``restraint_k``
      - float [kJ/mol/nm²]
      - ``83680``
      - Stiffness of the C-terminus harmonic position restraint to the A/P target point (= 200 kcal/mol/Å²). Switching the target A→P is how translocation is reproduced. (Its ``k`` is a per-particle parameter so it coexists with the tunnel wall's global ``k``.)
-   * - ``buffer``
-     - float [nm]
-     - ``0.4``
-     - Legacy A-anchor seed offset; unused on the ribosome path (the new residue is seeded at its hold point).
    * - ``minimize``
      - bool
      - ``yes``
@@ -262,14 +259,6 @@ consumed by :func:`~cosmo.csp.core.run_length`).
      - bool
      - ``yes``
      - Apply the one-sided half-harmonic tunnel wall (a floor below the synthesis point). The plane ``x₀`` is **auto-derived** from the ribosome (``min(A-target.x, P-target.x)``) and the stiffness is a fixed model constant — neither is a key; only this on/off toggle.
-   * - ``ptc_offset``
-     - float [nm]
-     - auto ``0.476``
-     - Offset into the tunnel (+x) from the P-anchor bead at which the C-terminus is held (clears the tRNA bead). Defaults to the tRNA-bond length. Ignored when ``optimize_ptc_geometry = yes``.
-   * - ``optimize_ptc_geometry``
-     - bool
-     - ``no``
-     - Place the A-site seed / stage-1-2 target and the P-site / stage-3 target **one peptide bond apart** — the model's ``bond_length_protein`` (**0.380 nm** for ``hps_kr``, *not* topo's 0.381) — and clear of the ribosome excluded volume, by minimizing the soft O'Brien tRNA restraints + the 12-10-6 wall. The new residue is then delivered with its peptide bond at equilibrium (stage-1 energies drop ~50×). Position-restraint path either way (the tRNA tether is not used).
    * - ``device``
      - str
      - ``CPU``
@@ -297,7 +286,7 @@ Required inputs (``pdb_file`` / ``ribosome``)
     STRIDE, no contact map). ``ribosome`` is the truncated CG ribosome providing
     the P-/A-anchors and the rigid scenery; it must carry tRNA beads under the fixed
     names (segids ``PtR``/``AtR``, resid 76, beads ``R``/``P``/``BR2``) or anchor
-    lookup — and ``optimize_ptc_geometry`` — fail.
+    lookup — and the always-on PTC-geometry optimization — fail.
 
 Per-codon vs. uniform timing (``mrna`` / ``codon_times``)
     ``codon_times`` selects the timing mode by its **value type**: a **path** →

@@ -57,9 +57,9 @@ import openmm as mm
 
 import MDAnalysis as mda
 
-from cosmo.csp.core import (RunParams, TUNNEL_AXIS, read_anchor, run_length,
+from cosmo.csp.core import (RunParams, read_anchor, run_length,
                             optimal_ptc_targets)
-from cosmo.csp.ribosome import load_ribosome, TRNA_TETHER_BOND_NM
+from cosmo.csp.ribosome import load_ribosome
 from cosmo.parameters import model_parameters
 from cosmo.utils.config import strtobool
 from cosmo.csp import kinetics
@@ -139,28 +139,18 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     print(f"A-anchor (AtR 76 R): {a_anchor} nm")
 
     # Hold/seed targets (fixed points the C-terminus is position-restrained to).
-    if ep.optimize_ptc_geometry:
-        # Optimize the PTC geometry: place the A-site and P-site target points exactly
-        # one peptide bond apart (the model's bond_length_protein -- 0.380 nm for hps_kr,
-        # not topo's 0.381) and clear of the ribosome excluded volume. Seeding the new
-        # residue at a_target while the previous C-terminus rests at p_target makes the
-        # always-present peptide bond start at its equilibrium length.
-        pep_nm = float(model_parameters.parameters[ep.model]["bond_length_protein"])
-        a_target, p_target = optimal_ptc_targets(ribo, peptide_nm=pep_nm)
-        print(f"[optimize_ptc_geometry] optimal PTC targets "
-              f"(|A-P| = {np.linalg.norm(a_target - p_target):.4f} nm = 1 peptide bond "
-              f"@ {pep_nm} nm; fixed points, not bonds):")
-        print(f"  A-site target (new-AA seed + stage-1/2 restraint): {a_target} nm")
-        print(f"  P-site target (prev-AA / stage-3 restraint)       : {p_target} nm")
-    else:
-        # Default: offset into the tunnel (+x) from each raw tRNA anchor bead so the
-        # C-terminus does not sit on top of a ribosome bead (a near-coincident clash).
-        # Offset defaults to the tether bond length (override via ptc_offset).
-        offset = ep.ptc_offset_nm
-        if offset is None:
-            offset = TRNA_TETHER_BOND_NM
-        p_target = p_anchor + offset * TUNNEL_AXIS
-        a_target = a_anchor + offset * TUNNEL_AXIS
+    # The PTC geometry is always optimized: place the A-site and P-site target points
+    # exactly one peptide bond apart (the model's bond_length_protein -- 0.380 nm for
+    # hps_kr, not topo's 0.381) and clear of the ribosome excluded volume. Seeding the
+    # new residue at a_target while the previous C-terminus rests at p_target makes the
+    # always-present peptide bond start at its equilibrium length.
+    pep_nm = float(model_parameters.parameters[ep.model]["bond_length_protein"])
+    a_target, p_target = optimal_ptc_targets(ribo, peptide_nm=pep_nm)
+    print(f"[PTC geometry] optimal PTC targets "
+          f"(|A-P| = {np.linalg.norm(a_target - p_target):.4f} nm = 1 peptide bond "
+          f"@ {pep_nm} nm; fixed points, not bonds):")
+    print(f"  A-site target (new-AA seed + stage-1/2 restraint): {a_target} nm")
+    print(f"  P-site target (prev-AA / stage-3 restraint)       : {p_target} nm")
 
     # Tunnel-wall plane (auto-derived -- never a stale user knob): the lower
     # (deeper-in-tunnel, smaller-x) C-terminus hold plane, so the held C-terminus sits
@@ -339,12 +329,12 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
 
     MD / ribosome keys: ``model`` (nascent force field, default ``hps_kr`` -- it carries
     the O'Brien Rmin/2 table for the ribosome-NC 12-10-6 excluded volume), ``dt``,
-    ``ref_t``, ``tau_t``, ``nstout``, ``device``, ``ppn``, ``constraints``,
-    ``restraint_k``, ``buffer``, ``minimize``, ``tunnel_wall``, ``ptc_offset``,
-    ``optimize_ptc_geometry`` (yes/no; place the A/P restraint targets one peptide bond
-    apart and clear of the ribosome excluded volume -- when on, ``ptc_offset`` is unused).
+    ``ref_t``, ``tau_t``, ``nstout``, ``device``, ``ppn``, ``constraints`` (default
+    ``None`` -- flexible bonds), ``restraint_k``, ``minimize``, ``tunnel_wall``.
     (``trna_tether`` is not honoured -- CSP forces the position restraint; the wall
-    plane is auto-derived; output is always nascent-only.)
+    plane is auto-derived; the PTC geometry is always optimized -- each new residue is
+    seeded/held one peptide bond from the previous C-terminus, EV-clear; output is
+    always nascent-only.)
 
     Inline ``#``/``;`` comments are ignored. **Units:** OpenMM defaults.
     """
@@ -407,16 +397,10 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
         p.constraints = None if cons.lower() == "none" else cons
     if opt("restraint_k") is not None:
         p.restraint_k = float(opt("restraint_k"))
-    if opt("buffer") is not None:
-        p.buffer_nm = float(opt("buffer"))
     if opt("minimize") is not None:
         p.minimize = bool(strtobool(opt("minimize")))
     if opt("tunnel_wall") is not None:
         p.tunnel_wall = bool(strtobool(opt("tunnel_wall")))
-    if opt("ptc_offset") is not None:
-        p.ptc_offset_nm = float(opt("ptc_offset"))
-    if opt("optimize_ptc_geometry") is not None:
-        p.optimize_ptc_geometry = bool(strtobool(opt("optimize_ptc_geometry")))
 
     # --- O'Brien kinetic knobs ---
     if opt("scale_factor") is not None:
@@ -461,7 +445,7 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
             f"(~{3 * p.max_steps_per_stage} steps/residue)")
     log(f"  ribosome: rigid scenery (O'Brien 12-10-6 excluded volume + Yukawa)"
         f"; tunnel wall: {'on (plane auto-derived)' if p.tunnel_wall else 'off'}")
-    log(f"  PTC geometry: {'optimized (A/P targets one peptide bond apart, EV-clear)' if p.optimize_ptc_geometry else 'raw tRNA anchors + ptc_offset'}")
+    log(f"  PTC geometry: optimized (A/P targets one peptide bond apart, EV-clear)")
     log(f"  integrator: dt={p.dt_ps} ps, ref_t={p.ref_t} K, tau_t={p.tau_t} /ps, nstout={p.nstout}")
     if p.ejection_steps or p.dissociation_steps:
         log(f"  post-synthesis: ejection={p.ejection_steps} steps, "

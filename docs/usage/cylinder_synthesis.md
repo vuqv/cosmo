@@ -92,7 +92,7 @@ sub-stages), so `time_stage_1` / `time_stage_2` are inherited but **unused** —
 codon dwell is a single segment. (3) The post-synthesis free runs are `ejection_steps`
 then `dissociation_steps` (same keywords as the explicit-ribosome runner, both drop the
 C-terminus restraint). (4) The explicit-ribosome
-knobs (`optimize_ptc_geometry`, `trna_tether`, `tunnel_wall`, `ptc_offset`) do not apply.
+knobs (`trna_tether`, `tunnel_wall`) and the always-on PTC-geometry optimization do not apply.
 (5) Purely steric — no ribosome electrostatics.
 ```
 

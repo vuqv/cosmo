@@ -63,7 +63,7 @@ RESTRAINT_K_KJ = 83680.0
 # offset by +/- this amount perpendicular to the tunnel axis to break collinearity.
 COLD_START_ZIGZAG_NM = 0.03
 
-# --- PTC-geometry optimization (optimize_ptc_geometry; opt-in) -------------
+# --- PTC-geometry optimization (always on) ---------------------------------
 # O'Brien tRNA resting bond lengths (nm; 4.27 / 4.76 A) and orienting-angle stiffness.
 _PTC_D_A_NM, _PTC_D_P_NM = 0.427, 0.476
 _PTC_ANGLE_K_KJ = 25.0 * 4.184                  # = 104.6 kJ/mol/rad^2 (O'Brien)
@@ -149,7 +149,7 @@ def optimal_ptc_targets(ribo, *, aa_rmin_2_nm: float = 0.5, n_starts: int = 60,
                         ) -> Tuple[np.ndarray, np.ndarray]:
     """Optimal A-site / P-site C-terminus restraint **target points** (nm).
 
-    Ported from ``topo.csp.core.optimal_ptc_targets`` (the ``optimize_ptc_geometry``
+    Ported from ``topo.csp.core.optimal_ptc_targets`` (the always-on PTC-geometry
     path). Returns ``(a_target, p_target)`` -- two **fixed points in space** (nm; NOT
     bonds; the CSP path restrains the C-terminus to a fixed point via
     :func:`add_cterm_restraint`) that sit exactly one **peptide bond** (``peptide_nm``,
@@ -304,17 +304,17 @@ def cold_start_positions(L0: int, anchor: np.ndarray,
     return positions
 
 
-def seed_positions(prev_final: np.ndarray, a_anchor: np.ndarray,
-                   buffer_nm: float) -> np.ndarray:
+def seed_positions(prev_final: np.ndarray, seed_point: np.ndarray) -> np.ndarray:
     """Seed length ``L`` from the previous final structure + the new residue.
 
     Residues ``1..L-1`` keep their coordinates from step ``L-1``'s final structure
     (``prev_final``, shape ``(L-1, 3)`` nm); the new C-terminal residue ``L`` is
-    placed at the A-anchor offset by ``buffer_nm`` along +x (the buffer clears
-    excluded volume so the new bead does not get a huge non-bonded kick). Returns an
-    ``(L, 3)`` array in nm.
+    placed at ``seed_point`` -- the equilibrium-bond A-site target from
+    :func:`optimal_ptc_targets` -- so the always-present peptide bond ``L-1<->L``
+    starts at its equilibrium length and the seeded structure minimizes cleanly.
+    Returns an ``(L, 3)`` array in nm.
     """
-    new_residue = a_anchor + buffer_nm * TUNNEL_AXIS
+    new_residue = np.asarray(seed_point, dtype=float)
     return np.vstack([prev_final, new_residue[None, :]])
 
 
@@ -453,23 +453,15 @@ class RunParams:
     nstout: int = 50
     device: str = "CPU"
     ppn: int = 1
-    # Flexible (harmonic) bonds by default (None) -- NOT rigid 'AllBonds'. The new
-    # residue is seeded far from its bond equilibrium and the restraint translocates it
-    # A->P; a harmonic bond absorbs the stretch, a rigid constraint's solver diverges.
+    # Flexible (harmonic) bonds by default (None) -- NOT rigid 'AllBonds'. cosmo's soft
+    # HPS/mpipi potentials have no stiff native-Go wells, so there is no rigid-constraint
+    # stability path (unlike topo's Go model); flexible bonds are the deliberate choice
+    # for this IDP/condensate force field. The always-on PTC optimization still seeds each
+    # new residue one peptide bond from the previous C-terminus, so the peptide bond starts
+    # at equilibrium -- a quality improvement, not a constraint requirement.
     constraints: object = None
     restraint_k: float = RESTRAINT_K_KJ   # kJ/mol/nm^2 (= 200 kcal/mol/A^2)
-    buffer_nm: float = 0.4
     minimize: bool = True
-    # How far into the tunnel (+x) from the P-anchor bead to hold/seed the C-terminus
-    # (nm). None -> auto: 0 with no ribosome, else the tether bond length / 0.4 nm.
-    ptc_offset_nm: Optional[float] = None
-    # Optimize the PTC restraint/seed geometry (opt-in). When True the CSP runner seeds
-    # each new residue at the optimal A-site target one peptide bond (model
-    # bond_length_protein, ~0.380 nm) from the previous C-terminus at the P-site target
-    # (:func:`optimal_ptc_targets`), so the always-present peptide bond starts at its
-    # equilibrium length (clear of the ribosome excluded volume). Default False keeps the
-    # raw-anchor + fixed-offset targets.
-    optimize_ptc_geometry: bool = False
     # --- rigid ribosome scenery (the supplied PDB is always rigid for CSP) ---
     # When a ribosome is present the output is always nascent-only (the rigid scenery is
     # static). ribosome<->nascent excluded volume is the O'Brien 12-10-6 (fixed eps /
@@ -618,13 +610,14 @@ def run_length(L: int, *, full_pdb: str,
         if prev_final.shape[0] != L - 1:
             raise ValueError(
                 f"prev_final has {prev_final.shape[0]} residues but L-1 = {L - 1}.")
-        if ribo is not None:
-            # Seed the new C-terminus at its equilibrium hold point (avoids the large
-            # placement strain of dropping it ~1 nm away at the A-anchor). The backbone
-            # bond to L-1 + the restraint/wall then drive forward extrusion.
-            nascent_pos = np.vstack([prev_final, cterm_seed[None, :]])
-        else:
-            nascent_pos = seed_positions(prev_final, a_anchor, params.buffer_nm)
+        # Seed the new C-terminus at its equilibrium hold point (the A-site target one
+        # peptide bond from the previous C-terminus), so the backbone bond to L-1 starts
+        # at equilibrium and the seeded structure minimizes cleanly; the restraint/wall
+        # then drive forward extrusion.
+        if cterm_seed is None:
+            raise ValueError("cterm_seed is required to seed a continued length "
+                             "(L > L0); the CSP runner always supplies it.")
+        nascent_pos = seed_positions(prev_final, cterm_seed)
 
     cfg = _make_cfg(out_dir, sub_pdb, params)
     if n_steps_override is not None:

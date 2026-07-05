@@ -59,6 +59,9 @@ RIBO_NC_EPS_KJ = 0.000132 * 4.184
 # O'Brien peptidyl-tRNA tether (from continuous_synthesis_v6.py):
 #   bond   C-term(CA) -- tRNA:76 R      k = 200 kcal/mol/A^2 = 83680 kJ/mol/nm^2
 TRNA_TETHER_BOND_NM = 0.476
+# These are nominal O'Brien stiffnesses. The bond/angle tether terms are added via
+# OpenMM Harmonic{Bond,Angle}Force (E = 1/2 k x^2), so `add_trna_tether` passes 2*k to
+# realize the full nominal value (see the convention note there).
 TRNA_TETHER_BOND_K = 83680.0            # kJ/mol/nm^2 (= 200 kcal/mol/A^2)
 TRNA_TETHER_ANGLE_K = 25.0 * 4.184      # kJ/mol/rad^2 (= 104.6)
 TRNA_TETHER_IMPROPER_K = 25.0 * 4.184   # kJ/mol/rad^2
@@ -377,16 +380,19 @@ def add_trna_tether(nascent_model, cterm_index: int, prev_index,
     d2r = math.radians
 
     # 1. bond N -- R (holds the residue at its site's resting length).
+    #    OpenMM's HarmonicBondForce/HarmonicAngleForce use E = 1/2 k (x-x0)^2, so pass
+    #    2*k to realize the nominal O'Brien stiffness (matches the improper/wall/restraint
+    #    Custom*Force terms, which use E = k (x-x0)^2 with no 1/2).
     bond = mm.HarmonicBondForce()
-    bond.addBond(int(cterm_index), R_idx, bond_nm, TRNA_TETHER_BOND_K)
+    bond.addBond(int(cterm_index), R_idx, bond_nm, 2.0 * TRNA_TETHER_BOND_K)
     system.addForce(bond)
 
     # 2. orienting harmonic angles N -- R -- P and N -- R -- BR2 (tRNA frame).
     haf = mm.HarmonicAngleForce()
     if P_idx is not None:
-        haf.addAngle(int(cterm_index), R_idx, P_idx, d2r(ang_P_deg), TRNA_TETHER_ANGLE_K)
+        haf.addAngle(int(cterm_index), R_idx, P_idx, d2r(ang_P_deg), 2.0 * TRNA_TETHER_ANGLE_K)
     if U2_idx is not None:
-        haf.addAngle(int(cterm_index), R_idx, U2_idx, d2r(ang_U2_deg), TRNA_TETHER_ANGLE_K)
+        haf.addAngle(int(cterm_index), R_idx, U2_idx, d2r(ang_U2_deg), 2.0 * TRNA_TETHER_ANGLE_K)
     if haf.getNumAngles() > 0:
         system.addForce(haf)
 

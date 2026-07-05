@@ -216,26 +216,24 @@ A **larger `scale_factor` ⇒ fewer steps per residue ⇒ a faster run**, while 
 `[min_steps_per_stage, max_steps_per_stage]` for tractability — a clamp on **MD steps
 only**; the sampled dwell **times in seconds** are recorded untouched in `dwell_times.dat`.
 
-### 6. PTC geometry (`optimize_ptc_geometry`)
+### 6. PTC geometry (always optimized)
 
-By default the A-site seed / stage-1-2 restraint target and the P-site / stage-3 target
-are the raw `AtR`/`PtR`-76 `R` anchor beads offset by `ptc_offset` (+x) — which leaves them
-~0.9 nm apart (the tRNA-bead separation in the structure), so each new residue's peptide
-bond starts badly **stretched**. Set **`optimize_ptc_geometry = yes`** and
-`optimal_ptc_targets` instead places the A/P targets **exactly one peptide bond apart**
-(cosmo's CG bond length — **0.380 nm** for `hps_kr`, *not* topo's 0.381 nm) and clear of
-the ribosome excluded volume, by minimizing the soft O'Brien tRNA-bond/angle/improper
-restraints + the 12-10-6 wall over a deterministic multistart. The new residue is then
-delivered with its peptide bond at equilibrium, which drops the stage-1 potential energy by
-~50× (from ~3700 to ~50 kJ/mol on α-synuclein). The C-terminus is still held by a
-**position restraint** to these points — not a bond to the tRNA beads.
+The A-site seed / stage-1-2 restraint target and the P-site / stage-3 target are placed
+by `optimal_ptc_targets` **exactly one peptide bond apart** (cosmo's CG bond length —
+**0.380 nm** for `hps_kr`, *not* topo's 0.381 nm) and clear of the ribosome excluded
+volume, by minimizing the soft O'Brien tRNA-bond/angle/improper restraints + the 12-10-6
+wall over a deterministic multistart. Each new residue is delivered with its peptide bond
+at equilibrium, which drops the stage-1 potential energy by ~50× versus seeding at the raw
+`AtR`/`PtR`-76 `R` anchor beads (which sit ~0.9 nm apart, badly stretching the bond). The
+C-terminus is held by a **position restraint** to these points — not a bond to the tRNA
+beads. This is always on; there is no knob.
 
 ```{note}
 cosmo uses **flexible harmonic bonds** throughout — there is no rigid-`AllBonds` +
 dt-halving stability path, because the soft HPS/mpipi potentials have no stiff native-Gō
-wells to diverge (this is where cosmo intentionally diverges from topo's `core.py`).
-`optimize_ptc_geometry` is therefore purely a *quality* improvement (equilibrium seeding),
-not a stability requirement.
+wells to diverge (this is where cosmo intentionally diverges from topo's `core.py`). The
+always-on PTC optimization is therefore purely a *quality* improvement (equilibrium
+seeding), not a stability requirement.
 ```
 
 ### 7. After the last residue: ejection (and dissociation)
@@ -303,13 +301,10 @@ dwell **times in seconds** are always written to `dwell_times.dat` regardless.
 | `nstout` | `50` | Trajectory/log output interval (steps). |
 | `device` | `CPU` | `GPU` / `CPU`. |
 | `ppn` | `1` | CPU threads (CPU platform). |
-| `constraints` | `None` | Bond constraints; CSP uses flexible bonds — leave `None`. |
+| `constraints` | `None` | Bond constraints; CSP uses flexible bonds (soft HPS/mpipi, no stiff Gō wells) — leave `None`. |
 | `restraint_k` | `83680` | C-terminus harmonic restraint constant, kJ/mol/nm². |
-| `buffer` | `0.4` | Legacy A-anchor seed offset (nm); unused when the ribosome path seeds at the hold point. |
 | `minimize` | `yes` | Energy-minimize the seeded structure before each stage's MD. |
 | `tunnel_wall` | `yes` | One-sided tunnel wall (floor below the synthesis point); plane auto-placed. |
-| `ptc_offset` | auto `0.476` | C-terminus offset into the tunnel from the P-anchor bead (clears the tRNA bead). |
-| `optimize_ptc_geometry` | `no` | Place the A/P targets one peptide bond (0.380 nm) apart and EV-clear, so the new residue's bond starts at equilibrium (§6). When on, `ptc_offset` is unused. |
 
 There is **no `rigid_ribosome` key** (supplying the `ribosome` PDB *is* the signal to load
 it as rigid scenery), output is **always nascent-only**, and `trna_tether` is **forced
@@ -378,7 +373,7 @@ run_continuous_synthesis(
 # (b) or construct parameters directly (the ribosome PDB is always rigid scenery;
 #     the tunnel-wall plane is auto-derived from it):
 from cosmo.csp.core import RunParams
-params = RunParams(model="hps_kr", optimize_ptc_geometry=True,
+params = RunParams(model="hps_kr",
                    scale_factor=4331293.0, random_seed=1, ejection_steps=50000)
 run_continuous_synthesis("asyn.pdb", "ribosome_trunc.pdb",
                          L0=5, L_max=10, mrna="mrna.txt", params=params)
