@@ -9,7 +9,8 @@ ribosome excluded volume, and the analytic tunnel keeps the in-tunnel segment ex
 the chain threads out the exit.
 
 - **CLI:** `cosmo-cylinder -f cylinder.ini` (or `python -m cosmo.csp.cylinder -f cylinder.ini`)
-- **Proof of concept:** `sandbox/validate/cylinder.ini` (α-synuclein, L = 5 → 10).
+- **Worked example:** `tutorials/07_csp_cylinder/` (α-synuclein); a larger production
+  configuration lives in `sandbox/validate/cylinder.ini`.
 - **Module:** `cosmo.csp.cylinder` — a parallel of the explicit-bead `cosmo.csp.protocol`.
   It **reuses** the shared engine `cosmo.csp.core` (length model, seed / restrain / output
   path) and the timing core `cosmo.csp.kinetics`, adding only the one analytic tunnel force
@@ -36,7 +37,7 @@ purely steric, no electrostatics, no bead clashes.
 ## Quick start
 
 ```bash
-cd sandbox/validate
+cd tutorials/07_csp_cylinder
 cosmo-cylinder -f cylinder.ini         # -> synth_out_cyl/
 
 cosmo-csp-movie -o synth_out_cyl       # stitch per-length trajectories into a movie
@@ -166,9 +167,10 @@ device = CPU ; ppn = 1 ; outdir = synth_out_cyl
 ### Shared kinetics & MD keys
 
 These behave exactly as on the {doc}`synthesis_control` page (inherited from the shared
-`RunParams`): `model` (default `hps_kr`), `scale_factor`, `codon_times`, `random_seed`,
-`max_steps_per_stage` / `min_steps_per_stage` (testing-only), `constraints` (`None`
-flexible default, or `AllBonds` for rigid bonds), `restraint_k`, `minimize`,
+`RunParams`): `model` (default `hps_kr`; any IDP model works), `scale_factor`,
+`codon_times`, `random_seed`, `ribosome_traffic` / `initiation_rate` (traffic
+correction), `max_steps_per_stage` / `min_steps_per_stage` (testing-only), `constraints`
+(`None` flexible default, or `AllBonds` for rigid bonds), `restraint_k`, `minimize`,
 `dt` / `ref_t` / `tau_t` / `nstout`,
 `device` / `ppn`.
 

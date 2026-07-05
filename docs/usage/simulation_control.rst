@@ -38,6 +38,9 @@ Example ``md.ini``:
         log_width = 14       ; min column width for aligned, fixed-width .log
         ; force-field model: hps_urry, hps_kr, hps_ss, or mpipi
         model = hps_urry
+        ; bond treatment: None (flexible harmonic bonds, default) or AllBonds (rigid)
+        ; constraints = AllBonds
+        ; constraint_tolerance = 1e-5   ; only used with constraints = AllBonds
 
         ; temperature coupling
         tcoupl = yes
@@ -219,6 +222,16 @@ description).
      - no
      - ``yes``
      - Energy-minimize the input structure before dynamics. Forced ``no`` when ``restart = yes``.
+   * - ``constraints``
+     - str
+     - no
+     - ``None``
+     - Bond treatment: ``None`` (flexible harmonic bonds, the default) or ``AllBonds`` (rigid distance constraints, so a larger ``dt`` can be used). See the note below.
+   * - ``constraint_tolerance``
+     - float
+     - no
+     - ``1e-5``
+     - Integrator relative constraint tolerance. Only meaningful when ``constraints = AllBonds``; harmless otherwise.
 
 .. note::
 
@@ -261,8 +274,22 @@ Force-field model (``model``)
     scale), ``hps_kr`` (Kapcha–Rossky scale; broad residue coverage including RNA
     and phosphorylated residues, but less accurate), ``hps_ss`` (``hps_urry`` plus
     bonded angle and torsion terms), or ``mpipi`` (Wang–Frenkel non-bonded
-    potential). All models use flexible harmonic bonds. See
+    potential). All models use flexible harmonic bonds by default (see the
+    ``constraints`` option to switch to rigid constraints). See
     :doc:`../tutorials/02_models`.
+
+Bond treatment (``constraints`` / ``constraint_tolerance``)
+    By default (``constraints`` unset or ``None``) the CA/P chain bonds are
+    **flexible harmonic springs** — the physically appropriate choice for disordered
+    chains. Setting ``constraints = AllBonds`` instead makes every bond a **rigid
+    distance constraint** pinned at its equilibrium length: the harmonic bond force is
+    not created, the fast bond-stretch mode is removed, and a larger ``dt`` can be
+    used. Constraints act **only** on the pseudo-bonds — the non-bonded potentials
+    (Ashbaugh–Hatch / Wang–Frenkel and Debye–Hückel electrostatics) are untouched.
+    ``constraint_tolerance`` (default ``1e-5``) sets the integrator's relative
+    constraint tolerance and is read only in the ``AllBonds`` case. Unlike the sibling
+    ``topo`` package (a Gō model that defaults to ``AllBonds``), cosmo defaults to
+    flexible bonds — a deliberate IDP-physics choice.
 
 Temperature / pressure coupling
     ``ref_t`` and ``tau_t`` are only consumed when ``tcoupl = yes`` (and are then

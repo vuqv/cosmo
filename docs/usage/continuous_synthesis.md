@@ -12,8 +12,10 @@ kinetics with the explicit ribosome replaced by a cylindrical bore — see
 
 - **CLI:** `cosmo-csp -f csp.ini` (or `python -m cosmo.csp -f csp.ini`)
 - **Movie tool:** `cosmo-csp-movie -o <out_root> [--ribosome ribo.pdb]`
-- **Proof of concept:** `sandbox/validate/` — a smoke run (`csp.ini`, L = 5 → 8) on
-  α-synuclein plus the cylinder variant.
+- **Worked example:** `tutorials/08_csp_cg_ribosome/` — a tutorial-scaled run on
+  α-synuclein grown on the real *E. coli* 4V9D CG ribosome (the analytic-tunnel
+  variant is `tutorials/07_csp_cylinder/`). A larger production configuration lives
+  in `sandbox/validate/` and `sandbox/Ecoli/`.
 - **Architecture:** CSP is a thin outer loop. The per-length MD work — building the
   length-`L` model, seeding coordinates, restraints, running one stage — lives in the
   shared low-level engine `cosmo.csp.core` (`run_length`, `RunParams`); the
@@ -37,11 +39,11 @@ All paths in the INI are relative to the working directory; run from the example
 A GPU is recommended for production (the explicit-ribosome system has ~4,600 rigid beads).
 
 ```bash
-cd sandbox/validate
+cd tutorials/08_csp_cg_ribosome
 cosmo-csp -f csp.ini              # 3-stage synthesis -> synth_out_csp/
 
 # stitch the per-stage trajectories into one VMD movie
-cosmo-csp-movie -o synth_out_csp --ribosome ribosome_trunc.pdb
+cosmo-csp-movie -o synth_out_csp --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
 vmd -e synth_out_csp/movie.tcl
 ```
 
@@ -130,11 +132,13 @@ U = ε·[13(R/r)¹² − 18(R/r)¹⁰ + 4(R/r)⁶] ,   R = Rmin/2ᵢ + Rmin/2ⱼ
 ε = 0.000132 kcal/mol ,   cutoff 2.0 nm / switch 1.8 nm ,   {nascent}×{ribosome} only
 ```
 
-The per-bead `Rmin/2` (O'Brien's structure-based CG collision radii) live in
-`cosmo.parameters.model_parameters` under the **`hps_kr`** model — per-amino-acid values
-plus the rRNA `P`/`R`/`BR` beads. This is why **`hps_kr` is the default CSP force field**:
-it carries both the `Rmin/2` table for the ribosome wall *and* the Ashbaugh–Hatch
-potential for the **nascent IDP↔IDP** interaction. Electrostatics fold into the existing
+The per-bead `Rmin/2` (O'Brien's structure-based CG collision radii) are
+**model-independent** steric radii: they live in the standalone `OBRIEN_RMIN_2_NM`
+(per-amino-acid) and `OBRIEN_RNA_RMIN_2_BEADS` (rRNA `P`/`R`/`BR`) tables in
+`cosmo.parameters.model_parameters`, **decoupled from any force field**. So the ribosome
+wall is identical for **every** nascent model — CSP runs on `hps_kr`, `hps_urry` or
+`mpipi` alike (`hps_kr` is merely the default); the selected model only sets the
+**nascent IDP↔IDP** interaction (Ashbaugh–Hatch or Wang–Frenkel). Electrostatics fold into the existing
 **Yukawa** force, extended over the ribosome charges (rRNA phosphate −1e, charged
 residues) on `{nascent}×{nascent}` + `{nascent}×{ribosome}` (no intra-ribosome
 electrostatics; the rigid ribosome's own interactions are constant and never computed).
@@ -269,7 +273,7 @@ For a compact tabular reference of every `csp.ini` option, see {doc}`synthesis_c
 |-----|----------|---------|---------|
 | `pdb_file` | **yes** | — | All-atom / CA native PDB of the target protein; the CG model is built from its first `L` residues. |
 | `ribosome` | **yes** | — | Truncated CG ribosome PDB (P-/A-anchors + rigid scenery). |
-| `model` | no | `hps_kr` | Nascent force field. **`hps_kr`** carries the `Rmin/2` table for the ribosome 12-10-6 wall; other models fall back to `hps_kr` for those radii only. |
+| `model` | no | `hps_kr` | Nascent force field. **Any model works** (`hps_kr` / `hps_urry` / `mpipi`); `hps_kr` is only the default. The ribosome 12-10-6 wall uses the model-independent O'Brien `Rmin/2` tables (`OBRIEN_RMIN_2_NM` / `OBRIEN_RNA_RMIN_2_BEADS`), so the model only sets the nascent IDP↔IDP interaction. |
 | `L0` | no | `1` | Start nascent-chain length. |
 | `L_max` | no | full length | Final nascent length. |
 | `mrna` | cond. | — | mRNA file (one codon per residue). Required for per-codon timing (unless `codon_times` is a number). |
@@ -287,6 +291,8 @@ topo's Gō-model inputs and do not apply to cosmo's sequence-based chain.
 | `time_stage_1` | `0.00034` | Mean peptidyl-transfer dwell, **seconds**. |
 | `time_stage_2` | `0.004201` | Mean translocation dwell, **seconds**. |
 | `random_seed` | — | Seed for the FPT sampler. |
+| `ribosome_traffic` | `no` | Apply the ribosome-traffic (polysome) dwell-time correction on top of the per-codon kinetics; off = single-ribosome timing. |
+| `initiation_rate` | `0.083333` | Translation initiation rate (1/s); used **only** when `ribosome_traffic = yes`. |
 | `max_steps_per_stage` | — (uncapped) | **Testing only** — upper clamp on each stage's step count. |
 | `min_steps_per_stage` | `1` | **Testing only** — lower clamp. |
 | `ejection_steps` | `0` | Post-synthesis ejection phase (steps); `0` = skip. |
@@ -358,7 +364,7 @@ synthesis order, padding every frame to the final length and overlaying the stat
 ribosome — into one VMD-playable movie (auto-detects the 3-stage vs flat layout):
 
 ```bash
-cosmo-csp-movie -o <outdir> --ribosome ribosome_trunc.pdb
+cosmo-csp-movie -o <outdir> --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
 vmd -e <outdir>/movie.tcl
 ```
 
@@ -381,9 +387,9 @@ run_continuous_synthesis(
 # (b) or construct parameters directly (the ribosome PDB is always rigid scenery;
 #     the tunnel-wall plane is auto-derived from it):
 from cosmo.csp.core import RunParams
-params = RunParams(model="hps_kr",
+params = RunParams(model="hps_urry",   # any IDP model works; hps_kr is the default
                    scale_factor=4331293.0, random_seed=1, ejection_steps=50000)
-run_continuous_synthesis("asyn.pdb", "ribosome_trunc.pdb",
+run_continuous_synthesis("asyn.pdb", "4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb",
                          L0=5, L_max=10, mrna="mrna.txt", params=params)
 ```
 

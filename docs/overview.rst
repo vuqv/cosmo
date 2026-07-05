@@ -55,9 +55,9 @@ field). Two runners differ in how the ribosome exit tunnel is represented:
   infinite wall (no explicit ribosome beads); fast, never jams, one MD segment per
   residue.
 * **``cosmo-csp``** — the ribosome-based counterpart: grow the chain through an
-  explicit truncated CG ribosome (``ribosome_trunc.pdb``, see
-  :doc:`usage/ribosome_preparation`) with the O'Brien 12-10-6 excluded volume, in three
-  codon-timed sub-stages per residue, then eject the completed chain.
+  explicit truncated CG ribosome PDB (see :doc:`usage/ribosome_preparation`) with the
+  O'Brien 12-10-6 excluded volume, in three codon-timed sub-stages per residue, then
+  eject the completed chain.
 
 **Which to use.** Reach for the **cylinder** for fast exploration of how tunnel geometry
 + codon kinetics shape a disordered chain as it extrudes, or when you have no ribosome
@@ -74,8 +74,12 @@ translocation-coupled forces matter to your question.
    without accounting for those missing terms.
 
 Runnable proof-of-concept examples (α-synuclein) live in ``sandbox/validate/``
-(``csp.ini`` and ``cylinder.ini``); see also ``tutorials/07_csp_cylinder/`` and
-``tutorials/08_csp_cg_ribosome/``.
+(``csp.ini`` and ``cylinder.ini``).
+
+.. rubric:: Tutorials
+
+* :doc:`7 · Continuous synthesis — analytic tunnel (cosmo-cylinder) <tutorials/07_csp_cylinder>`
+* :doc:`8 · Continuous synthesis — coarse-grained E. coli ribosome (cosmo-csp) <tutorials/08_csp_cg_ribosome>`
 
 .. rubric:: Reference
 

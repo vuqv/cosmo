@@ -141,6 +141,33 @@ The spring constant and equilibrium length are model-dependent:
 Nucleic-acid (``P``–``P``) bonds use the nucleic equilibrium length of 0.5 nm;
 protein (``CA``–``CA``) bonds use the protein value.
 
+Rigid vs. flexible bonds (``constraints``)
+------------------------------------------
+
+By default the chain bonds are the **flexible harmonic springs** above — the
+physically appropriate choice for intrinsically disordered chains, where backbone
+flexibility matters. Passing ``constraints='AllBonds'`` to
+:func:`~cosmo.core.models.buildCoarseGrainModel` instead makes every ``CA``/``P``
+bond a **rigid distance constraint** pinned at its equilibrium length: the harmonic
+bond force is not created, the fast bond-stretch vibrational mode is removed, and the
+integrator can take a larger timestep. The two are mutually exclusive — a bond is
+never both constrained and harmonic.
+
+.. code-block:: python
+
+    # flexible harmonic bonds (default)
+    model = cosmo.models.buildCoarseGrainModel(structure_file, model='hps_urry')
+    # rigid AllBonds constraints (larger-timestep path)
+    model = cosmo.models.buildCoarseGrainModel(structure_file, model='hps_urry',
+                                               constraints='AllBonds')
+
+Constraints act **only** on the pseudo-bonds; the non-bonded potentials
+(Ashbaugh–Hatch / Wang–Frenkel and the Debye–Hückel electrostatics) are unaffected.
+From ``md.ini`` the option is the ``constraints`` key (``None`` / ``AllBonds``), with
+``constraint_tolerance`` (default ``1e-5``) setting the integrator's relative
+constraint tolerance. Unlike the sibling ``topo`` package (a Gō model that defaults
+to ``AllBonds``), cosmo defaults to flexible bonds — a deliberate IDP-physics choice.
+
 Angle Potential
 +++++++++++++++
 

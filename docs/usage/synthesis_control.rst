@@ -31,7 +31,7 @@ The runner lives in the package as :mod:`cosmo.csp`. Once cosmo is installed
     python -m cosmo.csp -f csp.ini    # module form
 
     # stitch the per-stage trajectories into one VMD movie afterwards
-    cosmo-csp-movie -o synth_out --ribosome ribosome_trunc.pdb
+    cosmo-csp-movie -o synth_out --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
 
 A GPU is recommended: the truncated ribosome adds several thousand rigid beads.
 
@@ -42,8 +42,8 @@ Example ``csp.ini``:
         [OPTIONS]
         ; --- inputs (pdb_file, ribosome are required) ---
         pdb_file = asyn.pdb              ; full native PDB; the CG model is built from it
-        ribosome = ribosome_trunc.pdb    ; truncated CG ribosome (P-/A-anchors + rigid scenery)
-        model    = hps_kr                ; nascent IDP force field (carries the Rmin/2 wall table)
+        ribosome = 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb   ; truncated CG ribosome (P-/A-anchors + rigid scenery)
+        model    = hps_urry              ; nascent IDP force field (any model works; hps_kr is the default)
 
         ; --- length schedule ---
         L0    = 5            ; first nascent length (default 1)
@@ -69,8 +69,9 @@ Example ``csp.ini``:
         nstout = 20          ; trajectory/log output interval (steps)
 
         ; --- ribosome / PTC mechanics ---
-        ; PTC geometry is always optimized (A/P targets one peptide bond, 0.380 nm,
-        ; apart and EV-clear) -- no knob. Bonds default to flexible (constraints = None;
+        ; PTC geometry is always optimized (A/P targets one peptide bond, ~0.38 nm,
+        ; the selected model's bond length, apart and EV-clear) -- no knob. Bonds default
+        ; to flexible (constraints = None;
         ; set constraints = AllBonds for rigid bonds).
         restraint_k = 83680  ; C-terminus harmonic restraint (kJ/mol/nm^2)
         minimize    = yes    ; energy-minimize each seeded structure before its MD
@@ -119,7 +120,7 @@ Inputs & length schedule
      - str
      - no
      - ``hps_kr``
-     - Nascent IDP force field. ``hps_kr`` carries the O'Brien ``Rmin/2`` table for the ribosome↔nascent 12-10-6 excluded volume *and* the Ashbaugh–Hatch potential for the nascent chain; other models fall back to ``hps_kr`` for the wall radii only.
+     - Nascent IDP force field. **Any model works** (``hps_kr`` / ``hps_urry`` / ``mpipi``); ``hps_kr`` is merely the default. The ribosome↔nascent 12-10-6 excluded volume uses the **model-independent** O'Brien ``Rmin/2`` collision radii (standalone ``OBRIEN_RMIN_2_NM`` / ``OBRIEN_RNA_RMIN_2_BEADS`` tables in ``cosmo.parameters.model_parameters``), decoupled from the force field; the nascent IDP↔IDP interaction is whatever the selected model provides (Ashbaugh–Hatch or Wang–Frenkel).
    * - ``mrna``
      - str
      - for per-codon timing
@@ -185,6 +186,16 @@ Kinetics & schedule length
      - no
      - ``—`` (nondet.)
      - Seed for the first-passage-time sampler (reproducible dwell schedule).
+   * - ``ribosome_traffic``
+     - bool
+     - no
+     - ``no``
+     - Apply the ribosome-traffic (polysome) dwell-time correction, if available, on top of the per-codon kinetics. Off by default (single-ribosome timing).
+   * - ``initiation_rate``
+     - float
+     - no
+     - ``0.083333``
+     - Translation initiation rate (1/s). Consumed **only** when ``ribosome_traffic = yes``.
    * - ``max_steps_per_stage``
      - int
      - no
@@ -299,8 +310,10 @@ Ribosome ↔ nascent excluded volume
     The rigid ribosome interacts with the chain via the O'Brien **12-10-6**
     excluded volume (sum combining rule ``R = Rmin/2ᵢ + Rmin/2ⱼ``, ``ε = 0.000132``
     kcal/mol) plus Debye–Hückel (Yukawa) electrostatics. The per-bead ``Rmin/2``
-    values are inherited from topo and live on the ``hps_kr`` model (per-AA + the
-    rRNA ``P``/``R``/``BR`` beads) — hence ``hps_kr`` is the default force field.
+    values are inherited from topo and are **model-independent** steric radii: they
+    live in the standalone ``OBRIEN_RMIN_2_NM`` (per-AA) and ``OBRIEN_RNA_RMIN_2_BEADS``
+    (rRNA ``P``/``R``/``BR``) tables in ``cosmo.parameters.model_parameters``, decoupled
+    from any force field, so the excluded volume is identical for every nascent model.
 
 Post-synthesis phases (``ejection_steps`` / ``dissociation_steps``)
     After the last residue, ``ejection_steps > 0`` runs a phase with the C-terminus

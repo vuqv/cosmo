@@ -474,9 +474,11 @@ class RunParams:
     per-length helper simply ignores the kinetic fields.
     """
     # --- MD / integrator ---
-    # Nascent-chain force field. Default hps_kr: it carries the O'Brien Rmin/2 table used
-    # by the ribosome<->nascent 12-10-6 excluded volume (cosmo.csp.ribosome), while the
-    # nascent IDP<->IDP interaction is its Ashbaugh-Hatch potential.
+    # Nascent-chain force field. Any IDP model works (hps_kr / hps_urry / mpipi): the
+    # ribosome<->nascent 12-10-6 excluded volume uses the model-independent O'Brien
+    # Rmin/2 collision-radius tables (OBRIEN_RMIN_2_NM / OBRIEN_RNA_RMIN_2_BEADS in
+    # model_parameters), decoupled from the force field, while the nascent IDP<->IDP
+    # interaction is whatever the selected model provides. hps_kr is just the default.
     model: str = "hps_kr"
     n_steps: int = 1000                # fallback per-segment steps (kinetics override it)
     dt_ps: float = 0.01

@@ -11,4 +11,6 @@
 04_restart_and_outputs
 05_slab_llps
 06_protein_rna_complex
+07_csp_cylinder
+08_csp_cg_ribosome
 ```
