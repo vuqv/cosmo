@@ -21,9 +21,20 @@ What it provides:
 Because cosmo's force field is sequence-based there is **no STRIDE, no native contact
 map and no build-once-subset machinery** (see ``cosmo/translation/PLAN.md`` §2): a
 length-``L`` model is simply :func:`cosmo.models.buildCoarseGrainModel` on the **first
-``L`` residues** of the nascent PDB. (topo's ``core.py`` also carries a per-stage
-dt-halving stability guard against stiff Gō-contact divergence; cosmo's soft HPS
-potentials have no such stiff wells, so that guard is intentionally omitted here.)
+``L`` residues** of the nascent PDB.
+
+Like topo, :func:`run_length` wraps each stage in a **per-stage dt-halving stability
+guard** (:data:`STABILITY_POTE_LIMIT_KJ` / :data:`STABILITY_MAX_ATTEMPTS`). The
+divergence it guards is **non-native excluded volume**, not a native-contact well: the
+new residue is seeded at the *fixed* A-site target, and a recently-added residue that has
+not yet cleared that region can sit inside the stiff repulsive core of the
+ribosome<->nascent 12-10-6 EV or the nascent Ashbaugh-Hatch potential. That stiff EV mode
+is unstable at the configured dt, the stage diverges (PotE -> ~1e13 kJ/mol), and -- with
+no guard -- the chain explodes and never recovers (observed: sandbox/Yeast asyn, L47
+stage 1, new bead 0.22 nm from residue 45). Both the 12-10-6 EV and the AH core are
+present in cosmo *and* topo, so this guard is genuinely shared architecture, not
+structure-based (Gō) physics. It re-runs a diverging stage at ``dt/2`` with ``2x`` steps
+(dwell ``= n_steps * dt`` preserved exactly), which stabilises the integration.
 
 **Units:** OpenMM defaults throughout -- length nm, time ps, energy kJ/mol,
 temperature K, force constants kJ/mol/nm^2. In-vivo dwell times (kinetics) are seconds.
@@ -31,6 +42,7 @@ temperature K, force constants kJ/mol/nm^2. In-vivo dwell times (kinetics) are s
 from __future__ import annotations
 
 import contextlib
+import math
 import os
 import time
 from dataclasses import dataclass
@@ -48,7 +60,7 @@ from cosmo.parameters import model_parameters
 from cosmo.utils import runinfo
 from cosmo.csp.ribosome import (Ribosome, append_ribosome, add_trna_tether,
                                 add_tunnel_wall, TRNA_TETHER_BOND_NM,
-                                TUNNEL_WALL_X0_NM, TUNNEL_WALL_K, RIBO_NC_EPS_KJ)
+                                TUNNEL_WALL_K, RIBO_NC_EPS_KJ)
 
 # --- physical constants / conversions -------------------------------------
 # Tunnel / exit axis: the working ribosome is X-aligned (PLAN.md §5), so the chain
@@ -62,6 +74,25 @@ RESTRAINT_K_KJ = 83680.0
 # gradient would be singular (-> NaN on the first minimization step); the beads are
 # offset by +/- this amount perpendicular to the tunnel axis to break collinearity.
 COLD_START_ZIGZAG_NM = 0.03
+
+# --- per-stage stability guard --------------------------------------------
+# The seeded structure is integrated at the configured timestep with flexible (un-
+# constrained) bonds. For a few configurations the dynamics diverge (potential energy
+# -> ~1e13 kJ/mol) and corrupt that stage's frames. The stiff mode responsible is
+# **non-native excluded volume**: the new residue is seeded at the fixed A-site target,
+# and a recently-added residue that has not cleared that region can land inside the
+# repulsive core of the ribosome<->nascent 12-10-6 EV or the nascent Ashbaugh-Hatch
+# potential (observed: sandbox/Yeast asyn L47, new bead 0.22 nm from residue 45). Both
+# potentials exist in cosmo and topo, so this is shared architecture (mirrors
+# topo.csp.core). Rather than rigid AllBonds constraints (topo's Go path; cosmo keeps
+# flexible IDP bonds), a diverging stage is detected and re-run with a halved timestep
+# and proportionally more steps -- which preserves the physical in-vivo dwell time
+# (dwell = n_steps * dt) exactly while stabilising the integration. Up to
+# STABILITY_MAX_ATTEMPTS halvings are tried (dt -> dt/2^k). A finite, physically sane CG
+# stage has |PotE| of order 1e1-1e4 kJ/mol, so the 1e9 limit cleanly separates
+# "diverged" from "fine" with margin.
+STABILITY_POTE_LIMIT_KJ = 1.0e9
+STABILITY_MAX_ATTEMPTS = 6
 
 # --- PTC-geometry optimization (always on) ---------------------------------
 # O'Brien tRNA resting bond lengths (nm; 4.27 / 4.76 A) and orienting-angle stiffness.
@@ -453,12 +484,14 @@ class RunParams:
     nstout: int = 50
     device: str = "CPU"
     ppn: int = 1
-    # Flexible (harmonic) bonds by default (None) -- NOT rigid 'AllBonds'. cosmo's soft
-    # HPS/mpipi potentials have no stiff native-Go wells, so there is no rigid-constraint
-    # stability path (unlike topo's Go model); flexible bonds are the deliberate choice
-    # for this IDP/condensate force field. The always-on PTC optimization still seeds each
-    # new residue one peptide bond from the previous C-terminus, so the peptide bond starts
-    # at equilibrium -- a quality improvement, not a constraint requirement.
+    # Bond treatment (forwarded to buildCoarseGrainModel). Default None = flexible
+    # (harmonic) bonds -- the physically appropriate choice for this IDP/condensate force
+    # field, where backbone flexibility matters (cosmo defaults to flexible where topo's
+    # Go model defaults to 'AllBonds'). Set 'AllBonds' for rigid bonds (larger-timestep
+    # path); constraints act only on the CA/P pseudo-bonds, so the stiff non-native EV is
+    # unaffected -- the per-stage dt-halving guard, not AllBonds, is what prevents EV
+    # blow-ups. The always-on PTC optimization still seeds each new residue one peptide
+    # bond from the previous C-terminus, so the bond starts at equilibrium either way.
     constraints: object = None
     restraint_k: float = RESTRAINT_K_KJ   # kJ/mol/nm^2 (= 200 kcal/mol/A^2)
     minimize: bool = True
@@ -468,8 +501,7 @@ class RunParams:
     # Rmin/2 from model_parameters) -- no soft-wall knobs.
     trna_tether: bool = True           # O'Brien tRNA tether vs. plain position restraint
     tunnel_wall: bool = True           # one-sided planar wall x >= x0 (forward extrusion)
-    tunnel_wall_x0_nm: Optional[float] = None  # None -> auto-derived from the structure
-    tunnel_wall_k: float = TUNNEL_WALL_K
+    tunnel_wall_k: float = TUNNEL_WALL_K  # x0 is always auto-derived per-structure (protocol)
 
     # ------------------------------------------------------------------
     # O'Brien continuous-synthesis kinetics (used only by the high-level runners).
@@ -531,7 +563,7 @@ def run_length(L: int, *, full_pdb: str,
                prev_final: Optional[np.ndarray], out_root: Path,
                params: RunParams,
                ribo: Optional[Ribosome] = None,
-               wall_x0_nm: float = TUNNEL_WALL_X0_NM,
+               wall_x0_nm: float,
                cterm_seed: Optional[np.ndarray] = None,
                seed_override: Optional[np.ndarray] = None,
                restrain: bool = True, out_subdir: Optional[str] = None,
@@ -592,7 +624,8 @@ def run_length(L: int, *, full_pdb: str,
     #    (the seeded coordinates are, and they are minimized explicitly).
     with _quiet():
         cgModel = models.buildCoarseGrainModel(sub_pdb, model=params.model,
-                                               minimize=False, check_forces=False)
+                                               minimize=False, check_forces=False,
+                                               constraints=params.constraints)
     _vprint(f"[ build ] {sub_pdb}")
     _vprint(f"  chains={cgModel.n_chains}  CA atoms={cgModel.n_atoms}  "
             f"bonds={cgModel.n_bonds}  model={params.model}"
@@ -675,22 +708,91 @@ def run_length(L: int, *, full_pdb: str,
 
     do_minimize = params.minimize if minimize_override is None else bool(minimize_override)
 
+    # 5b. Stability-guarded stage run (mirrors topo.csp.core). The common case runs once
+    #     at the configured dt; a diverging stage -- a non-native EV blow-up, see the
+    #     module docstring / STABILITY_* constants -- is re-run at dt/2 with 2x steps
+    #     (identical dwell = n_steps * dt) until it integrates cleanly. Divergence is
+    #     judged from the **maximum** |PotE| over the stage (a mid-run blow-up can cool
+    #     back below the limit by the final frame yet still have ruined those frames), and
+    #     the chunked stepping aborts a diverging stage early. Each retry's fresh
+    #     setup_simulation + attach_reporters truncates the per-stage output, so a
+    #     successful attempt cleanly overwrites the aborted one. The `[stability]` notices
+    #     print outside _quiet() so a divergence/retry is visible in the run log.
+    base_dt = cfg.dt
+    base_steps = cfg.md_steps
+    ctx = None
+    max_pe = float("nan")
     start = time.time()
-    with _quiet():
-        ctx = engine.setup_simulation(cfg, cgModel, control_file=None,
-                                      shift_positions=False)
+    for attempt in range(STABILITY_MAX_ATTEMPTS):
+        cfg.dt = base_dt / (2 ** attempt)
+        cfg.md_steps = base_steps * (2 ** attempt)
+        if attempt > 0:
+            print(f"[stability] stage diverged (max|PotE| = {max_pe:.3g} kJ/mol > "
+                  f"{STABILITY_POTE_LIMIT_KJ:g}); re-running with dt = "
+                  f"{cfg.dt.value_in_unit(unit.picoseconds):g} ps x {cfg.md_steps} "
+                  f"steps (identical dwell time; attempt {attempt + 1}/"
+                  f"{STABILITY_MAX_ATTEMPTS}).")
+        with _quiet():
+            ctx = engine.setup_simulation(cfg, cgModel, control_file=None,
+                                          shift_positions=False)
+        diverged = False
+        max_pe = 0.0
         if do_minimize:
-            ctx.simulation.minimizeEnergy()
-            ctx.simulation.context.setVelocitiesToTemperature(cfg.ref_t)
-        engine.attach_reporters(cfg, ctx.simulation, total_steps=cfg.md_steps)
-        if nascent_only:
-            # Swap the full-system DCD reporter for a nascent-only one (the rigid
-            # ribosome is static -- no need to write its beads every frame).
-            ctx.simulation.reporters[1] = NascentDCDReporter(
-                cfg.output_path(".dcd"), cfg.nstxout, nascent_topology, L)
-        ctx.simulation.step(cfg.md_steps)
-        final_pe = ctx.simulation.context.getState(getEnergy=True).getPotentialEnergy(
-            ).value_in_unit(unit.kilojoule_per_mole)
+            try:
+                with _quiet():
+                    ctx.simulation.minimizeEnergy()
+                    ctx.simulation.context.setVelocitiesToTemperature(cfg.ref_t)
+            except Exception as exc:
+                # A NaN during minimization (e.g. a bead seeded inside the stiff
+                # ribosome 12-10-6 wall) -> treat as divergence and retry with a halved
+                # timestep (same seed; smaller dt lets the wall push it out cleanly).
+                print(f"[stability] minimization failed ({type(exc).__name__}: "
+                      f"{str(exc).splitlines()[0][:80]}); treating as divergence.")
+                diverged = True
+
+        if not diverged:
+            with _quiet():
+                engine.attach_reporters(cfg, ctx.simulation, total_steps=cfg.md_steps)
+                if nascent_only:
+                    # Swap the full-system DCD reporter for a nascent-only one (the rigid
+                    # ribosome is static -- no need to write its beads every frame).
+                    ctx.simulation.reporters[1] = NascentDCDReporter(
+                        cfg.output_path(".dcd"), cfg.nstxout, nascent_topology, L)
+            # Step in chunks so a divergence is caught (and the stage aborted) mid-run.
+            chunk = max(cfg.nstxout, cfg.md_steps // 20, 1)
+            done = 0
+            while done < cfg.md_steps:
+                n = min(chunk, cfg.md_steps - done)
+                try:
+                    ctx.simulation.step(n)
+                except Exception as exc:
+                    # OpenMM raises "Particle coordinate is NaN" when a stage blows up
+                    # outright; catch it so the guard can retry instead of aborting the run.
+                    print(f"[stability] integration blew up ({type(exc).__name__}: "
+                          f"{str(exc).splitlines()[0][:80]}).")
+                    diverged = True
+                    break
+                done += n
+                pe = abs(ctx.simulation.context.getState(getEnergy=True)
+                         .getPotentialEnergy().value_in_unit(unit.kilojoule_per_mole))
+                max_pe = max(max_pe, pe)
+                if not math.isfinite(pe) or pe > STABILITY_POTE_LIMIT_KJ:
+                    diverged = True
+                    break
+        if not diverged:
+            break
+    else:
+        print(f"[stability][warning] stage '{out_subdir or ('L_%03d' % L)}' still "
+              f"diverges after {STABILITY_MAX_ATTEMPTS} attempts (max|PotE| = "
+              f"{max_pe:.3g} kJ/mol). Continuing, but this stage's frames are suspect.")
+    # Restore the configured values (per-call cfg, but keep it tidy for the summary
+    # line + finalize; report the physical base step count, not a retry's inflated one).
+    cfg.dt = base_dt
+    cfg.md_steps = base_steps
+
+    final_pe = ctx.simulation.context.getState(getEnergy=True).getPotentialEnergy(
+        ).value_in_unit(unit.kilojoule_per_mole)
+    with _quiet():
         if nascent_only:
             _finalize_nascent(cfg, ctx, nascent_topology, L, start)
         else:

@@ -32,11 +32,13 @@ nascent chain uses flexible bonds and the ribosome has none, so no constraint ev
 involves a mass-0 particle.
 
 **Rmin/2 (collision-radius) source.** The per-bead ``Rmin_2`` values are inherited
-verbatim from topo (O'Brien's structure-based CG collision radii) and now live in
-:mod:`cosmo.parameters.model_parameters` under the **hps_kr** model (per-AA + the rRNA
-``P``/``R``/``BR`` beads). This module reads them exactly as topo does -- so the
+verbatim from topo (O'Brien's structure-based CG collision radii). They are steric
+collision radii -- force-field-independent -- so they live in
+:mod:`cosmo.parameters.model_parameters` as standalone tables (``OBRIEN_RMIN_2_NM`` per-AA
++ ``OBRIEN_RNA_RMIN_2_BEADS`` for the rRNA ``P``/``R``/``BR`` beads), *not* attached to
+any IDP model. This module reads them for **every** nascent force field alike -- so the
 ribosome<->nascent 12-10-6 excluded volume is identical to topo's, while the nascent
-IDP<->IDP interaction stays the hps_kr Ashbaugh-Hatch potential.
+IDP<->IDP interaction stays whatever model the run selects (hps_kr / hps_urry / mpipi).
 """
 from __future__ import annotations
 
@@ -49,7 +51,9 @@ import openmm as mm
 from openmm import unit
 from openmm.app.element import carbon as _CARBON
 
-from cosmo.parameters.model_parameters import parameters as MODEL_PARAMS
+from cosmo.parameters.model_parameters import (parameters as MODEL_PARAMS,
+                                                OBRIEN_RMIN_2_NM,
+                                                OBRIEN_RNA_RMIN_2_BEADS)
 
 # Ribosome-NC excluded-volume well depth: 0.000132 kcal/mol -> kJ/mol (O'Brien).
 RIBO_NC_EPS_KJ = 0.000132 * 4.184
@@ -82,22 +86,17 @@ _NC_126_ENERGY = ("eps*(13*(R/r)^12 - 18*(R/r)^10 + 4*(R/r)^6); R = rm1 + rm2")
 
 # Planar tunnel wall (O'Brien): a one-sided restraint keeping the nascent chain at
 # x >= x0, so it can only extrude forward (+x). x0 is the C-terminal-AA addition plane
-# (PTC / P-site) ~ P-anchor x + tether bond length; the runner sets it from the anchors.
-TUNNEL_WALL_X0_NM = 1.05
+# (PTC / P-site); it is always derived per-structure from the anchors by the runner
+# (the lower A/P C-terminus hold plane, see cosmo.csp.protocol) and passed in
+# explicitly, so there is no module-level default for it -- only the
+# structure-independent wall stiffness k has one.
 TUNNEL_WALL_K = 8368.0                  # kJ/mol/nm^2 (= 20 kcal/mol/A^2)
 
-# The model carrying the O'Brien Rmin/2 table (inherited from topo). The CSP nascent
-# chain runs on hps_kr; a model without Rmin_2 for a bead falls back to this one for the
-# *excluded-volume radius only* (steric size is force-field-independent).
-_RMIN2_MODEL = "hps_kr"
-
-# O'Brien per-AA sidechain Rmin/2 (nm), read from the hps_kr table (== topo's values).
-# Used for the nascent side of the NC<->ribosome excluded volume when no explicit
-# per-residue array is supplied.
-_AA20 = ("ALA", "ARG", "ASN", "ASP", "CYS", "GLN", "GLU", "GLY", "HIS", "ILE",
-         "LEU", "LYS", "MET", "PHE", "PRO", "SER", "THR", "TRP", "TYR", "VAL")
-OBRIEN_SC_RMIN_2_NM = {aa: MODEL_PARAMS[_RMIN2_MODEL][aa]["Rmin_2"]
-                       for aa in _AA20 if "Rmin_2" in MODEL_PARAMS[_RMIN2_MODEL].get(aa, {})}
+# O'Brien per-AA sidechain Rmin/2 (nm), the model-independent steric collision radii
+# (:data:`cosmo.parameters.model_parameters.OBRIEN_RMIN_2_NM`). Used for the nascent side
+# of the NC<->ribosome excluded volume when no explicit per-residue array is supplied.
+OBRIEN_SC_RMIN_2_NM = dict(OBRIEN_RMIN_2_NM)
+# HIS tautomer aliases share HIS's Rmin/2.
 OBRIEN_SC_RMIN_2_NM.update({t: OBRIEN_SC_RMIN_2_NM["HIS"] for t in ("HSD", "HSE", "HSP")
                             if "HIS" in OBRIEN_SC_RMIN_2_NM})
 
@@ -130,33 +129,41 @@ def _bead_type(name: str, resname: str) -> str:
 
 
 def _rmin2_charge(model: str, btype: str) -> Tuple[float, float]:
-    """Return ``(Rmin/2 nm, charge)`` for a bead type from ``model_parameters``.
+    """Return ``(Rmin/2 nm, charge)`` for a rigid-ribosome bead type.
 
-    Reads ``Rmin_2`` + ``charge`` from ``model`` if present, else from the
-    :data:`_RMIN2_MODEL` (``hps_kr``) O'Brien table -- so any nascent force field can
-    still supply the excluded-volume radius (which is force-field-independent), while
-    only hps_kr needs to carry ``Rmin_2``.
+    The **excluded-volume radius** is a steric collision radius -- force-field-independent
+    -- so it always comes from the O'Brien tables
+    (:data:`~cosmo.parameters.model_parameters.OBRIEN_RNA_RMIN_2_BEADS` for the rRNA
+    ``P``/``R``/``BR`` scenery beads, :data:`OBRIEN_SC_RMIN_2_NM` for protein Ca beads,
+    keyed by residue name), independent of the nascent force field. The **charge** is the
+    residue's formal charge: for protein Ca beads it is read from the nascent ``model``
+    (so the ribosome scenery uses the same electrostatics as the nascent chain -- e.g.
+    mpipi's partial charges); for the rRNA beads it comes from the O'Brien bead table.
     """
-    e = MODEL_PARAMS[model].get(btype)
-    if isinstance(e, dict) and "Rmin_2" in e:
-        return float(e["Rmin_2"]), float(e.get("charge", 0.0))
-    fe = MODEL_PARAMS[_RMIN2_MODEL].get(btype)
-    if isinstance(fe, dict) and "Rmin_2" in fe:
-        charge = float(e["charge"]) if isinstance(e, dict) and "charge" in e else float(fe.get("charge", 0.0))
-        return float(fe["Rmin_2"]), charge
-    raise ValueError(f"bead type {btype!r} has no Rmin_2 in model {model!r} or the "
-                     f"{_RMIN2_MODEL!r} O'Brien table (needed for the ribosome-NC "
-                     f"12-10-6 excluded volume).")
+    # rRNA scenery bead (P/R/BR): radius + formal charge both from the O'Brien bead table.
+    b = OBRIEN_RNA_RMIN_2_BEADS.get(btype)
+    if b is not None:
+        return float(b["Rmin_2"]), float(b.get("charge", 0.0))
+    # Protein Ca bead (btype == residue name): O'Brien steric radius; formal charge from
+    # the nascent force field.
+    rm = OBRIEN_SC_RMIN_2_NM.get(btype)
+    if rm is not None:
+        e = MODEL_PARAMS[model].get(btype)
+        charge = float(e["charge"]) if isinstance(e, dict) and "charge" in e else 0.0
+        return float(rm), charge
+    raise ValueError(f"bead type {btype!r} has no O'Brien Rmin/2 (needed for the "
+                     f"ribosome-NC 12-10-6 excluded volume): not a standard residue name "
+                     f"or an rRNA P/R/BR bead.")
 
 
 def load_ribosome(pdb_file: str, model: str = "hps_kr") -> Ribosome:
     """Parse a (truncated) CG ribosome PDB into a :class:`Ribosome`.
 
     Reads each ATOM/HETATM record, derives its bead type (:func:`_bead_type`) and looks
-    up its Rmin/2 (collision radius, nm) and charge from ``model_parameters``
-    (:func:`_rmin2_charge`) -- **protein Ca beads** by residue name, **rRNA P/R/BR
-    beads** by bead type. These are O'Brien's values (inherited from topo, carried on
-    the hps_kr model). Coordinates are converted from angstrom to nm.
+    up its Rmin/2 (collision radius, nm) and charge (:func:`_rmin2_charge`) -- **protein
+    Ca beads** by residue name, **rRNA P/R/BR beads** by bead type. The radii are
+    O'Brien's model-independent steric values (inherited from topo); the charge is the
+    residue's formal charge in ``model``. Coordinates are converted from angstrom to nm.
 
     The ribosome CG PDB is the O'Brien 3/4-bead representation (protein Ca; rRNA
     P/R/BR), produced by :mod:`cosmo.csp.cg_ribosome` + :mod:`cosmo.csp.truncate_ribosome`.
@@ -411,7 +418,7 @@ def add_trna_tether(nascent_model, cterm_index: int, prev_index,
         nascent_model.gaussianAngleForce.addAngle(int(prev_index), int(cterm_index), R_idx)
 
 
-def add_tunnel_wall(system, nascent_indices, x0_nm: float = TUNNEL_WALL_X0_NM,
+def add_tunnel_wall(system, nascent_indices, x0_nm: float,
                     k: float = TUNNEL_WALL_K) -> mm.Force:
     """Add O'Brien's one-sided planar tunnel wall on the nascent chain.
 

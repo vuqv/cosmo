@@ -114,18 +114,26 @@ class SimulationConfig:
     restart: bool = False
     minimize: bool = True
 
+    # bond treatment: None (flexible harmonic bonds -- the IDP-appropriate default) or
+    # 'AllBonds' (rigid distance constraints; larger-timestep path). Passed to the model
+    # builder. Unlike topo (Gō model, default 'AllBonds'), cosmo defaults to flexible.
+    constraints: Optional[Any] = None
+    # integrator constraint tolerance (relative). Only meaningful with constraints=AllBonds;
+    # harmless otherwise. Matches topo's default (OpenMM's own default is 1e-5).
+    constraint_tolerance: float = 1e-5
+
     # the path this config was read from (bookkeeping)
     config_file: Optional[str] = None
 
     def build_kwargs(self) -> dict:
         """Keyword arguments for :func:`cosmo.models.buildCoarseGrainModel`.
 
-        Passes ``minimize``, ``model`` and ``box_dimension`` (the builder's own
-        defaults cover the optional ``frozen_indices`` / ``except_chains`` /
-        ``nb_exclusions`` arguments).
+        Passes ``minimize``, ``model``, ``box_dimension`` and ``constraints`` (the
+        builder's own defaults cover the optional ``frozen_indices`` / ``except_chains``
+        / ``nb_exclusions`` arguments).
         """
         return dict(minimize=self.minimize, model=self.model,
-                    box_dimension=self.box_dimension)
+                    box_dimension=self.box_dimension, constraints=self.constraints)
 
     def output_path(self, suffix: str = '') -> str:
         """Path for a generated output file: ``<output_dir>/<outname><suffix>``.
@@ -309,6 +317,15 @@ def read_simulation_config(config_file: str, verbose: bool = True) -> Simulation
     else:
         cfg.minimize = bool(strtobool(str(params.get('minimize', cfg.minimize))))
         log(f'  minimize: {cfg.minimize}')
+
+    # Bond treatment: 'AllBonds' (rigid distance constraints) or None/'None'/'' (flexible
+    # harmonic bonds -- the cosmo default). Normalized so a blank / 'none' becomes None.
+    cfg.constraints = params.get('constraints', cfg.constraints)
+    if cfg.constraints is not None and str(cfg.constraints).strip().lower() in ('none', ''):
+        cfg.constraints = None
+    cfg.constraint_tolerance = float(
+        params.get('constraint_tolerance', cfg.constraint_tolerance))
+    log(f'  constraints: {"None (flexible harmonic bonds)" if cfg.constraints is None else cfg.constraints}')
 
     log('-' * 70)
     return cfg

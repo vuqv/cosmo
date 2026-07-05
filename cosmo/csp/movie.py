@@ -44,6 +44,46 @@ SENTINEL_A = 99999.0
 POST_PHASES = ("ejection", "dissociation", "stallation")
 
 
+def _pick_traj(phase_dir: str, outname: str = "traj") -> Optional[str]:
+    """Pick the trajectory file to read for one stage/phase, or ``None`` if absent.
+
+    Prefer ``<outname>.dcd`` when it actually holds frames, but a coarse ``nstout``
+    (relative to the steps run per stage) can leave a stage's DCD **empty** (0 bytes)
+    -- every frame interval landed past the end of the short run. In that case fall
+    back to ``<outname>_final.pdb``, the last-frame snapshot the runner always writes,
+    so the stage still contributes its (single) final conformation instead of being
+    silently dropped. Without this, a coarse-output CSP run yields a movie that skips
+    most lengths.
+
+    Mirrors the sibling ``topo`` project's ``topo/csp/movie.py._pick_traj``.
+
+    Parameters
+    ----------
+    phase_dir : str
+        Directory of a single stage or post-synthesis phase (e.g.
+        ``<out_root>/L_<L>/stage_<s>`` or ``<out_root>/ejection``).
+    outname : str, optional
+        Per-stage output basename used by the runner (default ``"traj"``); the
+        candidate files are ``<outname>.dcd`` and ``<outname>_final.pdb``.
+
+    Returns
+    -------
+    str or None
+        Path to ``<outname>.dcd`` if it exists and is non-empty, else
+        ``<outname>_final.pdb`` if present, else the empty ``<outname>.dcd`` if it
+        exists, else ``None`` when no trajectory file is found.
+    """
+    dcd = os.path.join(phase_dir, f"{outname}.dcd")
+    if os.path.isfile(dcd) and os.path.getsize(dcd) > 0:
+        return dcd
+    final_pdb = os.path.join(phase_dir, f"{outname}_final.pdb")
+    if os.path.isfile(final_pdb):
+        return final_pdb
+    if os.path.isfile(dcd):  # empty DCD and no final-frame fallback -- read it anyway
+        return dcd
+    return None
+
+
 def find_segments(out_root: str,
                   outname: str = "traj") -> List[Tuple[str, int, str, str]]:
     """Return the ordered growth segments ``[(label, n_atoms, psf, dcd), ...]``.
@@ -55,7 +95,9 @@ def find_segments(out_root: str,
     - otherwise the flat ``L_<L>/traj.*`` is a single segment (``L=<L>``).
 
     ``n_atoms`` for a length-``L`` segment is ``L`` (nascent-only output). Only segments
-    with both a ``.psf`` and a ``.dcd`` are kept; lengths are sorted ascending.
+    with a ``.psf`` and a readable trajectory are kept; the trajectory is the ``.dcd``
+    when it has frames, else the ``_final.pdb`` snapshot (see :func:`_pick_traj`).
+    Lengths are sorted ascending.
     """
     lengths = []
     for d in glob.glob(os.path.join(out_root, "L_*")):
@@ -73,14 +115,14 @@ def find_segments(out_root: str,
             for sd in stage_dirs:
                 sm = re.search(r"stage_(\d+)$", os.path.basename(sd))
                 psf = os.path.join(sd, f"{outname}.psf")
-                dcd = os.path.join(sd, f"{outname}.dcd")
-                if os.path.isfile(psf) and os.path.isfile(dcd):
-                    segments.append((f"L={L} s{sm.group(1) if sm else '?'}", L, psf, dcd))
+                traj = _pick_traj(sd, outname)
+                if os.path.isfile(psf) and traj is not None:
+                    segments.append((f"L={L} s{sm.group(1) if sm else '?'}", L, psf, traj))
         else:
             psf = os.path.join(d, f"{outname}.psf")
-            dcd = os.path.join(d, f"{outname}.dcd")
-            if os.path.isfile(psf) and os.path.isfile(dcd):
-                segments.append((f"L={L}", L, psf, dcd))
+            traj = _pick_traj(d, outname)
+            if os.path.isfile(psf) and traj is not None:
+                segments.append((f"L={L}", L, psf, traj))
     return segments
 
 
@@ -90,9 +132,9 @@ def find_post(out_root: str, outname: str = "traj") -> List[Tuple[str, str, str]
     for name in POST_PHASES:
         d = os.path.join(out_root, name)
         psf = os.path.join(d, f"{outname}.psf")
-        dcd = os.path.join(d, f"{outname}.dcd")
-        if os.path.isfile(psf) and os.path.isfile(dcd):
-            found.append((name, psf, dcd))
+        traj = _pick_traj(d, outname)
+        if os.path.isfile(psf) and traj is not None:
+            found.append((name, psf, traj))
     return found
 
 
@@ -155,23 +197,36 @@ def stitch_movie(out_root: str, out_prefix: str = "movie",
     log(f"Parking not-yet-synthesized beads: {park}")
 
     total_frames = 0
+    skipped = 0
     with mda.Writer(out_dcd, n_atoms=N) as writer:
         for label, n, psf, dcd in segments:
-            u = mda.Universe(psf, dcd)
-            nfr = 0
-            for _ in u.trajectory:
-                coords = np.empty((N, 3), dtype=np.float32)
-                coords[:n] = u.atoms.positions
-                if n < N:
-                    if park == "sentinel":
-                        coords[n:] = SENTINEL_A
-                    else:  # stack on the current C-terminus (last real bead)
-                        coords[n:] = u.atoms.positions[n - 1]
-                full.atoms.positions = coords
-                writer.write(full.atoms)
-                nfr += 1
+            # A segment can be unreadable if its DCD is still being written (an
+            # in-progress run) or was truncated by a crash -- skip it (with a warning)
+            # rather than aborting the whole movie. Open + read inside the guard so a
+            # premature-EOF header error or a zero-frame DCD just drops that segment.
+            try:
+                u = mda.Universe(psf, dcd)
+                nfr = 0
+                for _ in u.trajectory:
+                    coords = np.empty((N, 3), dtype=np.float32)
+                    coords[:n] = u.atoms.positions
+                    if n < N:
+                        if park == "sentinel":
+                            coords[n:] = SENTINEL_A
+                        else:  # stack on the current C-terminus (last real bead)
+                            coords[n:] = u.atoms.positions[n - 1]
+                    full.atoms.positions = coords
+                    writer.write(full.atoms)
+                    nfr += 1
+            except Exception as exc:
+                skipped += 1
+                log(f"  {label:>12}: SKIPPED (unreadable/empty DCD: "
+                    f"{type(exc).__name__}: {exc})")
+                continue
             total_frames += nfr
             log(f"  {label:>12}: {nfr} frames")
+    if skipped:
+        log(f"  ({skipped} segment(s) skipped -- truncated or still being written)")
 
     log(f"Movie trajectory: {out_dcd}  ({total_frames} frames total)")
 

@@ -327,8 +327,11 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     - ``max_steps_per_stage`` / ``min_steps_per_stage`` -- clamp each stage's step count.
     - ``ejection_steps`` / ``dissociation_steps`` -- post-synthesis free runs (0 = skip).
 
-    MD / ribosome keys: ``model`` (nascent force field, default ``hps_kr`` -- it carries
-    the O'Brien Rmin/2 table for the ribosome-NC 12-10-6 excluded volume), ``dt``,
+    MD / ribosome keys: ``model`` (nascent IDP force field, default ``hps_kr``; any IDP
+    model works -- the ribosome-NC 12-10-6 excluded volume is decoupled from it, always
+    using the O'Brien Rmin/2 collision radii, and a model lacking its own ``Rmin_2``
+    (e.g. ``hps_urry``, ``mpipi``) transparently falls back to the shared hps_kr table
+    for the steric radius only), ``dt``,
     ``ref_t``, ``tau_t``, ``nstout``, ``device``, ``ppn``, ``constraints`` (default
     ``None`` -- flexible bonds), ``restraint_k``, ``minimize``, ``tunnel_wall``.
     (``trna_tether`` is not honoured -- CSP forces the position restraint; the wall

@@ -22,6 +22,7 @@ class models:
                               frozen_indices: list = None,
                               except_chains: list = None,
                               nb_exclusions: list = None,
+                              constraints: Any = None,
                               check_forces: bool = True):
         """
         Build a CA/P coarse-grained model for protein and nucleic-acid systems
@@ -50,6 +51,15 @@ class models:
             List of chain IDs to exclude from bonding.
         nb_exclusions : list, optional
             List of pairs of atom indices to exclude from nonbonded forces.
+        constraints : str or None, optional (default: None)
+            Bond treatment. ``None`` (or ``'None'``) keeps **flexible harmonic bonds**
+            -- the physically appropriate default for intrinsically disordered chains,
+            where backbone flexibility matters. ``'AllBonds'`` makes every bond a **rigid
+            distance constraint** (pinned at its equilibrium length; no harmonic bond
+            force is created), which removes the fast bond-stretch mode and lets the
+            integrator take a larger timestep. Constraints act only on the CA/P
+            pseudo-bonds; the non-bonded potentials (Ashbaugh-Hatch / Wang-Frenkel and,
+            with a ribosome, the 12-10-6 excluded volume) are unaffected.
         check_forces : bool, optional (default: True)
             If True, run the build-time large-force / initial-energy check on the
             input structure. Set False when restarting from a checkpoint, where
@@ -94,11 +104,32 @@ class models:
             cosmo_model.setCAIDPerResidueType()
             print(f'  per-residue: mass, charge, atom type ({model})')
 
+        # Resolve the bond-constraint mode. Accepted: None / 'None' / 'none' (flexible
+        # harmonic bonds -- the default for IDPs) or 'AllBonds' (rigid distance
+        # constraints). Rigid and flexible are mutually exclusive, so a bond is never
+        # both constrained and harmonic. Unlike topo (Gō model, default 'AllBonds'),
+        # cosmo defaults to flexible bonds -- a genuine IDP-physics choice, not a mirror
+        # gap -- but supports 'AllBonds' for users who want the larger-timestep path.
+        if constraints is None or str(constraints).strip().lower() == 'none':
+            use_constraints = False
+        elif str(constraints).strip().lower() == 'allbonds':
+            use_constraints = True
+        else:
+            raise ValueError(
+                f"Invalid constraints option: {constraints!r}. Expected 'AllBonds' or None.")
+        cosmo_model.use_bond_constraints = use_constraints
+
         # Set particle interactions and add forces to the system. Force-group
         # insertion order below is significant (each force gets a group index in
         # this order) and must be kept in sync with the reporter / benchmark.
         cosmo_model.setBondForceConstants()
-        cosmo_model.addHarmonicBondForces()
+        # Only add the harmonic bond force when bonds are flexible. With rigid bonds
+        # (constraints='AllBonds') the distance is pinned by a constraint added in
+        # createSystemObject (after particles exist), so a harmonic term would be
+        # redundant. Force-group order is preserved: the flexible path is unchanged, and
+        # the rigid path simply omits the (absent) 'Harmonic Bond Energy' group.
+        if not use_constraints:
+            cosmo_model.addHarmonicBondForces()
 
         if model == 'hps_ss':
             # hps_ss adds bonded angle + torsion terms on top of hps_urry.
@@ -143,7 +174,8 @@ class models:
             nb_name = 'Wang-Frenkel'
 
         extra = ', Gaussian angle+torsion' if model == 'hps_ss' else ''
-        print(f'  forces: harmonic bond, Yukawa, {nb_name}{extra}  '
+        bond_term = 'rigid bond constraints (AllBonds)' if use_constraints else 'harmonic bond'
+        print(f'  forces: {bond_term}, Yukawa, {nb_name}{extra}  '
               f'(pbc={use_pbc})')
 
         # Generate the system object and add the previously generated forces. The

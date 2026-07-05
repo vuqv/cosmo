@@ -70,7 +70,8 @@ Example ``csp.ini``:
 
         ; --- ribosome / PTC mechanics ---
         ; PTC geometry is always optimized (A/P targets one peptide bond, 0.380 nm,
-        ; apart and EV-clear) -- no knob. Bonds stay flexible (constraints = None).
+        ; apart and EV-clear) -- no knob. Bonds default to flexible (constraints = None;
+        ; set constraints = AllBonds for rigid bonds).
         restraint_k = 83680  ; C-terminus harmonic restraint (kJ/mol/nm^2)
         minimize    = yes    ; energy-minimize each seeded structure before its MD
         ; tunnel_wall = yes  ; one-sided tunnel floor (default on; plane auto-derived)
@@ -246,7 +247,7 @@ consumed by :func:`~cosmo.csp.core.run_length`).
    * - ``constraints``
      - str
      - ``None``
-     - Bond treatment. ``None`` (flexible harmonic bonds) is the deliberate default: cosmo's soft HPS/mpipi potentials have no stiff native-Gō wells, so there is no rigid-constraint stability path (unlike topo's Gō model). The always-on PTC optimization still seeds each new residue at equilibrium, so the seeded structure minimizes cleanly.
+     - Bond treatment: ``None`` (flexible harmonic bonds, the default) or ``AllBonds`` (rigid distance constraints). Both are supported. ``None`` is the default because backbone flexibility is physically meaningful for intrinsically disordered chains; ``AllBonds`` pins every CA/P bond at its equilibrium length, removing the fast bond-stretch mode so a larger timestep can be used. Constraints act only on the pseudo-bonds — the non-bonded potentials (Ashbaugh-Hatch / Wang-Frenkel and, with a ribosome, the 12-10-6 excluded volume) are unaffected, so ``AllBonds`` does not by itself prevent a stiff-EV blow-up (the per-stage dt-halving guard handles that).
    * - ``restraint_k``
      - float [kJ/mol/nm²]
      - ``83680``

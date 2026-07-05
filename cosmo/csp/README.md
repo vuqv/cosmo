@@ -19,9 +19,14 @@ topo's Gō machinery entirely: **no STRIDE, no native-contact map, no `domain.ya
 nscales, no build-once-subset**. A length-`L` nascent model is simply
 `cosmo.models.buildCoarseGrainModel` on the **first `L` residues** of the sequence (all
 cosmo forces are sequence-local or pairwise-by-type, so the restriction is exact — see
-[`cosmo/translation/PLAN.md`](../translation/PLAN.md) §2). topo's per-stage dt-halving
-stability guard (against stiff Gō-contact divergence) is likewise omitted — cosmo's
-soft HPS potentials have no such stiff wells.
+[`cosmo/translation/PLAN.md`](../translation/PLAN.md) §2). Like topo, each stage is wrapped
+in a **per-stage dt-halving stability guard** (`STABILITY_POTE_LIMIT_KJ` /
+`STABILITY_MAX_ATTEMPTS` in `core.py`): the divergence it guards is **non-native excluded
+volume** (the new residue seeded at the fixed A-site landing in the stiff repulsive core of
+the ribosome↔nascent 12-10-6 EV or the nascent Ashbaugh-Hatch potential — both present in
+cosmo *and* topo), not a native-contact well. A diverging stage (PotE → ~1e13 kJ/mol) is
+re-run at `dt/2` with `2×` steps (dwell `= n_steps · dt` preserved) until it integrates
+cleanly.
 
 > `cosmo.csp` is a **new, self-contained** package. The older `cosmo.translation`
 > (single-stage constant-schedule `cosmo-elongate`) is left in place and untouched.
@@ -104,10 +109,14 @@ no knob.
 with the nascent chain through the O'Brien form
 `U = ε·[13(R/r)¹² − 18(R/r)¹⁰ + 4(R/r)⁶]` (ε = 0.000132 kcal/mol) with the **sum**
 combining rule `R = Rmin/2ᵢ + Rmin/2ⱼ`, plus the Yukawa electrostatics. The per-bead
-`Rmin/2` values are **inherited verbatim from topo** (O'Brien's CG collision radii) and
-live in `cosmo.parameters.model_parameters` under **`hps_kr`** (per-AA + the rRNA
-`P`/`R`/`BR` beads). The **nascent IDP↔IDP** interaction is unchanged — the `hps_kr`
-Ashbaugh–Hatch potential — so `hps_kr` is the CSP force field (it carries both).
+`Rmin/2` values are **inherited verbatim from topo** (O'Brien's CG collision radii).
+They are **steric** radii — force-field-independent — so they live in
+`cosmo.parameters.model_parameters` as standalone tables (`OBRIEN_RMIN_2_NM` per-AA +
+`OBRIEN_RNA_RMIN_2_BEADS` for the rRNA `P`/`R`/`BR` beads), **not** attached to any IDP
+model, and are used for **every** nascent force field alike. Only the bead *charges* are
+model-dependent (the residue's formal charge, e.g. mpipi's partial charges). The
+**nascent IDP↔IDP** interaction is whatever `model` the run selects (`hps_kr` /
+`hps_urry` / `mpipi`) — any of them works with the CSP excluded volume.
 
 **Units:** OpenMM defaults — nm, ps, kJ/mol, K, kJ/mol/nm². In-vivo dwell times: seconds.
 

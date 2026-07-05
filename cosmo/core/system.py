@@ -148,6 +148,11 @@ class system:
         self.bond_length_nucleic = model_parameters.parameters[model]["bond_length_nucleic"]
         self.bondedTo = None
         self.harmonicBondForce = None
+        # Bond treatment: when True, each bond is a rigid OpenMM distance constraint
+        # (constraints='AllBonds') instead of a harmonic bond force. Set by the model
+        # builder; the two are mutually exclusive (a bond is never both). See
+        # addBondConstraints / addHarmonicBondForces.
+        self.use_bond_constraints = False
 
         self.angles = OrderedDict()
         self.angles_indexes = []
@@ -577,6 +582,28 @@ class system:
                                            bond[1].index,
                                            self.bonds[bond][0],
                                            self.bonds[bond][1])
+
+    def addBondConstraints(self) -> None:
+        """Add a rigid distance constraint for each bond (``constraints='AllBonds'``).
+
+        The rigid-bond alternative to :func:`addHarmonicBondForces`: every bond in
+        :code:`self.bonds` becomes an OpenMM distance constraint pinned at its
+        equilibrium length (``self.bonds[bond][0]``), removing the fast bond-stretch
+        vibrational mode so the integrator can take a larger timestep. Rigid and
+        harmonic bonds are mutually exclusive -- the model builder calls exactly one of
+        the two -- so no harmonic bond force is created in this case.
+
+        Constraints reference particle indices, so this MUST be called after
+        :func:`addParticles` (unlike the harmonic force, which only builds a force
+        object); :func:`createSystemObject` does so.
+
+        Returns
+        -------
+        None
+        """
+        for bond in self.bonds:
+            self.system.addConstraint(bond[0].index, bond[1].index,
+                                      self.bonds[bond][0])
 
     def addGaussianAngleForces(self) -> None:
         """
@@ -1030,6 +1057,12 @@ class system:
 
         # Add particles to system
         self.addParticles()
+
+        # Rigid bonds (constraints='AllBonds'): add the distance constraints now that
+        # the particles exist. Mutually exclusive with the harmonic bond force (the
+        # builder created no harmonicBondForce in this case, so addSystemForces skips it).
+        if self.use_bond_constraints:
+            self.addBondConstraints()
 
         # Add created forces into the system
         self.addSystemForces()

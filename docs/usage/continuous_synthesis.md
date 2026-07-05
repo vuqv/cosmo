@@ -229,11 +229,20 @@ C-terminus is held by a **position restraint** to these points — not a bond to
 beads. This is always on; there is no knob.
 
 ```{note}
-cosmo uses **flexible harmonic bonds** throughout — there is no rigid-`AllBonds` +
-dt-halving stability path, because the soft HPS/mpipi potentials have no stiff native-Gō
-wells to diverge (this is where cosmo intentionally diverges from topo's `core.py`). The
-always-on PTC optimization is therefore purely a *quality* improvement (equilibrium
-seeding), not a stability requirement.
+cosmo **defaults to flexible harmonic bonds** (`constraints = None`) because backbone
+flexibility is physically meaningful for disordered chains, but it **also supports rigid
+bonds** (`constraints = AllBonds`) — every CA/P bond becomes a distance constraint pinned
+at its equilibrium length, removing the fast bond-stretch mode so a larger `dt` can be
+used. Constraints act only on the bonds; the **non-bonded** potentials are untouched.
+So `AllBonds` does **not** by itself prevent the stiff-EV blow-up: the **non-native
+excluded volume** is still stiff — the new residue is seeded at the fixed A-site target,
+and a recently-added residue that has not cleared that region can land in the repulsive
+core of the ribosome↔nascent 12-10-6 EV or the nascent Ashbaugh-Hatch potential (both
+present in cosmo and topo). That diverges at the configured `dt` (PotE → ~1e13 kJ/mol),
+which is why cosmo keeps topo's **per-stage dt-halving stability guard**: it re-runs the
+stage at `dt/2` with `2×` steps (identical dwell) until it is stable. The always-on PTC
+optimization reduces how often this fires (equilibrium seeding lowers the stage-1 energy
+~50×), but it is a *quality* improvement, not a full substitute for the guard.
 ```
 
 ### 7. After the last residue: ejection (and dissociation)
@@ -301,7 +310,7 @@ dwell **times in seconds** are always written to `dwell_times.dat` regardless.
 | `nstout` | `50` | Trajectory/log output interval (steps). |
 | `device` | `CPU` | `GPU` / `CPU`. |
 | `ppn` | `1` | CPU threads (CPU platform). |
-| `constraints` | `None` | Bond constraints; CSP uses flexible bonds (soft HPS/mpipi, no stiff Gō wells) — leave `None`. |
+| `constraints` | `None` | Bond treatment: `None` (flexible harmonic bonds, default) or `AllBonds` (rigid distance constraints — larger-timestep path). |
 | `restraint_k` | `83680` | C-terminus harmonic restraint constant, kJ/mol/nm². |
 | `minimize` | `yes` | Energy-minimize the seeded structure before each stage's MD. |
 | `tunnel_wall` | `yes` | One-sided tunnel wall (floor below the synthesis point); plane auto-placed. |

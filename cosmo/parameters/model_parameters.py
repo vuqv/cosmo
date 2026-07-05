@@ -1024,15 +1024,17 @@ _extend_mpipi_with_rna()
 # interaction used by ``cosmo.csp``.
 #
 # Inherited **verbatim from the sibling topo package** (topo.parameters.model_parameters
-# -- the structure-based CG collision radii of O'Brien et al. 2011/2012). Added to the
-# ``hps_kr`` model only: the CSP nascent chain runs on hps_kr, and its IDP<->IDP
-# interaction is unchanged (the hps_kr Ashbaugh-Hatch potential). These ``Rmin_2`` values
-# are consumed *only* by the ribosome<->nascent 12-10-6 excluded volume
-# (cosmo.csp.ribosome, sum combining rule R = Rmin/2_i + Rmin/2_j), never by the HPS pair
-# potential. The rRNA ``P``/``R``/``BR`` beads (which cosmo does not otherwise
-# parameterise) are added as scenery-only entries carrying just Rmin/2 + charge.
+# -- the structure-based CG collision radii of O'Brien et al. 2011/2012). These are
+# **steric collision radii** -- force-field-independent -- so they are *not* attached to
+# any IDP model. They live here as standalone module-level tables consumed *only* by the
+# ribosome<->nascent 12-10-6 excluded volume (:mod:`cosmo.csp.ribosome`, sum combining
+# rule R = Rmin/2_i + Rmin/2_j), for **every** nascent force field alike (hps_kr /
+# hps_urry / mpipi); they are never read by the HPS/mpipi pair potential. The nascent
+# side always uses these radii; the nascent IDP<->IDP interaction stays whatever model
+# the run selects. The rRNA ``P``/``R``/``BR`` beads (which cosmo does not otherwise
+# parameterise) carry just Rmin/2 + formal charge for the rigid-ribosome scenery.
 # ---------------------------------------------------------------------------
-_OBRIEN_RMIN_2_NM = {
+OBRIEN_RMIN_2_NM = {
     "ALA": 0.2862278, "ARG": 0.3704125, "ASN": 0.3199017, "ASP": 0.3142894,
     "CYS": 0.3030648, "GLN": 0.3423509, "GLU": 0.3367386, "GLY": 0.2525540,
     "HIS": 0.3423509, "ILE": 0.3423509, "LEU": 0.3423509, "LYS": 0.3535755,
@@ -1041,18 +1043,8 @@ _OBRIEN_RMIN_2_NM = {
 }
 # rRNA CG beads (O'Brien 3/4-bead P/R/BR): Rmin/2 (nm) + charge for the rigid-ribosome
 # excluded volume / electrostatics. Scenery-only -- not typed into the HPS pair tables.
-_OBRIEN_RNA_RMIN_2_BEADS = {
+OBRIEN_RNA_RMIN_2_BEADS = {
     "P":  {"Rmin_2": 0.644766, "charge": -1.0},
     "R":  {"Rmin_2": 0.523140, "charge": 0.0},
     "BR": {"Rmin_2": 0.534244, "charge": 0.0},
 }
-for _rn, _rm in _OBRIEN_RMIN_2_NM.items():
-    if _rn in parameters["hps_kr"]:
-        parameters["hps_kr"][_rn]["Rmin_2"] = _rm
-# HIS tautomer aliases share HIS's Rmin/2 (if present in the table).
-for _t in ("HSD", "HSE", "HSP"):
-    if _t in parameters["hps_kr"]:
-        parameters["hps_kr"][_t]["Rmin_2"] = _OBRIEN_RMIN_2_NM["HIS"]
-# Add the rRNA scenery beads to hps_kr (Rmin/2 + charge only).
-for _bn, _bp in _OBRIEN_RNA_RMIN_2_BEADS.items():
-    parameters["hps_kr"].setdefault(_bn, dict(_bp))

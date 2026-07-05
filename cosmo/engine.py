@@ -159,6 +159,8 @@ def setup_simulation(cfg, built, control_file=None, shift_positions=True):
     """
     platform, properties = cfg.make_platform()
     integrator = mm.LangevinIntegrator(cfg.ref_t, cfg.tau_t, cfg.dt)
+    # Constraint tolerance applies to rigid (AllBonds) bonds; harmless otherwise.
+    integrator.setConstraintTolerance(cfg.constraint_tolerance)
     simulation = mm.app.Simulation(built.topology, built.system, integrator,
                                    platform, properties)
 

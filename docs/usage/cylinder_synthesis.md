@@ -167,8 +167,9 @@ device = CPU ; ppn = 1 ; outdir = synth_out_cyl
 
 These behave exactly as on the {doc}`synthesis_control` page (inherited from the shared
 `RunParams`): `model` (default `hps_kr`), `scale_factor`, `codon_times`, `random_seed`,
-`max_steps_per_stage` / `min_steps_per_stage` (testing-only), `constraints` (flexible —
-leave `None`), `restraint_k`, `minimize`, `dt` / `ref_t` / `tau_t` / `nstout`,
+`max_steps_per_stage` / `min_steps_per_stage` (testing-only), `constraints` (`None`
+flexible default, or `AllBonds` for rigid bonds), `restraint_k`, `minimize`,
+`dt` / `ref_t` / `tau_t` / `nstout`,
 `device` / `ppn`.
 
 ```{warning}
