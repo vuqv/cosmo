@@ -55,8 +55,23 @@ field). Two runners differ in how the ribosome exit tunnel is represented:
   infinite wall (no explicit ribosome beads); fast, never jams, one MD segment per
   residue.
 * **``cosmo-csp``** — the ribosome-based counterpart: grow the chain through an
-  explicit truncated CG ribosome with the O'Brien 12-10-6 excluded volume, in three
+  explicit truncated CG ribosome (``ribosome_trunc.pdb``, see
+  :doc:`usage/ribosome_preparation`) with the O'Brien 12-10-6 excluded volume, in three
   codon-timed sub-stages per residue, then eject the completed chain.
+
+**Which to use.** Reach for the **cylinder** for fast exploration of how tunnel geometry
++ codon kinetics shape a disordered chain as it extrudes, or when you have no ribosome
+structure — it is the simplest starting point. Reach for the **explicit ribosome** when
+the tunnel-wall charge, the real tunnel shape (constriction / vestibule), or
+translocation-coupled forces matter to your question.
+
+.. warning::
+
+   **The two runners are comparable only in the *mean* per-residue dwell time, not in
+   confinement chemistry.** The cylinder omits the ribosome's electrostatics and surface
+   excluded volume and has a uniform straight bore. Do not compare extrusion/conformation
+   observables (radius of gyration vs. length, contact formation) across the two runners
+   without accounting for those missing terms.
 
 Runnable proof-of-concept examples (α-synuclein) live in ``sandbox/validate/``
 (``csp.ini`` and ``cylinder.ini``); see also ``tutorials/09_translation_cylinder/`` and
@@ -64,6 +79,7 @@ Runnable proof-of-concept examples (α-synuclein) live in ``sandbox/validate/``
 
 .. rubric:: Reference
 
+* :doc:`The ribosome structure — get or build one <usage/ribosome_preparation>`
 * :doc:`Synthesis on a coarse-grained ribosome <usage/continuous_synthesis>`
 * :doc:`Synthesis through an analytic tunnel <usage/cylinder_synthesis>`
 * :doc:`Synthesis control options (csp.ini) <usage/synthesis_control>`

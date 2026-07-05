@@ -37,6 +37,7 @@ right tutorials, and :doc:`modules/introduction` for installation and package la
    :maxdepth: 1
    :caption: Co-translational synthesis
 
+   usage/ribosome_preparation
    usage/continuous_synthesis
    usage/cylinder_synthesis
    usage/synthesis_control
