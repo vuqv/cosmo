@@ -1,6 +1,6 @@
 """``cosmo.csp`` -- the O'Brien Continuous Synthesis Protocol, ported to cosmo.
 
-The per-codon, three-stage co-translational synthesis protocol of
+The per-codon, three-stage protein synthesis protocol of
 ``continuous_synthesis_v6.py`` (Yang Jiang, Dan Nissley, Ed O'Brien), expressed in
 cosmo style on cosmo's **sequence-based IDP force field** (HPS / mpipi). It mirrors the
 sibling ``topo`` project's ``topo.csp`` package -- same module layout, class/function

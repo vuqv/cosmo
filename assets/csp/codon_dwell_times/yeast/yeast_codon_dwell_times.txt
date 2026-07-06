@@ -1,0 +1,131 @@
+# =============================================================================
+# Per-codon translation dwell times — Saccharomyces cerevisiae (yeast)
+# =============================================================================
+# Format : CODON<TAB>TIME_SECONDS   (RNA alphabet, U; 6 decimal places)
+#          61 sense codons + 3 stop codons (UAA, UAG, UGA) = 64 rows
+#          Value = mean elongation dwell time per codon, in seconds.
+#          Larger value = slower codon.
+#
+# ---------------------------------------------------------------------------
+# SOURCE OF RELATIVE DATA
+#   Gardin, Yeasmin, Yurovsky, Cai, Skiena, Futcher (2014)
+#   "Measurement of average decoding rates of the 61 sense codons in vivo"
+#   eLife 3:e03735.  doi:10.7554/eLife.03735
+#   -> Table 2A: Ribosome Residence Time (RRT) at footprint position 6
+#      (the ribosomal A-site) for all 61 sense codons, plus genomic codon
+#      usage per 1000 codons. RRT is normalized so the genome-wide average
+#      codon = 1.0 and is monotonic with dwell time (larger RRT = slower).
+#   Note: Table 2A as published lists codon TCT twice as "TCC"; the second
+#      entry (usage 23.5, RRT 0.98) is TCT and is corrected here.
+#
+# ELONGATION-RATE ANCHOR (sets the absolute time scale)
+#   R = 9.3 codons/s  (mean; Chu et al. 2014, Cell 153:1589, validated vs
+#   Arava et al. 2003 polysome data).  tau = 1/R = 0.107527 s per codon.
+#
+# CONVERSION PROCEDURE (frequency-weighted; O'Brien-pipeline compatible)
+#   For each sense codon c with relative value r_c (= RRT) and genomic
+#   codon-usage frequency f_c (from Table 2A usage/1000, renormalized to
+#   sum_c f_c = 1 over the 61 sense codons):
+#       rbar_w = sum_c ( f_c * r_c )          # freq-weighted mean of RRT
+#       t_c    = r_c / ( R * rbar_w )         # seconds
+#   This guarantees a transcript of average codon composition translates at
+#   exactly R: sum_c f_c * t_c = tau = 1/R.  (Verified = 0.107527 s.)
+#   Because t_c is a ratio, the arbitrary normalization of the source table
+#   cancels. DNA T was converted to RNA U.
+#   Computed rbar_w = 1.03858 ; codon-usage sum = 998.2/1000.
+#
+# STOP CODONS (UAA, UAG, UGA)
+#   Ribosome-profiling sense-codon tables do not cover termination.
+#   Per modeling choice, each stop is assigned the organism mean per-codon
+#   time = tau = 0.107527 s (a placeholder; termination is not codon-resolved
+#   here and eukaryotic readthrough differs by stop identity: UGA leakiest,
+#   UAA tightest).
+#
+# RANGE CHECK: fastest ACC (Thr) = 0.072473 s ; slowest CUC (Leu) = 0.195676 s.
+#   Brackets the E. coli Fluitt et al. 2007 mean (~0.068 s/codon) as expected.
+#
+# CAVEATS
+#   - Relative (occupancy-derived), not a mechanistic kinetic model like the
+#     E. coli Fluitt table; absolute scale is entirely set by the chosen R.
+#   - Temperature: yeast growth ~30 C vs E. coli reference 37 C (310 K).
+#   - Mean per codon only; real dwell varies with sequence context.
+#
+# Generated for project "Ribosome_modelling". Anchor R and stop-codon
+# convention are documented modeling choices, not measurements.
+# =============================================================================
+# ---------------------------------------------------------------------------
+# UNDERLYING RELATIVE VALUES — RRT (Ribosome Residence Time, A-site; higher=slower) (U alphabet, 61 sense codons, 10 per row)
+#   Gardin et al. 2014 eLife 3:e03735, Table 2A. Normalized so genome-avg codon = 1.0.
+#   AAA=0.88  AAC=0.76  AAG=0.74  AAU=0.88  ACA=1.35  ACC=0.7  ACG=1.12  ACU=0.78  AGA=1.01  AGC=1.09
+#   AGG=1.59  AGU=1.1  AUA=1.57  AUC=0.8  AUG=0.92  AUU=0.92  CAA=0.87  CAC=1.08  CAG=1.15  CAU=0.93
+#   CCA=1.38  CCC=1.71  CCG=1.31  CCU=1.27  CGA=1.45  CGC=1.45  CGG=1.44  CGU=0.87  CUA=1.25  CUC=1.89
+#   CUG=0.92  CUU=1.24  GAA=1.04  GAC=0.85  GAG=1.25  GAU=0.76  GCA=1.28  GCC=0.86  GCG=0.99  GCU=0.81
+#   GGA=1.56  GGC=1.22  GGG=1.61  GGU=0.93  GUA=1.31  GUC=0.75  GUG=1.52  GUU=0.75  UAC=1.25  UAU=1.25
+#   UCA=1.26  UCC=0.99  UCG=1.43  UCU=0.98  UGC=1.23  UGG=1.53  UGU=0.81  UUA=0.99  UUC=1  UUG=0.92
+#   UUU=1.05
+# ---------------------------------------------------------------------------
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+AAA	0.091108	LYS
+AAC	0.078685	ASN
+AAG	0.076614	LYS
+AAU	0.091108	ASN
+ACA	0.139769	THR
+ACC	0.072473	THR
+ACG	0.115956	THR
+ACU	0.080755	THR
+AGA	0.104568	ARG
+AGC	0.112850	SER
+AGG	0.164616	ARG
+AGU	0.113886	SER
+AUA	0.162546	ILE
+AUC	0.082826	ILE
+AUG	0.095250	MET
+AUU	0.095250	ILE
+CAA	0.090073	GLN
+CAC	0.111815	HIS
+CAG	0.119062	GLN
+CAU	0.096285	HIS
+CCA	0.142875	PRO
+CCC	0.177040	PRO
+CCG	0.135627	PRO
+CCU	0.131486	PRO
+CGA	0.150122	ARG
+CGC	0.150122	ARG
+CGG	0.149087	ARG
+CGU	0.090073	ARG
+CUA	0.129415	LEU
+CUC	0.195676	LEU
+CUG	0.095250	LEU
+CUU	0.128380	LEU
+GAA	0.107674	GLU
+GAC	0.088002	ASP
+GAG	0.129415	GLU
+GAU	0.078685	ASP
+GCA	0.132521	ALA
+GCC	0.089038	ALA
+GCG	0.102497	ALA
+GCU	0.083861	ALA
+GGA	0.161510	GLY
+GGC	0.126309	GLY
+GGG	0.166687	GLY
+GGU	0.096285	GLY
+GUA	0.135627	VAL
+GUC	0.077649	VAL
+GUG	0.157369	VAL
+GUU	0.077649	VAL
+UAA	0.107527	STOP
+UAC	0.129415	TYR
+UAG	0.107527	STOP
+UAU	0.129415	TYR
+UCA	0.130451	SER
+UCC	0.102497	SER
+UCG	0.148051	SER
+UCU	0.101462	SER
+UGA	0.107527	STOP
+UGC	0.127345	CYS
+UGG	0.158404	TRP
+UGU	0.083861	CYS
+UUA	0.102497	LEU
+UUC	0.103532	PHE
+UUG	0.095250	LEU
+UUU	0.108709	PHE

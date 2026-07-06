@@ -1,4 +1,4 @@
-"""Core nascent-chain MD engine for co-translational synthesis (a library, not a runner).
+"""Core nascent-chain MD engine for protein synthesis (a library, not a runner).
 
 The shared per-length machinery of :mod:`cosmo.csp`, mirroring the sibling ``topo``
 project's ``topo/csp/core.py`` but built on cosmo's **sequence-based IDP force field**

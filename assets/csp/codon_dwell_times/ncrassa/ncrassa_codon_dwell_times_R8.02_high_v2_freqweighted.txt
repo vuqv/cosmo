@@ -1,0 +1,120 @@
+# =============================================================================
+# Per-codon translation dwell times — Neurospora crassa   [VERSION 2: FREQUENCY-WEIGHTED]
+# =============================================================================
+# Format : CODON<TAB>TIME_SECONDS (RNA alphabet, U; 6 dp). 61 sense + 3 stop.
+# Elongation-rate anchor R = 8.02 codons/s ; tau = 1/R = 0.124688 s.
+#
+# WHAT'S DIFFERENT FROM VERSION 1
+#   v1 (companion file, unweighted) sets the UNWEIGHTED mean over the 61 codon
+#   TYPES to tau. v2 (this file) sets the CODON-USAGE-WEIGHTED mean to tau, so a
+#   transcript of average composition translates at exactly R -- the same
+#   Option-B convention used for the E. coli (Fluitt/O'Brien) and yeast tables.
+#   Conversion:  t_c = r_c * tau / SUM_c( f_c * r_c )
+#   where f_c = genomic codon-usage frequency. Verified SUM f_c*t_c = tau
+#   (= 0.124688). The RELATIVE codon pattern is IDENTICAL to v1; v2 = v1 times
+#   a single constant:  v2/v1 = 1.0579 (+5.8%)
+#
+# CODON USAGE SOURCE (f_c)
+#   Kazusa Neurospora crassa [gbpln]: 3,953 CDS (2,048,035 codons), species 5141.
+#   https://www.kazusa.or.jp/codon/  (sense codons renormalized to sum 1 = f_c).
+#   Full table [codon per-thousand(count)], standard codon order:
+#     UUU  11.8(24098)      UCU  11.9(24466)      UAU   8.5(17342)      UGU   3.4(6864)     
+#     UUC  22.1(45213)      UCC  20.0(40934)      UAC  17.5(35768)      UGC   7.7(15795)    
+#     UUA   2.7(5596)       UCA   9.2(18878)      UAA   0.6(1305)       UGA   0.8(1606)     
+#     UUG  14.9(30615)      UCG  14.5(29720)      UAG   0.5(1105)       UGG  13.1(26845)    
+#
+#     CUU  14.2(29177)      CCU  15.1(30898)      CAU   9.5(19363)      CGU   8.9(18193)    
+#     CUC  26.8(54859)      CCC  22.4(45919)      CAC  14.8(30271)      CGC  17.6(36131)    
+#     CUA   6.0(12196)      CCA  12.4(25320)      CAA  17.0(34722)      CGA   7.1(14442)    
+#     CUG  18.3(37407)      CCG  14.6(29827)      CAG  26.0(53342)      CGG   8.5(17492)    
+#
+#     AUU  14.0(28668)      ACU  11.2(22851)      AAU  10.3(21140)      AGU   8.7(17740)    
+#     AUC  26.5(54226)      ACC  24.7(50609)      AAC  27.0(55293)      AGC  17.4(35699)    
+#     AUA   4.1(8373)       ACA  10.7(22008)      AAA  11.7(23932)      AGA   7.9(16197)    
+#     AUG  21.8(44655)      ACG  13.5(27722)      AAG  40.4(82727)      AGG  11.8(24252)    
+#
+#     GUU  13.8(28345)      GCU  21.1(43267)      GAU  24.0(49136)      GGU  18.3(37439)    
+#     GUC  24.8(50857)      GCC  36.0(73666)      GAC  32.5(66663)      GGC  29.0(59424)    
+#     GUA   5.4(11060)      GCA  12.6(25733)      GAA  22.4(45953)      GGA  13.6(27770)    
+#     GUG  15.5(31763)      GCG  17.3(35344)      GAG  42.7(87418)      GGG  10.9(22396)
+#
+# RELATIVE DATA SOURCE
+#   Yang et al. 2019 NAR Fig 1 RCDT (digitized, +/-~0.03; CCA=1.0 slowest ref).
+#   doi:10.1093/nar/gkz710
+# UNDERLYING RELATIVE VALUES — RCDT (A-site decoding time; higher=slower), 10/row
+#   Yang 2019 Fig 1
+#   AAA=0.78  AAC=0.61  AAG=0.55  AAU=0.82  ACA=0.76  ACC=0.53  ACG=0.76  ACU=0.68  AGA=0.85  AGC=0.72
+#   AGG=0.8  AGU=0.81  AUA=0.97  AUC=0.57  AUG=0.72  AUU=0.68  CAA=0.8  CAC=0.59  CAG=0.66  CAU=0.78
+#   CCA=1  CCC=0.67  CCG=0.9  CCU=0.89  CGA=0.97  CGC=0.65  CGG=0.85  CGU=0.73  CUA=0.83  CUC=0.55
+#   CUG=0.75  CUU=0.73  GAA=0.72  GAC=0.71  GAG=0.59  GAU=0.8  GCA=0.79  GCC=0.55  GCG=0.66  GCU=0.68
+#   GGA=0.72  GGC=0.58  GGG=0.66  GGU=0.6  GUA=0.82  GUC=0.55  GUG=0.69  GUU=0.66  UAC=0.56  UAU=0.75
+#   UCA=0.83  UCC=0.56  UCG=0.68  UCU=0.72  UGC=0.59  UGG=0.72  UGU=0.83  UUA=0.88  UUC=0.64  UUG=0.7
+#   UUU=0.8
+#
+# RANGE (v2): fastest ACC = 0.096922 s ; slowest CCA = 0.182872 s.
+# =============================================================================
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+AAA	0.142640	LYS
+AAC	0.111552	ASN
+AAG	0.100580	LYS
+AAU	0.149955	ASN
+ACA	0.138983	THR
+ACC	0.096922	THR
+ACG	0.138983	THR
+ACU	0.124353	THR
+AGA	0.155441	ARG
+AGC	0.131668	SER
+AGG	0.146298	ARG
+AGU	0.148127	SER
+AUA	0.177386	ILE
+AUC	0.104237	ILE
+AUG	0.131668	MET
+AUU	0.124353	ILE
+CAA	0.146298	GLN
+CAC	0.107895	HIS
+CAG	0.120696	GLN
+CAU	0.142640	HIS
+CCA	0.182872	PRO
+CCC	0.122524	PRO
+CCG	0.164585	PRO
+CCU	0.162756	PRO
+CGA	0.177386	ARG
+CGC	0.118867	ARG
+CGG	0.155441	ARG
+CGU	0.133497	ARG
+CUA	0.151784	LEU
+CUC	0.100580	LEU
+CUG	0.137154	LEU
+CUU	0.133497	LEU
+GAA	0.131668	GLU
+GAC	0.129839	ASP
+GAG	0.107895	GLU
+GAU	0.146298	ASP
+GCA	0.144469	ALA
+GCC	0.100580	ALA
+GCG	0.120696	ALA
+GCU	0.124353	ALA
+GGA	0.131668	GLY
+GGC	0.106066	GLY
+GGG	0.120696	GLY
+GGU	0.109723	GLY
+GUA	0.149955	VAL
+GUC	0.100580	VAL
+GUG	0.126182	VAL
+GUU	0.120696	VAL
+UAA	0.124688	STOP
+UAC	0.102408	TYR
+UAG	0.124688	STOP
+UAU	0.137154	TYR
+UCA	0.151784	SER
+UCC	0.102408	SER
+UCG	0.124353	SER
+UCU	0.131668	SER
+UGA	0.124688	STOP
+UGC	0.107895	CYS
+UGG	0.131668	TRP
+UGU	0.151784	CYS
+UUA	0.160928	LEU
+UUC	0.117038	PHE
+UUG	0.128011	LEU
+UUU	0.146298	PHE

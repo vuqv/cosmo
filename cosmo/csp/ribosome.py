@@ -1,4 +1,4 @@
-"""Rigid ribosome scenery + cross-interactions for co-translational synthesis.
+"""Rigid ribosome scenery + cross-interactions for protein synthesis.
 
 The nascent chain is simulated with cosmo's sequence-based IDP force field (the
 **hps_kr** Ashbaugh-Hatch potential for the CSP path); the truncated ribosome is added

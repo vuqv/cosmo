@@ -9,7 +9,7 @@ Python library and command-line toolkit for coarse-grained molecular dynamics of
 `OpenMM <https://openmm.org/>`_. From a sequence it builds a one-bead-per-residue
 model under the hydropathy-scale **HPS** (Ashbaugh–Hatch) or **mpipi** (Wang–Frenkel)
 force field and runs Langevin dynamics — for single-chain dimensions, liquid–liquid
-phase separation, protein–RNA complexes, and **co-translational synthesis**.
+phase separation, protein–RNA complexes, and **protein synthesis**.
 
 **New here?** Read :doc:`overview` to see the two things COSMO does and jump to the
 right tutorials, and :doc:`modules/introduction` for installation and package layout.
@@ -35,9 +35,10 @@ right tutorials, and :doc:`modules/introduction` for installation and package la
 
 .. toctree::
    :maxdepth: 1
-   :caption: Co-translational synthesis
+   :caption: Protein synthesis
 
    usage/ribosome_preparation
+   usage/codon_dwell_times
    usage/continuous_synthesis
    usage/cylinder_synthesis
    usage/synthesis_control

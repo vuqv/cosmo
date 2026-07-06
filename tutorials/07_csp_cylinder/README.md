@@ -40,7 +40,7 @@ run for **one MD segment** whose length is set by the codon's translation time.
 |------|------|
 | `asyn.pdb` | Full-length nascent protein (only the first `L` residues exist at each length). |
 | `mrna.txt` | Demo mRNA (140 cycled sense codons + `UAA` stop) — times each residue. |
-| `cylinder.ini` | Analytic-tunnel config (`model = hps_kr`, per-codon mRNA + bundled *E. coli* 310 K table, then `ejection` + `dissociation` free runs). |
+| `cylinder.ini` | Analytic-tunnel config (`model = hps_kr`, per-codon mRNA + the *E. coli* 310 K table from `assets/csp/codon_dwell_times/`, then `ejection` + `dissociation` free runs). |
 
 ## Run it
 
@@ -52,9 +52,9 @@ python -m cosmo.csp.cylinder -f cylinder.ini    # -> synth_out_cyl/L_<L>/
 ```
 
 The config defaults to `device = CPU` so it runs anywhere; switch to `device = GPU`
-for a real run. Kinetics are **per-codon**: `mrna.txt` gives the codon sequence and,
-because `codon_times` is omitted, each codon's dwell comes from the bundled *E. coli*
-310 K translation-time table. `max_steps_per_stage` clamps each residue's dwell
+for a real run. Kinetics are **per-codon**: `mrna.txt` gives the codon sequence and
+`codon_times` points at the *E. coli* 310 K translation-time table under
+`assets/csp/codon_dwell_times/`. `max_steps_per_stage` clamps each residue's dwell
 (otherwise ~10⁶ steps) down to a traceable test size — raise it, extend `L_max`, and
 switch to GPU for production.
 

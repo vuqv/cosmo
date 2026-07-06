@@ -1,6 +1,6 @@
 # `cosmo.csp` — Continuous Synthesis Protocol (O'Brien) on cosmo's IDP force field
 
-The per-codon, three-stage co-translational synthesis protocol of
+The per-codon, three-stage protein synthesis protocol of
 `continuous_synthesis_v6.py` (Yang Jiang, Dan Nissley, Ed O'Brien), ported to cosmo.
 `cosmo.csp` (the CSP runner, `cosmo-csp`) times every residue from its mRNA codon and
 splits it into the three sub-stages of the elongation cycle. It is a thin outer loop
@@ -28,7 +28,7 @@ cosmo *and* topo), not a native-contact well. A diverging stage (PotE → ~1e13 
 re-run at `dt/2` with `2×` steps (dwell `= n_steps · dt` preserved) until it integrates
 cleanly.
 
-> `cosmo.csp` is a **self-contained** package and the sole co-translational synthesis
+> `cosmo.csp` is a **self-contained** package and the sole protein synthesis
 > subsystem. It replaced the older single-stage `cosmo.translation` (`cosmo-elongate`)
 > package, which has been removed.
 
@@ -63,7 +63,7 @@ steps    = int(t_sim_ns / (dt_ps * 1e-3))        # -> MD steps
 | `cylinder.py` | **the cylinder runner** (`cosmo-cylinder`): analytic exit tunnel (a bore in an infinite wall, `add_tunnel_cylinder`) instead of explicit beads. Same codon kinetics, **one MD segment per residue** (no A/P sub-stages). |
 | `ribosome.py` | rigid CG ribosome scenery + ribosome↔nascent excluded volume / electrostatics; the tRNA tether and planar tunnel wall. Loads a CG ribosome PDB (topo P/R/BR rep) prepared with the sibling `topo` package. |
 | `movie.py` | stitch the per-residue/-stage trajectories into one VMD movie (`cosmo-csp-movie`; auto-detects the 3-stage vs flat layout). |
-| `data/` | bundled `ecoli_trans_times_310K.txt` — the default E. coli (310 K) codon-time table (organism-universal). |
+| `synth_mrna.py` | build a `fastest`/`slowest` synonymous-codon mRNA for a protein from its PDB + a codon dwell-time table (`cosmo-make-mrna`). |
 
 ## Public API
 
@@ -80,11 +80,16 @@ run_continuous_synthesis(cfg.pdb_file, cfg.ribosome, L0=cfg.L0, L_max=cfg.L_max,
 ## Control file (`csp.ini`)
 
 A single `[OPTIONS]` section. Required: `pdb_file`, `ribosome`. `L0` (default `1`) and
-`L_max` (default = full length) are optional. Per-codon timing also requires `mrna`
-(`codon_times` is optional — defaults to the bundled E. coli 310 K table).
+`L_max` (default = full length) are optional. Per-codon timing requires both `mrna` and
+a `codon_times` table path (there is no bundled default — pick one under
+`assets/csp/codon_dwell_times/`). Setting `mrna = fastest` or `slowest` auto-builds a
+synonymous-codon mRNA from the protein + table.
 
-**Kinetic keys:** `mrna`, `codon_times` (a table path for per-codon timing, **or** a
-positive number of seconds for a uniform codon time), `scale_factor`, `time_stage_1`,
+**Kinetic keys:** `mrna` (an mRNA file, **or** `fastest`/`slowest` to auto-build a
+synonymous-codon mRNA — each residue's fastest/slowest codon per the `codon_times` table,
+written next to the PDB), `codon_times` (a table path for per-codon timing — required, no
+bundled default — **or** a positive number of seconds for a uniform codon time),
+`scale_factor`, `time_stage_1`,
 `time_stage_2`, `random_seed`, `max_steps_per_stage` / `min_steps_per_stage` (test
 clamps), `ejection_steps` / `dissociation_steps` (post-synthesis free runs).
 

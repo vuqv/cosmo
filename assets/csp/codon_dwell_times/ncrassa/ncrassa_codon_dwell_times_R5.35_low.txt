@@ -1,0 +1,125 @@
+# =============================================================================
+# Per-codon translation dwell times — Neurospora crassa
+# ELONGATION-RATE ANCHOR: R = 5.35 codons/s  (low end of the measured N. crassa range)
+# =============================================================================
+# Format : CODON<TAB>TIME_SECONDS   (RNA alphabet, U; 6 decimal places)
+#          61 sense codons + 3 stop codons (UAA, UAG, UGA) = 64 rows.
+#          Larger value = slower codon.
+#
+# ELONGATION-RATE ANCHOR (now empirically based, not an assumption)
+#   Measured peptide chain elongation rate for N. crassa = 5.35-8.02 amino
+#   acids/s per ribosome (growth-condition dependent; a genome-averaged rate).
+#   This file uses R = 5.35 codons/s (low end of that range). tau = 1/R = 0.186916 s.
+#   Times scale as 1/R; companion files use the other ends of the range. The
+#   relative codon pattern (from RCDT) is identical across all three files.
+#     Source of R: Karpinets et al. 2006, BMC Biol 4:30 (PMID 16953894),
+#       table 3, derived from primary data in Alberghina et al. 1975,
+#       J Biol Chem 250(12):4381-8 (PMID 124730) — rates of RNA/protein
+#       synthesis across N. crassa steady-state growth. Also BNID 107872.
+#
+# ---------------------------------------------------------------------------
+# SOURCE OF RELATIVE DATA (per-codon pattern)
+#   Yang, Yu, Zhao, Dang, Wu, Xie, Sachs, Liu (2019)
+#   "eRF1 mediates codon usage effects on mRNA translation efficiency through
+#   premature termination at rare codons."  Nucleic Acids Research 47(17):9243.
+#   doi:10.1093/nar/gkz710
+#   -> RCDT (Relative Codon Decoding Time), Figure 1 (black dots, right axis).
+#      RCDT = average relative A-site (RPF nt 16-18) ribosome dwell time per
+#      sense codon, = CDT normalized to the highest-occupied codon CCA (Pro),
+#      so CCA = 1.0 is the slowest reference; all others <= 1.0. Higher = slower.
+#
+# HOW THE RELATIVE VALUES WERE OBTAINED
+#   The 61 RCDT values are NOT tabulated in the paper; they exist only as the
+#   dots in Figure 1 and were pixel-digitized here (figure rendered at 300 dpi;
+#   each panel's right axis calibrated 0.5 = box bottom, 1.0 = box top, verified
+#   by CCA = 1.0). Estimated read precision +/- ~0.03 in RCDT. Treat as
+#   figure-digitized approximations, not exact source values.
+#
+# CONVERSION (Option A, unweighted):
+#       t_c = RCDT_c * tau / mean_over_61(RCDT)      mean(RCDT) = 0.7213
+#   Verified: unweighted mean of t_c = tau = 0.186916 s.
+#
+# STOP CODONS (UAA, UAG, UGA): assigned the mean per-codon time = tau = 0.186916 s.
+#
+# RANGE: fastest ACC (Thr) = 0.137341 s ; slowest CCA (Pro) = 0.259133 s.
+#
+# CAVEATS: RCDT values are figure-digitized (+/- ~0.03). The measured R is a
+#   bulk, growth-averaged rate (indirect method); profiling temperature
+#   (~25-32 C) is below the 37 C E. coli reference.
+# =============================================================================
+# ---------------------------------------------------------------------------
+# UNDERLYING RELATIVE VALUES — RCDT (Relative Codon Decoding Time, A-site; higher=slower) (U alphabet, 61 sense codons, 10 per row)
+#   Yang et al. 2019 NAR Fig 1 (digitized, +/-~0.03). CCA=1.0 = slowest reference.
+#   AAA=0.78  AAC=0.61  AAG=0.55  AAU=0.82  ACA=0.76  ACC=0.53  ACG=0.76  ACU=0.68  AGA=0.85  AGC=0.72
+#   AGG=0.8  AGU=0.81  AUA=0.97  AUC=0.57  AUG=0.72  AUU=0.68  CAA=0.8  CAC=0.59  CAG=0.66  CAU=0.78
+#   CCA=1  CCC=0.67  CCG=0.9  CCU=0.89  CGA=0.97  CGC=0.65  CGG=0.85  CGU=0.73  CUA=0.83  CUC=0.55
+#   CUG=0.75  CUU=0.73  GAA=0.72  GAC=0.71  GAG=0.59  GAU=0.8  GCA=0.79  GCC=0.55  GCG=0.66  GCU=0.68
+#   GGA=0.72  GGC=0.58  GGG=0.66  GGU=0.6  GUA=0.82  GUC=0.55  GUG=0.69  GUU=0.66  UAC=0.56  UAU=0.75
+#   UCA=0.83  UCC=0.56  UCG=0.68  UCU=0.72  UGC=0.59  UGG=0.72  UGU=0.83  UUA=0.88  UUC=0.64  UUG=0.7
+#   UUU=0.8
+# ---------------------------------------------------------------------------
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+AAA	0.202124	LYS
+AAC	0.158071	ASN
+AAG	0.142523	LYS
+AAU	0.212489	ASN
+ACA	0.196941	THR
+ACC	0.137341	THR
+ACG	0.196941	THR
+ACU	0.176211	THR
+AGA	0.220263	ARG
+AGC	0.186576	SER
+AGG	0.207307	ARG
+AGU	0.209898	SER
+AUA	0.251359	ILE
+AUC	0.147706	ILE
+AUG	0.186576	MET
+AUU	0.176211	ILE
+CAA	0.207307	GLN
+CAC	0.152889	HIS
+CAG	0.171028	GLN
+CAU	0.202124	HIS
+CCA	0.259133	PRO
+CCC	0.173619	PRO
+CCG	0.233220	PRO
+CCU	0.230629	PRO
+CGA	0.251359	ARG
+CGC	0.168437	ARG
+CGG	0.220263	ARG
+CGU	0.189167	ARG
+CUA	0.215081	LEU
+CUC	0.142523	LEU
+CUG	0.194350	LEU
+CUU	0.189167	LEU
+GAA	0.186576	GLU
+GAC	0.183985	ASP
+GAG	0.152889	GLU
+GAU	0.207307	ASP
+GCA	0.204715	ALA
+GCC	0.142523	ALA
+GCG	0.171028	ALA
+GCU	0.176211	ALA
+GGA	0.186576	GLY
+GGC	0.150297	GLY
+GGG	0.171028	GLY
+GGU	0.155480	GLY
+GUA	0.212489	VAL
+GUC	0.142523	VAL
+GUG	0.178802	VAL
+GUU	0.171028	VAL
+UAA	0.186916	STOP
+UAC	0.145115	TYR
+UAG	0.186916	STOP
+UAU	0.194350	TYR
+UCA	0.215081	SER
+UCC	0.145115	SER
+UCG	0.176211	SER
+UCU	0.186576	SER
+UGA	0.186916	STOP
+UGC	0.152889	CYS
+UGG	0.186576	TRP
+UGU	0.215081	CYS
+UUA	0.228037	LEU
+UUC	0.165845	PHE
+UUG	0.181393	LEU
+UUU	0.207307	PHE

@@ -1,0 +1,148 @@
+# =============================================================================
+# Per-codon translation times — Saccharomyces cerevisiae  (O'Brien-lab, absolute)
+# DATA COLUMN = MEAN codon translation time, WEISSMAN/WILLIAMS dataset, SECONDS.
+# =============================================================================
+# Format : CODON<TAB>TIME_SECONDS   (RNA alphabet, U; 6 decimal places)
+#          64 codons: 61 sense + 3 stop (UAA/UAG/UGA). Larger value = slower.
+#          Stop-codon times are MEASURED here (not placeholders).
+#
+# SOURCE
+#   Sharma, Sormanni, Ahmed, Ciryam, Friedrich, Kramer, O'Brien (2019)
+#   "A chemical kinetic basis for measuring translation initiation and
+#   elongation rates from ribosome profiling data."
+#   PLoS Comput Biol 15(5):e1007070.  doi:10.1371/journal.pcbi.1007070
+#   -> S1 File (pcbi.1007070.s016.xlsx), sheets "Nissley data translation
+#      rates" and "Weissman data translation rates".
+#   Absolute per-codon translation times from the authors' chemical-kinetic
+#   model (Eq 12) applied to S. cerevisiae ribosome profiling — the SAME
+#   continuous-synthesis framework as this project's pipeline, so these are the
+#   most directly compatible yeast numbers (the model sets absolute time
+#   itself; no external elongation-rate anchor R is needed).
+#
+# WHICH NUMBER / DATASET (see note from analysis)
+#   MEAN translation time is used (matches the mean first-passage convention of
+#   the E. coli Fluitt table and O'Brien continuous-synthesis simulations).
+#   Data rows use the WEISSMAN/WILLIAMS dataset (364 transcripts) rather than
+#   Nissley (117), because its per-codon means rest on ~3x more observations
+#   and are less noisy; the two datasets agree closely (233 vs 238 ms
+#   sense-codon average) and are well-correlated. All four series (both
+#   datasets x mean/median, in ms) are listed below to substitute if desired.
+#
+# ABSOLUTE SCALE / RATE NOTE
+#   O'Brien anchor the transcriptome-wide average codon time to ~200 ms
+#   (~5 codons/s). Sense-codon MEAN here averages ~233 ms (~4.3
+#   codons/s). This is SLOWER than the R=9.3/s scale in the companion
+#   Gardin-RRT yeast file (mean ~0.108 s); they encode different rate choices.
+#
+# RANGE (Weissman mean): fastest GUU = 0.145000 s ; slowest CCG = 0.504000 s.
+#
+# ---------------------------------------------------------------------------
+# SOURCE VALUES — Weissman/Williams MEAN translation time (ms), 10/row  [= data column x1000]
+#   primary; 364 transcripts
+#   AAA=216  AAC=166  AAG=194  AAU=168  ACA=260  ACC=162  ACG=323  ACU=173  AGA=218  AGC=217
+#   AGG=318  AGU=201  AUA=273  AUC=146  AUG=182  AUU=151  CAA=159  CAC=208  CAG=237  CAU=185
+#   CCA=238  CCC=356  CCG=504  CCU=271  CGA=482  CGC=286  CGG=427  CGU=192  CUA=194  CUC=283
+#   CUG=305  CUU=204  GAA=206  GAC=202  GAG=255  GAU=200  GCA=239  GCC=166  GCG=307  GCU=164
+#   GGA=320  GGC=277  GGG=326  GGU=223  GUA=204  GUC=152  GUG=264  GUU=145  UAA=185  UAC=216
+#   UAG=311  UAU=191  UCA=200  UCC=177  UCG=282  UCU=167  UGA=376  UGC=273  UGG=325  UGU=178
+#   UUA=158  UUC=168  UUG=179  UUU=172
+#
+# SOURCE VALUES — Weissman/Williams MEDIAN translation time (ms), 10/row
+#   robust central estimate
+#   AAA=179  AAC=148  AAG=155  AAU=149  ACA=237  ACC=135  ACG=296  ACU=141  AGA=191  AGC=205
+#   AGG=273  AGU=184  AUA=236  AUC=128  AUG=167  AUU=133  CAA=138  CAC=186  CAG=212  CAU=164
+#   CCA=206  CCC=315  CCG=455  CCU=235  CGA=496  CGC=260  CGG=360  CGU=167  CUA=178  CUC=256
+#   CUG=281  CUU=184  GAA=184  GAC=181  GAG=234  GAU=175  GCA=220  GCC=148  GCG=271  GCU=149
+#   GGA=271  GGC=233  GGG=287  GGU=182  GUA=185  GUC=137  GUG=238  GUU=129  UAA=144  UAC=196
+#   UAG=255  UAU=176  UCA=180  UCC=160  UCG=253  UCU=150  UGA=317  UGC=244  UGG=275  UGU=161
+#   UUA=142  UUC=152  UUG=161  UUU=157
+#
+# SOURCE VALUES — Nissley MEAN translation time (ms), 10/row
+#   alternative dataset (117 transcripts)
+#   AAA=178  AAC=153  AAG=174  AAU=161  ACA=259  ACC=156  ACG=343  ACU=162  AGA=209  AGC=253
+#   AGG=321  AGU=214  AUA=279  AUC=143  AUG=192  AUU=146  CAA=169  CAC=248  CAG=253  CAU=203
+#   CCA=245  CCC=347  CCG=390  CCU=254  CGA=218  CGC=402  CGG=443  CGU=212  CUA=234  CUC=288
+#   CUG=301  CUU=221  GAA=208  GAC=231  GAG=268  GAU=203  GCA=253  GCC=179  GCG=272  GCU=167
+#   GGA=325  GGC=263  GGG=327  GGU=210  GUA=231  GUC=167  GUG=280  GUU=148  UAA=719  UAC=233
+#   UAG=821  UAU=187  UCA=232  UCC=235  UCG=334  UCU=201  UGA=989  UGC=292  UGG=370  UGU=197
+#   UUA=172  UUC=179  UUG=175  UUU=182
+#
+# SOURCE VALUES — Nissley MEDIAN translation time (ms), 10/row
+#   alternative dataset, robust central estimate
+#   AAA=153  AAC=142  AAG=145  AAU=139  ACA=228  ACC=138  ACG=327  ACU=146  AGA=192  AGC=247
+#   AGG=305  AGU=205  AUA=266  AUC=131  AUG=177  AUU=127  CAA=152  CAC=236  CAG=243  CAU=192
+#   CCA=218  CCC=331  CCG=344  CCU=237  CGA=218  CGC=321  CGG=337  CGU=193  CUA=210  CUC=250
+#   CUG=279  CUU=209  GAA=190  GAC=208  GAG=254  GAU=179  GCA=238  GCC=164  GCG=258  GCU=156
+#   GGA=292  GGC=250  GGG=297  GGU=183  GUA=200  GUC=155  GUG=253  GUU=133  UAA=669  UAC=216
+#   UAG=829  UAU=171  UCA=211  UCC=213  UCG=329  UCU=187  UGA=976  UGC=263  UGG=331  UGU=189
+#   UUA=153  UUC=169  UUG=160  UUU=165
+# ---------------------------------------------------------------------------
+# CAVEATS: per-codon times vary up to ~16-26 fold with sequence context (the
+#   tabulated value is the mean over all instances). Stop-codon times differ
+#   between datasets (termination is noisy): compare Weissman vs Nissley below.
+# =============================================================================
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+AAA	0.216000	LYS
+AAC	0.166000	ASN
+AAG	0.194000	LYS
+AAU	0.168000	ASN
+ACA	0.260000	THR
+ACC	0.162000	THR
+ACG	0.323000	THR
+ACU	0.173000	THR
+AGA	0.218000	ARG
+AGC	0.217000	SER
+AGG	0.318000	ARG
+AGU	0.201000	SER
+AUA	0.273000	ILE
+AUC	0.146000	ILE
+AUG	0.182000	MET
+AUU	0.151000	ILE
+CAA	0.159000	GLN
+CAC	0.208000	HIS
+CAG	0.237000	GLN
+CAU	0.185000	HIS
+CCA	0.238000	PRO
+CCC	0.356000	PRO
+CCG	0.504000	PRO
+CCU	0.271000	PRO
+CGA	0.482000	ARG
+CGC	0.286000	ARG
+CGG	0.427000	ARG
+CGU	0.192000	ARG
+CUA	0.194000	LEU
+CUC	0.283000	LEU
+CUG	0.305000	LEU
+CUU	0.204000	LEU
+GAA	0.206000	GLU
+GAC	0.202000	ASP
+GAG	0.255000	GLU
+GAU	0.200000	ASP
+GCA	0.239000	ALA
+GCC	0.166000	ALA
+GCG	0.307000	ALA
+GCU	0.164000	ALA
+GGA	0.320000	GLY
+GGC	0.277000	GLY
+GGG	0.326000	GLY
+GGU	0.223000	GLY
+GUA	0.204000	VAL
+GUC	0.152000	VAL
+GUG	0.264000	VAL
+GUU	0.145000	VAL
+UAA	0.185000	STOP
+UAC	0.216000	TYR
+UAG	0.311000	STOP
+UAU	0.191000	TYR
+UCA	0.200000	SER
+UCC	0.177000	SER
+UCG	0.282000	SER
+UCU	0.167000	SER
+UGA	0.376000	STOP
+UGC	0.273000	CYS
+UGG	0.325000	TRP
+UGU	0.178000	CYS
+UUA	0.158000	LEU
+UUC	0.168000	PHE
+UUG	0.179000	LEU
+UUU	0.172000	PHE

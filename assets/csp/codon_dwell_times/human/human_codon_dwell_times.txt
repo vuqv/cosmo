@@ -1,0 +1,136 @@
+# =============================================================================
+# Per-codon translation dwell times — Homo sapiens (human)
+# =============================================================================
+# Format : CODON<TAB>TIME_SECONDS   (RNA alphabet, U; 6 decimal places)
+#          61 sense codons + 3 stop codons (UAA, UAG, UGA) = 64 rows.
+#          Larger value = slower codon.
+#
+# ---------------------------------------------------------------------------
+# SOURCE OF RELATIVE DATA
+#   Gobet, Weger, Marquis, Martin, Neelagandan, Gachon, Naef (2020)
+#   "Robust landscapes of ribosome dwell times and aminoacyl-tRNAs in
+#   response to nutrient stress in liver."  PNAS 117(17):9630-9641.
+#   doi:10.1073/pnas.1918145117 ; bioRxiv 551838.
+#   -> Supplementary Dataset S1 (pnas.1918145117.sd01.xlsx), sheet 2,
+#      column "Human_Lintner_DT" = single-codon ribosome dwell time (DT) for
+#      the human ribosome-profiling dataset (Lintner et al.), reported by the
+#      authors' GLM as log2 dwell time, MEAN-CENTERED PER SITE, as a function
+#      of codon position relative to the ribosomal E site.
+#
+# A-SITE POSITION CHOICE (important modeling decision)
+#   The dataset gives DT at many positions; the ribosomal E/P/A "core" labels
+#   (positions 0,1,2) are blank for this column. The single-codon dwell signal
+#   is by far strongest at position -3 (spread across codons ~0.62 log2 vs
+#   <0.4 elsewhere) and shows the expected A-site decoding signature (third-
+#   position/wobble effect: NNU codons slow, NNG codons fast). Position -3 is
+#   therefore used as the A-site (decoding) value, the human analogue of the
+#   yeast position-6 A-site RRT. If the authors' coordinate assigns the A site
+#   to a different offset, re-extract at that position and re-run.
+#   Relative dwell factor:  r_c = 2 ** DT_c   (undo the log2).
+#
+# ELONGATION-RATE ANCHOR
+#   R = 5.6 codons/s (mammalian; Ingolia, Lareau & Weissman 2011, Cell 147:789).
+#   tau = 1/R = 0.178571 s per codon.
+#
+# CONVERSION (Option A, unweighted — matches the unweighted per-site
+# mean-centering of the source DT):
+#       t_c = r_c * tau / mean_over_61(r_c)
+#   Verified: unweighted mean of t_c = tau = 0.178571 s (a mean-composition
+#   codon translates at R). Computed mean(r_c) = 1.09550. DNA T -> RNA U.
+#   (Frequency-weighted Option B can be substituted if a human codon-usage
+#   table f_c is supplied; effect is second-order.)
+#
+# STOP CODONS (UAA, UAG, UGA)
+#   Assigned the organism mean per-codon time = tau = 0.178571 s (placeholder;
+#   termination is not codon-resolved here).
+#
+# RANGE: fastest GGG (Gly) = 0.053541 s ; slowest CGU (Arg) = 0.366171 s
+#   (~7x dynamic range).
+#
+# CAVEATS
+#   - "Human_Lintner_DT" is a single human cell-line profiling dataset; the
+#     mouse-liver columns (Gobet's own data) are cleaner and, per the codon
+#     dwell-time conservation across mammals, are a legitimate alternative for
+#     a "human/mammalian" table with the same R.
+#   - Occupancy/model-derived, not a mechanistic kinetic model; absolute scale
+#     set entirely by the chosen R. Single-codon DTs; codon-PAIR effects
+#     (Dataset S2) are not included.
+#   - Third-position/wobble pattern may partly reflect ribosome-profiling
+#     ligation bias (discussed in the source paper).
+# =============================================================================
+# ---------------------------------------------------------------------------
+# UNDERLYING RELATIVE VALUES — DT (log2 dwell time, mean-centered, A-site pos -3; higher=slower) (U alphabet, 61 sense codons, 10 per row)
+#   Gobet et al. 2020 PNAS, Dataset S1 Human_Lintner_DT. relative factor r = 2**DT.
+#   AAA=-0.37428  AAC=-0.15556  AAG=-0.34788  AAU=0.63557  ACA=0.73995  ACC=0.45488  ACG=0.26977  ACU=1.0358  AGA=-0.29848  AGC=-0.4291
+#   AGG=-0.99223  AGU=1.0588  AUA=-0.014569  AUC=0.047665  AUG=-0.23214  AUU=0.77522  CAA=0.032898  CAC=0.27871  CAG=-0.037538  CAU=0.99975
+#   CCA=0.7752  CCC=0.21689  CCG=0.28728  CCU=0.92218  CGA=-0.25713  CGC=-0.41052  CGG=-0.84525  CGU=1.1676  CUA=-0.097993  CUC=-0.19988
+#   CUG=-0.27661  CUU=0.66542  GAA=-0.55628  GAC=-0.57946  GAG=-0.86438  GAU=0.46656  GCA=0.34911  GCC=-0.022366  GCG=-0.24358  GCU=0.78554
+#   GGA=-0.6577  GGC=-0.82708  GGG=-1.6062  GGU=0.72531  GUA=-0.22319  GUC=-0.29632  GUG=-0.49135  GUU=0.51553  UAC=-0.19065  UAU=0.71788
+#   UCA=0.15247  UCC=0.13245  UCG=-0.2846  UCU=0.7472  UGC=-0.86077  UGG=-1.1177  UGU=0.6309  UUA=-0.64631  UUC=-0.43348  UUG=-1.0017
+#   UUU=0.28575
+# ---------------------------------------------------------------------------
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+AAA	0.125757	LYS
+AAC	0.146343	ASN
+AAG	0.128079	LYS
+AAU	0.253237	ASN
+ACA	0.272238	THR
+ACC	0.223426	THR
+ACG	0.196521	THR
+ACU	0.334201	THR
+AGA	0.132541	ARG
+AGC	0.121068	SER
+AGG	0.081943	ARG
+AGU	0.339572	SER
+AUA	0.161367	ILE
+AUC	0.168481	ILE
+AUG	0.138778	MET
+AUU	0.278975	ILE
+CAA	0.166765	GLN
+CAC	0.197743	HIS
+CAG	0.158818	GLN
+CAU	0.325954	HIS
+CCA	0.278971	PRO
+CCC	0.189449	PRO
+CCG	0.198921	PRO
+CCU	0.308891	PRO
+CGA	0.136395	ARG
+CGC	0.122637	ARG
+CGG	0.090731	ARG
+CGU	0.366171	ARG
+CUA	0.152301	LEU
+CUC	0.141916	LEU
+CUG	0.134565	LEU
+CUU	0.258531	LEU
+GAA	0.110852	GLU
+GAC	0.109085	ASP
+GAG	0.089536	GLU
+GAU	0.225242	ASP
+GCA	0.207632	ALA
+GCC	0.160497	ALA
+GCG	0.137682	ALA
+GCU	0.280978	ALA
+GGA	0.103327	GLY
+GGC	0.091881	GLY
+GGG	0.053541	GLY
+GGU	0.269489	GLY
+GUA	0.139641	VAL
+GUC	0.132739	VAL
+GUG	0.115955	VAL
+GUU	0.233019	VAL
+UAA	0.178571	STOP
+UAC	0.142827	TYR
+UAG	0.178571	STOP
+UAU	0.268105	TYR
+UCA	0.181175	SER
+UCC	0.178679	SER
+UCG	0.133822	SER
+UCU	0.273609	SER
+UGA	0.178571	STOP
+UGC	0.089760	CYS
+UGG	0.075117	TRP
+UGU	0.252418	CYS
+UUA	0.104146	LEU
+UUC	0.120701	PHE
+UUG	0.081407	LEU
+UUU	0.198710	PHE

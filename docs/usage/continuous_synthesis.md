@@ -1,7 +1,7 @@
 # Synthesis on a coarse-grained ribosome
 
 The **Continuous Synthesis Protocol (CSP)** is cosmo's **codon-resolved, kinetic** runner
-for co-translational synthesis on an **explicit coarse-grained ribosome**. It times
+for protein synthesis on an **explicit coarse-grained ribosome**. It times
 **every residue from its mRNA codon** and splits each elongation cycle into **three
 kinetic sub-stages** — reproducing O'Brien's `continuous_synthesis_v6.py` protocol, but
 on cosmo's **sequence-based IDP force field** (HPS / mpipi) instead of a structure-based
@@ -55,7 +55,7 @@ per-residue dwell-time log `<outdir>/dwell_times.dat`.
 
 ## Theory
 
-### 1. What is being modeled: co-translational synthesis
+### 1. What is being modeled: protein synthesis
 
 In a living cell a protein is **synthesized vectorially, N-terminus first**, by the
 ribosome, one amino acid at a time, while the growing ("nascent") chain threads out
@@ -276,8 +276,8 @@ For a compact tabular reference of every `csp.ini` option, see {doc}`synthesis_c
 | `model` | no | `hps_kr` | Nascent force field. **Any model works** (`hps_kr` / `hps_urry` / `mpipi`); `hps_kr` is only the default. The ribosome 12-10-6 wall uses the model-independent O'Brien `Rmin/2` tables (`OBRIEN_RMIN_2_NM` / `OBRIEN_RNA_RMIN_2_BEADS`), so the model only sets the nascent IDP↔IDP interaction. |
 | `L0` | no | `1` | Start nascent-chain length. |
 | `L_max` | no | full length | Final nascent length. |
-| `mrna` | cond. | — | mRNA file (one codon per residue). Required for per-codon timing (unless `codon_times` is a number). |
-| `codon_times` | no | bundled E. coli 310 K | A **table path** = per-codon timing; a **positive number of seconds** = uniform codon time (no `mrna` needed); omit = bundled Fluitt table. A table filename must **not** be a bare number. |
+| `mrna` | cond. | — | mRNA file (one codon per residue), **or** `fastest`/`slowest` to auto-build a synonymous-codon mRNA (see [Fastest / slowest mRNA](#fastest-slowest-mrna)). Required for per-codon timing (unless `codon_times` is a number). A real filename must not be `fastest`/`slowest`. |
+| `codon_times` | cond. | — | A **table path** = per-codon timing (required, no bundled default — pick one under `assets/csp/codon_dwell_times/`); a **positive number of seconds** = uniform codon time (no `mrna` needed). A table filename must **not** be a bare number. |
 | `outdir` | no | `synth_out` | Output root. |
 
 There is **no `domain_def`, `stride_output_file`, or `nascent_ev_radii` key** — those are

@@ -17,7 +17,7 @@ concepts involved. Work through them in order.
 | 5 | [Slab simulation of phase separation (LLPS)](./05_slab_llps/) | The slab method for condensates: NPT-compress, elongate, NVT, and read coexisting densities off ρ(z) to map a phase diagram. |
 | 6 | [Protein–RNA complex](./06_protein_rna_complex/) | Multi-component systems: assembling a mixed protein + RNA input and the nucleic-acid-capable models. |
 
-### Co-translational synthesis series (7–8)
+### Protein synthesis series (7–8)
 
 Tutorials 7–8 are an **advanced, research-oriented series** on
 **co-translational protein synthesis**: instead of folding a full-length chain in

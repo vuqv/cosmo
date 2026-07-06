@@ -1,7 +1,7 @@
 cosmo.csp package
 =================
 
-The O'Brien Continuous Synthesis Protocol (co-translational synthesis) ported to
+The O'Brien Continuous Synthesis Protocol (protein synthesis) ported to
 cosmo's sequence-based IDP force field. See :doc:`usage/continuous_synthesis` for the
 model and :doc:`usage/synthesis_control` for the ``csp.ini`` reference.
 

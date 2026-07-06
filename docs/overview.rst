@@ -12,7 +12,7 @@ That model powers **two complementary workflows**:
 
 * :ref:`A. Coarse-grained simulation of IDPs <overview-simulation>` — single chains,
   multi-chain slabs / LLPS, and protein–RNA complexes.
-* :ref:`B. Co-translational synthesis <overview-synthesis>` — grow the chain residue
+* :ref:`B. Protein synthesis <overview-synthesis>` — grow the chain residue
   by residue on the ribosome under codon-resolved kinetics, and watch how a disordered
   chain extrudes and behaves *as it is made*.
 
@@ -44,7 +44,7 @@ phase separation, and protein–RNA mixtures.
 
 .. _overview-synthesis:
 
-B. Co-translational synthesis
+B. Protein synthesis
 -----------------------------
 
 Grow the nascent chain **N→C, one residue at a time**, timing every residue from its
@@ -91,7 +91,7 @@ Runnable proof-of-concept examples (α-synuclein) live in ``sandbox/validate/``
 
 .. note::
 
-   Co-translational synthesis is the cosmo port of the sibling ``topo`` package's
+   Protein synthesis is the cosmo port of the sibling ``topo`` package's
    ``topo.csp``. It shares the codon kinetics, the three-stage protocol, the cylinder
    model, and the O'Brien 12-10-6 ribosome excluded volume, but the nascent chain is a
    **sequence-based IDP** (HPS / mpipi) rather than a structure-based Gō model — so

@@ -63,6 +63,7 @@ from cosmo.csp.ribosome import load_ribosome
 from cosmo.parameters import model_parameters
 from cosmo.utils.config import strtobool
 from cosmo.csp import kinetics
+from cosmo.csp import synth_mrna
 
 
 # --------------------------------------------------------------------------
@@ -92,11 +93,12 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     mrna : str, optional
         mRNA sequence file (one codon per residue) for the codon-resolved kinetics.
         Required for per-codon timing; not needed for uniform timing
-        (``params.uniform_codon_time`` set).
-    codon_time_table_path : str, optional
-        Per-codon mean-time table. ``None`` -> the bundled E. coli 310 K table
-        (organism-universal; see
-        :func:`cosmo.csp.kinetics.default_codon_time_table_path`).
+        (``params.uniform_codon_time`` set). (The INI also accepts ``fastest``/``slowest``
+        to auto-build a synonymous-codon mRNA; that is resolved to a written file in
+        :func:`read_csp_config` before this function is called.)
+    codon_time_table_path : str
+        Per-codon mean-time table (required for per-codon timing; pick one under
+        ``assets/csp/codon_dwell_times/``). There is no bundled default.
     params : RunParams, optional
         Kinetic + MD/ribosome run parameters (defaults to the dataclass defaults).
 
@@ -310,16 +312,19 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     The MD / ribosome keys configure the shared :class:`cosmo.csp.core.RunParams`
     machinery; the O'Brien **kinetic keys** are added on top. Required: ``pdb_file``,
     ``ribosome``. ``L0`` (default ``1``) and ``L_max`` (default = full residue count)
-    are optional. Per-codon timing additionally requires ``mrna`` (``codon_times`` is
-    optional -- defaults to the bundled E. coli 310 K table).
+    are optional. Per-codon timing requires both ``mrna`` and a ``codon_times`` table
+    path (there is no bundled default -- pick one under ``assets/csp/codon_dwell_times/``).
 
     Kinetic keys
     ------------
     - ``mrna`` -- mRNA sequence file (one codon per residue + 1 stop). Required for
-      per-codon timing.
+      per-codon timing. May also be the keyword ``fastest`` / ``slowest`` to auto-build a
+      synonymous-codon mRNA (each residue's fastest/slowest codon per the ``codon_times``
+      table, written next to the PDB); a real filename must not be ``fastest``/``slowest``.
     - ``codon_times`` -- either a **path** to a per-codon mean-time table
-      (``CODON  seconds``) **or** a **positive number of seconds** (uniform codon time,
-      no ``mrna`` needed). Optional; omitting it uses the bundled E. coli 310 K table.
+      (``CODON  seconds  amino_acid``; required for per-codon, no bundled default -- pick
+      one under ``assets/csp/codon_dwell_times/``) **or** a **positive number of seconds**
+      (uniform codon time, no ``mrna`` needed). A table filename must not be a bare number.
     - ``scale_factor`` -- in-vivo seconds -> in-silico ns compressor.
     - ``time_stage_1`` / ``time_stage_2`` -- mean peptidyl-transfer / translocation
       dwell (s); stage 3 = codon total minus these.
@@ -378,6 +383,24 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     outdir = opt("outdir") or "synth_out"
     mrna = opt("mrna")
     _uniform_codon_time, codon_time_table_path = kinetics.parse_codon_times(opt("codon_times"))
+    # mrna = "fastest"/"slowest": one-shot prep -- write the synonymous-codon mRNA next
+    # to the PDB and hand that file to the normal per-codon path. Reserved keywords, so a
+    # real mRNA filename must not be "fastest"/"slowest".
+    if mrna is not None and mrna.strip().lower() in synth_mrna.SYNTHETIC_MRNA_MODES:
+        _mode = mrna.strip().lower()
+        if _uniform_codon_time is not None:
+            raise ValueError(
+                f"{config_file}: mrna={_mode} is incompatible with a uniform "
+                f"'codon_times' (a number, {_uniform_codon_time:g} s): fastest/slowest "
+                f"picks the per-amino-acid extreme codon, which needs a codon-time "
+                f"*table* (e.g. one under assets/csp/codon_dwell_times/), not a single "
+                f"uniform time.")
+        if codon_time_table_path is None:
+            raise ValueError(
+                f"{config_file}: mrna={_mode} needs a 'codon_times' table path -- it "
+                f"defines which synonymous codon is {_mode}.")
+        mrna = synth_mrna.write_synthetic_mrna(pdb_file, codon_time_table_path, _mode)
+        log(f"  mrna={_mode}: wrote synonymous-codon mRNA -> {mrna}")
 
     p = RunParams()
     # --- MD / ribosome knobs ---
@@ -428,19 +451,20 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     if opt("dissociation_steps") is not None:
         p.dissociation_steps = as_int(opt("dissociation_steps"))
 
-    if p.uniform_codon_time is None and mrna is None:
-        raise ValueError(f"{config_file}: per-codon timing needs an 'mrna' file "
-                         f"(or set 'codon_times' to a positive number of seconds for a "
-                         f"uniform codon time). A 'codon_times' table path is optional "
-                         f"(defaults to the bundled E. coli 310 K table).")
+    # Per-codon timing needs both the (protein-specific) mRNA and an explicit codon-time
+    # table -- there is no bundled default (pick one under assets/csp/codon_dwell_times/).
+    if p.uniform_codon_time is None and (mrna is None or codon_time_table_path is None):
+        raise ValueError(f"{config_file}: per-codon timing needs both an 'mrna' file and "
+                         f"a 'codon_times' table path (e.g. one under "
+                         f"assets/csp/codon_dwell_times/), or set 'codon_times' to a "
+                         f"positive number of seconds for a uniform codon time.")
 
     log(f"  inputs: pdb_file={pdb_file}, ribosome={ribosome}")
     log(f"  schedule: L0={L0}, L_max={L_max if L_max is not None else 'full'}, model={p.model}")
     if p.uniform_codon_time is not None:
         log(f"  timing: uniform (codon_time={p.uniform_codon_time:g} s)")
     else:
-        _table = codon_time_table_path or "bundled E. coli 310 K"
-        log(f"  timing: per-codon (mrna={mrna}, codon_times={_table})")
+        log(f"  timing: per-codon (mrna={mrna}, codon_times={codon_time_table_path})")
     log(f"          scale_factor={p.scale_factor:g}, time_stage_1={p.time_stage_1:g} s, "
         f"time_stage_2={p.time_stage_2:g} s")
     if p.max_steps_per_stage is not None:

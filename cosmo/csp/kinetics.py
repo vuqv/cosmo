@@ -39,31 +39,10 @@ import os
 import random
 import shutil
 import subprocess
-from importlib import resources
 from typing import Dict, List, Optional, Sequence, Tuple
 
 # --- the genetic-code stop codons (RNA). A stop terminates the codon list. -----
 STOP_CODONS = ("UAA", "UAG", "UGA")
-
-# --- bundled default codon-time table (organism/temperature universal) ---------
-# The per-codon mean translation times are a property of the *organism* (E. coli)
-# at a given temperature (310 K), not of the protein being synthesized, so cosmo.csp
-# ships one and uses it whenever an INI/caller gives no explicit table.
-DEFAULT_CODON_TIME_TABLE_FILE = "ecoli_trans_times_310K.txt"  # in cosmo/csp/data/
-
-
-def default_codon_time_table_path() -> str:
-    """Return the filesystem path of the bundled E. coli (310 K) codon-time table.
-
-    The table (Fluitt *et al.* 2007) is shipped as package data under
-    ``cosmo/csp/data/`` and is the default used when no ``codon_time_table_path`` is supplied.
-
-    Returns
-    -------
-    str
-        Absolute path to the bundled ``ecoli_trans_times_310K.txt`` resource.
-    """
-    return str(resources.files("cosmo.csp").joinpath("data", DEFAULT_CODON_TIME_TABLE_FILE))
 
 
 def parse_codon_times(value: Optional[str]) -> Tuple[Optional[float], Optional[str]]:
@@ -75,8 +54,9 @@ def parse_codon_times(value: Optional[str]) -> Tuple[Optional[float], Optional[s
       codon gets that mean dwell (no mRNA needed);
     - anything else -> a **path** to a per-codon time table, so timing is per-codon
       from the mRNA;
-    - ``None`` (key absent/blank) -> per-codon timing with the bundled E. coli
-      310 K table (:func:`default_codon_time_table_path`).
+    - ``None`` (key absent/blank) -> **unset**: neither timing mode is chosen. There is
+      no bundled default table, so per-codon timing then requires an explicit table path
+      (see :func:`build_codon_time_lists`, which raises otherwise).
 
     A codon-time **table filename must therefore not be a bare number** -- a value
     that parses as a float is always taken as a uniform time in seconds, never a
@@ -93,9 +73,8 @@ def parse_codon_times(value: Optional[str]) -> Tuple[Optional[float], Optional[s
         ``(uniform_codon_time, table_path)`` -- exactly one is non-``None`` in the
         two "set" cases: a **float** (uniform mean codon time, seconds) with
         ``table_path`` ``None``, or a **path** with ``uniform_codon_time`` ``None``.
-        A blank/absent value returns ``(None, None)`` (per-codon with the bundled
-        default). Ready to fill :attr:`RunParams.uniform_codon_time` and the
-        ``codon_time_table_path`` path.
+        A blank/absent value returns ``(None, None)`` (neither mode chosen). Ready to
+        fill :attr:`RunParams.uniform_codon_time` and the ``codon_time_table_path`` path.
 
     Raises
     ------
@@ -529,10 +508,10 @@ def build_codon_time_lists(n_codons_needed: int, *,
     - ``uniform_codon_time`` is ``None`` (per-codon timing): read the mRNA +
       ``codon_time_table_path``, build the intrinsic per-codon list; if ``ribosome_traffic``
       and the external binary is available, replace ``real`` with its
-      traffic-corrected output, else ``real == intrinsic``. When
-      ``codon_time_table_path`` is ``None`` the **bundled E. coli (310 K) table**
-      (:func:`default_codon_time_table_path`) is used -- the codon-time table is
-      organism-universal, so only the (protein-specific) ``mrna`` is mandatory.
+      traffic-corrected output, else ``real == intrinsic``. Per-codon timing requires
+      **both** the (protein-specific) ``mrna`` and an explicit ``codon_time_table_path``
+      -- there is no bundled default table (choose one under
+      ``assets/csp/codon_dwell_times/``).
 
     ``n_codons_needed`` is the minimum list length required (``L_max + 1`` so that
     ``intrinsic[L_max]`` is valid).
@@ -547,8 +526,8 @@ def build_codon_time_lists(n_codons_needed: int, *,
     mrna_path : str or None
         Path to the mRNA file (required for per-codon timing).
     codon_time_table_path : str or None
-        Path to the codon-time table. If ``None`` (per-codon timing), the bundled
-        E. coli 310 K table (:func:`default_codon_time_table_path`) is used.
+        Path to the codon-time table (required for per-codon timing; there is no
+        bundled default).
     ribosome_traffic : bool
         If True, attempt the external ``ribosome_traffic`` correction for ``real``
         (falls back to ``real == intrinsic`` if the binary is unavailable).
@@ -567,8 +546,9 @@ def build_codon_time_lists(n_codons_needed: int, *,
     Raises
     ------
     ValueError
-        If per-codon timing is requested without ``mrna_path``, or if the mRNA /
-        traffic output has fewer than ``n_codons_needed`` entries.
+        If per-codon timing is requested without ``mrna_path`` or without
+        ``codon_time_table_path``, or if the mRNA / traffic output has fewer than
+        ``n_codons_needed`` entries.
     """
     if uniform_codon_time is not None:
         intrinsic = uniform_codon_time_list(n_codons_needed, uniform_codon_time)
@@ -577,10 +557,10 @@ def build_codon_time_lists(n_codons_needed: int, *,
     if not mrna_path:
         raise ValueError("per-codon kinetics require an `mrna` file.")
     if not codon_time_table_path:
-        codon_time_table_path = default_codon_time_table_path()
-        if verbose:
-            print(f"  [kinetics] no codon-time table given -- using bundled E. coli "
-                  f"310 K table ({DEFAULT_CODON_TIME_TABLE_FILE}).")
+        raise ValueError(
+            "per-codon kinetics require a codon-time table -- set `codon_times` to a "
+            "table path (e.g. one under assets/csp/codon_dwell_times/) or to a positive "
+            "number of seconds for uniform timing.")
     codon_time_table = read_codon_time_table(codon_time_table_path)
     codons = read_mrna(mrna_path)
     intrinsic = codon_time_list(codons, codon_time_table)

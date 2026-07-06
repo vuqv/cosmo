@@ -1,0 +1,83 @@
+# Mean per-codon translation times for *Escherichia coli* at 310 K (37 degC).
+#
+# This is the codon -> mean in-vivo translation time (seconds) table used by the
+# O'Brien Continuous Synthesis Protocol. It is the **mean total per-codon
+# translation time** (the full elongation-cycle mean first-passage time), which is
+# dominated by the codon-dependent aminoacyl-tRNA decoding/selection step (cognate
+# tRNA availability / codon-usage bias). It is NOT only the decoding time.
+#
+# Source: Fluitt, Pienaar & Viljoen, "Ribosome kinetics and aa-tRNA competition
+# determine rate and fidelity of peptide synthesis", Comput. Biol. Chem. 31 (2007)
+# 335-346 -- as redistributed with O'Brien's continuous_synthesis_v6 protocol
+# (file: Fluitt_ecoli_trans_time_310K_avg_16.5.txt; mean ~= 0.068 s/codon ~= 15 aa/s).
+#
+# Organism/temperature universal: this table is protein-INDEPENDENT, so topo.csp
+# uses it as the default codon-time table when an INI gives no `trans_times`.
+#
+# Format: one line per codon, "CODON<whitespace>TIME_SECONDS"; RNA alphabet (U).
+# 61 sense codons + 3 stop codons (UAA/UAG/UGA).
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+UUU	0.068164	PHE
+UUC	0.097735	PHE
+UUG	0.025060	LEU
+UUA	0.078689	LEU
+UCU	0.027566	SER
+UCC	0.123297	SER
+UCG	0.048116	SER
+UCA	0.053128	SER
+UGU	0.037590	CYS
+UGC	0.054631	CYS
+UGG	0.084203	TRP
+UGA	0.006014	STOP
+UAU	0.026564	TYR
+UAC	0.038593	TYR
+UAG	0.009523	STOP
+UAA	0.005513	STOP
+CUU	0.130314	LEU
+CUC	0.102246	LEU
+CUG	0.017542	LEU
+CUA	0.143345	LEU
+CCU	0.071672	PRO
+CCC	0.098738	PRO
+CCG	0.067162	PRO
+CCA	0.118786	PRO
+CGU	0.014034	ARG
+CGC	0.017542	ARG
+CGG	0.198979	ARG
+CGA	0.017041	ARG
+CAU	0.148357	HIS
+CAC	0.111268	HIS
+CAG	0.115779	GLN
+CAA	0.089716	GLN
+GUU	0.013031	VAL
+GUC	0.104251	VAL
+GUG	0.021051	VAL
+GUA	0.036588	VAL
+GCU	0.019547	ALA
+GCC	0.208000	ALA
+GCG	0.022053	ALA
+GCA	0.041600	ALA
+GGU	0.017542	GLY
+GGC	0.024559	GLY
+GGG	0.040598	GLY
+GGA	0.162391	GLY
+GAU	0.038593	ASP
+GAC	0.058140	ASP
+GAG	0.018043	GLU
+GAA	0.028569	GLU
+AUU	0.048617	ILE
+AUC	0.064154	ILE
+AUG	0.133321	MET
+AUA	0.064154	ILE
+ACU	0.027566	THR
+ACC	0.076685	THR
+ACG	0.064656	THR
+ACA	0.089215	THR
+AGU	0.042603	SER
+AGC	0.063653	SER
+AGG	0.231056	ARG
+AGA	0.095229	ARG
+AAU	0.054631	ASN
+AAC	0.080694	ASN
+AAG	0.051123	LYS
+AAA	0.038092	LYS

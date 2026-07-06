@@ -50,9 +50,10 @@ Example ``csp.ini``:
         L_max = 8            ; final nascent length (default: full residue count)
 
         ; --- codon-resolved kinetics ---
-        mrna         = mrna.txt        ; one codon per residue (required for per-codon timing)
-        ; codon_times = trans_times.txt  ; table path = per-codon; a positive number of s = uniform;
-                                          ; omit -> bundled E. coli 310 K table
+        mrna         = mrna.txt        ; one codon per residue (required for per-codon timing);
+                                       ; or "fastest"/"slowest" to auto-build a synonymous-codon mRNA
+        codon_times  = trans_times.txt ; table path = per-codon (required, no bundled default);
+                                       ; a positive number of s = uniform instead
         scale_factor = 4331293         ; in-vivo seconds -> in-silico ns compression (larger = faster)
         time_stage_1 = 0.000340        ; mean peptidyl-transfer dwell (s)
         time_stage_2 = 0.004201        ; mean translocation dwell (s)
@@ -125,12 +126,12 @@ Inputs & length schedule
      - str
      - for per-codon timing
      - ``—``
-     - mRNA sequence file (raw nucleotides; one codon per residue plus one stop). Required unless ``codon_times`` is a number (uniform timing).
+     - mRNA sequence file (raw nucleotides; one codon per residue plus one stop), **or** the keyword ``fastest`` / ``slowest`` to auto-build a synonymous-codon mRNA (each residue's fastest/slowest codon per the ``codon_times`` table, written next to the PDB). Required unless ``codon_times`` is a number (uniform timing). A real filename must not be ``fastest``/``slowest``.
    * - ``codon_times``
      - str or float
-     - no
-     - bundled E. coli 310 K
-     - Codon-timing key. A **path** to a ``CODON  seconds`` table = **per-codon** timing; a **positive number of seconds** = **uniform** timing (no ``mrna`` needed); omit = bundled Fluitt *E. coli* 310 K table. A table filename must **not** be a bare number.
+     - for per-codon timing
+     - ``—``
+     - Codon-timing key. A **path** to a ``CODON  seconds  amino_acid`` table = **per-codon** timing (required, no bundled default -- pick one under ``assets/csp/codon_dwell_times/``); a **positive number of seconds** = **uniform** timing (no ``mrna`` needed). A table filename must **not** be a bare number.
    * - ``L0``
      - int
      - no
@@ -303,8 +304,11 @@ Required inputs (``pdb_file`` / ``ribosome``)
 Per-codon vs. uniform timing (``mrna`` / ``codon_times``)
     ``codon_times`` selects the timing mode by its **value type**: a **path** →
     per-codon timing (``mrna`` required); a **positive number of seconds** →
-    uniform timing (no ``mrna``); **omitted** → per-codon with the bundled *E. coli*
-    310 K table. A codon-time table filename must not be a bare number.
+    uniform timing (no ``mrna``). There is no bundled default — per-codon timing needs
+    an explicit table path (pick one under ``assets/csp/codon_dwell_times/``). A
+    codon-time table filename must not be a bare number. Setting ``mrna = fastest`` or
+    ``slowest`` auto-builds a synonymous-codon mRNA from the protein + table (see
+    :doc:`codon_dwell_times`).
 
 Ribosome ↔ nascent excluded volume
     The rigid ribosome interacts with the chain via the O'Brien **12-10-6**

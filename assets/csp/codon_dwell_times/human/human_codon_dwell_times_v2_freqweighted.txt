@@ -1,0 +1,120 @@
+# =============================================================================
+# Per-codon translation dwell times — Homo sapiens   [VERSION 2: FREQUENCY-WEIGHTED]
+# =============================================================================
+# Format : CODON<TAB>TIME_SECONDS (RNA alphabet, U; 6 dp). 61 sense + 3 stop.
+# Elongation-rate anchor R = 5.6 codons/s ; tau = 1/R = 0.178571 s.
+#
+# WHAT'S DIFFERENT FROM VERSION 1
+#   v1 (companion file, unweighted) sets the UNWEIGHTED mean over the 61 codon
+#   TYPES to tau. v2 (this file) sets the CODON-USAGE-WEIGHTED mean to tau, so a
+#   transcript of average composition translates at exactly R -- the same
+#   Option-B convention used for the E. coli (Fluitt/O'Brien) and yeast tables.
+#   Conversion:  t_c = r_c * tau / SUM_c( f_c * r_c )
+#   where f_c = genomic codon-usage frequency. Verified SUM f_c*t_c = tau
+#   (= 0.178571). The RELATIVE codon pattern is IDENTICAL to v1; v2 = v1 times
+#   a single constant:  v2/v1 = 1.0537 (+5.4%)
+#
+# CODON USAGE SOURCE (f_c)
+#   Kazusa Homo sapiens [gbpri]: 93,487 CDS (40,662,582 codons), species 9606.
+#   https://www.kazusa.or.jp/codon/  (sense codons renormalized to sum 1 = f_c).
+#   Full table [codon per-thousand(count)], standard codon order:
+#     UUU  17.6(714298)     UCU  15.2(618711)     UAU  12.2(495699)     UGU  10.6(430311)   
+#     UUC  20.3(824692)     UCC  17.7(718892)     UAC  15.3(622407)     UGC  12.6(513028)   
+#     UUA   7.7(311881)     UCA  12.2(496448)     UAA   1.0(40285)      UGA   1.6(63237)    
+#     UUG  12.9(525688)     UCG   4.4(179419)     UAG   0.8(32109)      UGG  13.2(535595)   
+#
+#     CUU  13.2(536515)     CCU  17.5(713233)     CAU  10.9(441711)     CGU   4.5(184609)   
+#     CUC  19.6(796638)     CCC  19.8(804620)     CAC  15.1(613713)     CGC  10.4(423516)   
+#     CUA   7.2(290751)     CCA  16.9(688038)     CAA  12.3(501911)     CGA   6.2(250760)   
+#     CUG  39.6(1611801)    CCG   6.9(281570)     CAG  34.2(1391973)    CGG  11.4(464485)   
+#
+#     AUU  16.0(650473)     ACU  13.1(533609)     AAU  17.0(689701)     AGU  12.1(493429)   
+#     AUC  20.8(846466)     ACC  18.9(768147)     AAC  19.1(776603)     AGC  19.5(791383)   
+#     AUA   7.5(304565)     ACA  15.1(614523)     AAA  24.4(993621)     AGA  12.2(494682)   
+#     AUG  22.0(896005)     ACG   6.1(246105)     AAG  31.9(1295568)    AGG  12.0(486463)   
+#
+#     GUU  11.0(448607)     GCU  18.4(750096)     GAU  21.8(885429)     GGU  10.8(437126)   
+#     GUC  14.5(588138)     GCC  27.7(1127679)    GAC  25.1(1020595)    GGC  22.2(903565)   
+#     GUA   7.1(287712)     GCA  15.8(643471)     GAA  29.0(1177632)    GGA  16.5(669873)   
+#     GUG  28.1(1143534)    GCG   7.4(299495)     GAG  39.6(1609975)    GGG  16.5(669768)
+#
+# RELATIVE DATA SOURCE
+#   Gobet et al. 2020 PNAS, Dataset S1 Human_Lintner_DT (log2, A-site pos -3).
+#   r_c = 2**DT_c. doi:10.1073/pnas.1918145117
+# UNDERLYING RELATIVE VALUES — DT (log2 dwell time; higher=slower), 10/row
+#   Gobet 2020 Human_Lintner; r=2**DT
+#   AAA=-0.37428  AAC=-0.15556  AAG=-0.34788  AAU=0.63557  ACA=0.73995  ACC=0.45488  ACG=0.26977  ACU=1.0358  AGA=-0.29848  AGC=-0.4291
+#   AGG=-0.99223  AGU=1.0588  AUA=-0.014569  AUC=0.047665  AUG=-0.23214  AUU=0.77522  CAA=0.032898  CAC=0.27871  CAG=-0.037538  CAU=0.99975
+#   CCA=0.7752  CCC=0.21689  CCG=0.28728  CCU=0.92218  CGA=-0.25713  CGC=-0.41052  CGG=-0.84525  CGU=1.1676  CUA=-0.097993  CUC=-0.19988
+#   CUG=-0.27661  CUU=0.66542  GAA=-0.55628  GAC=-0.57946  GAG=-0.86438  GAU=0.46656  GCA=0.34911  GCC=-0.022366  GCG=-0.24358  GCU=0.78554
+#   GGA=-0.6577  GGC=-0.82708  GGG=-1.6062  GGU=0.72531  GUA=-0.22319  GUC=-0.29632  GUG=-0.49135  GUU=0.51553  UAC=-0.19065  UAU=0.71788
+#   UCA=0.15247  UCC=0.13245  UCG=-0.2846  UCU=0.7472  UGC=-0.86077  UGG=-1.1177  UGU=0.6309  UUA=-0.64631  UUC=-0.43348  UUG=-1.0017
+#   UUU=0.28575
+#
+# RANGE (v2): fastest GGG = 0.056416 s ; slowest CGU = 0.385833 s.
+# =============================================================================
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+AAA	0.132510	LYS
+AAC	0.154202	ASN
+AAG	0.134957	LYS
+AAU	0.266835	ASN
+ACA	0.286856	THR
+ACC	0.235424	THR
+ACG	0.207074	THR
+ACU	0.352147	THR
+AGA	0.139658	ARG
+AGC	0.127569	SER
+AGG	0.086343	ARG
+AGU	0.357806	SER
+AUA	0.170032	ILE
+AUC	0.177528	ILE
+AUG	0.146230	MET
+AUU	0.293956	ILE
+CAA	0.175720	GLN
+CAC	0.208361	HIS
+CAG	0.167347	GLN
+CAU	0.343457	HIS
+CCA	0.293952	PRO
+CCC	0.199622	PRO
+CCG	0.209603	PRO
+CCU	0.325478	PRO
+CGA	0.143719	ARG
+CGC	0.129223	ARG
+CGG	0.095603	ARG
+CGU	0.385833	ARG
+CUA	0.160479	LEU
+CUC	0.149537	LEU
+CUG	0.141791	LEU
+CUU	0.272414	LEU
+GAA	0.116805	GLU
+GAC	0.114943	ASP
+GAG	0.094344	GLU
+GAU	0.237337	ASP
+GCA	0.218781	ALA
+GCC	0.169116	ALA
+GCG	0.145075	ALA
+GCU	0.296066	ALA
+GGA	0.108875	GLY
+GGC	0.096815	GLY
+GGG	0.056416	GLY
+GGU	0.283960	GLY
+GUA	0.147140	VAL
+GUC	0.139867	VAL
+GUG	0.122182	VAL
+GUU	0.245532	VAL
+UAA	0.178571	STOP
+UAC	0.150496	TYR
+UAG	0.178571	STOP
+UAU	0.282501	TYR
+UCA	0.190904	SER
+UCC	0.188273	SER
+UCG	0.141008	SER
+UCU	0.288302	SER
+UGA	0.178571	STOP
+UGC	0.094580	CYS
+UGG	0.079151	TRP
+UGU	0.265973	CYS
+UUA	0.109738	LEU
+UUC	0.127182	PHE
+UUG	0.085778	LEU
+UUU	0.209381	PHE

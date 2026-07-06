@@ -33,13 +33,11 @@ cosmo-csp = "cosmo.csp.protocol:csp"
 cosmo-cylinder = "cosmo.csp.cylinder:cylinder"
 # Stitch the CSP per-residue/-stage trajectories into one VMD movie.
 cosmo-csp-movie = "cosmo.csp.movie:main"
+# Pre-generate a fastest/slowest synonymous-codon mRNA for a protein (same prep the
+# runners do for `mrna = fastest/slowest`):
+# `cosmo-make-mrna --pdb prot.pdb --codon-times table.txt --mode fastest`
+cosmo-make-mrna = "cosmo.csp.synth_mrna:main"
 
 [tool.setuptools.packages.find]
 # Only ship the importable package (not docs/tutorials/scripts at the repo root).
 include = ["cosmo*"]
-
-[tool.setuptools.package-data]
-# Bundled data shipped inside the importable package: the default E. coli codon-time
-# table used by cosmo.csp. (Ribosome structures are prepared with the sibling topo
-# package and supplied per-run; the tutorial bundles its own copy.)
-"cosmo.csp" = ["data/*.txt"]

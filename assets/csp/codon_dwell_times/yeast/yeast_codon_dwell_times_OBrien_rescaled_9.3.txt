@@ -1,0 +1,90 @@
+# =============================================================================
+# Per-codon translation times — S. cerevisiae  (O'Brien data, RESCALED to 9.3 aa/s)
+# =============================================================================
+# Format : CODON<TAB>TIME_SECONDS (RNA alphabet, U; 6 dp). 64 codons (stops measured).
+#
+# WHAT THIS IS
+#   The O'Brien/Sharma 2019 absolute yeast codon translation times (Weissman
+#   dataset, MEAN; file yeast_codon_dwell_times_OBrien.txt) UNIFORMLY rescaled
+#   so the codon-usage-weighted mean of the 61 sense codons = 1/9.3 s, i.e.
+#   9.3 codons/s (Chu et al. 2014) -- the SAME anchor as the Gardin-RRT file
+#   yeast_codon_dwell_times.txt. This makes the two yeast tables directly
+#   comparable on absolute scale.
+#     rescale factor C = 0.51673  (every codon, incl. measured stops, x C)
+#   The native O'Brien absolute scale (~4.3 codons/s) is kept in the
+#   unrescaled file; use THIS file only when you want O'Brien's per-codon
+#   PATTERN on the 9.3/s scale.
+#   Verified: usage-weighted sense mean = 0.107527 s = 1/9.3.
+#
+# SOURCE: Sharma, ..., O'Brien 2019 PLoS Comput Biol 15:e1007070, S1 File
+#   (pcbi.1007070.s016.xlsx, "Weissman data translation rates", MEAN column).
+#   Codon usage for the weighting: Gardin et al. 2014 Table 2A (same as the
+#   companion Gardin yeast file). R = 9.3 codons/s: Chu et al. 2014 Cell 153:1589.
+#
+# RANGE: fastest GUU = 0.074926 s ; slowest CCG = 0.260431 s.
+# =============================================================================
+# Columns: codon<TAB>mean_dwell_time_seconds<TAB>amino_acid (3-letter; STOP = stop codon)
+AAA	0.111613	LYS
+AAC	0.085777	ASN
+AAG	0.100245	LYS
+AAU	0.086810	ASN
+ACA	0.134349	THR
+ACC	0.083710	THR
+ACG	0.166903	THR
+ACU	0.089394	THR
+AGA	0.112647	ARG
+AGC	0.112130	SER
+AGG	0.164320	ARG
+AGU	0.103862	SER
+AUA	0.141067	ILE
+AUC	0.075442	ILE
+AUG	0.094045	MET
+AUU	0.078026	ILE
+CAA	0.082160	GLN
+CAC	0.107479	HIS
+CAG	0.122465	GLN
+CAU	0.095595	HIS
+CCA	0.122981	PRO
+CCC	0.183955	PRO
+CCG	0.260431	PRO
+CCU	0.140033	PRO
+CGA	0.249063	ARG
+CGC	0.147784	ARG
+CGG	0.220643	ARG
+CGU	0.099212	ARG
+CUA	0.100245	LEU
+CUC	0.146234	LEU
+CUG	0.157602	LEU
+CUU	0.105413	LEU
+GAA	0.106446	GLU
+GAC	0.104379	ASP
+GAG	0.131766	GLU
+GAU	0.103346	ASP
+GCA	0.123498	ALA
+GCC	0.085777	ALA
+GCG	0.158636	ALA
+GCU	0.084743	ALA
+GGA	0.165353	GLY
+GGC	0.143134	GLY
+GGG	0.168453	GLY
+GGU	0.115230	GLY
+GUA	0.105413	VAL
+GUC	0.078543	VAL
+GUG	0.136416	VAL
+GUU	0.074926	VAL
+UAA	0.095595	STOP
+UAC	0.111613	TYR
+UAG	0.160702	STOP
+UAU	0.098695	TYR
+UCA	0.103346	SER
+UCC	0.091461	SER
+UCG	0.145717	SER
+UCU	0.086294	SER
+UGA	0.194290	STOP
+UGC	0.141067	CYS
+UGG	0.167937	TRP
+UGU	0.091978	CYS
+UUA	0.081643	LEU
+UUC	0.086810	PHE
+UUG	0.092494	LEU
+UUU	0.088877	PHE

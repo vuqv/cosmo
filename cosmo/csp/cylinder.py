@@ -1,4 +1,4 @@
-"""Co-translational synthesis through an analytic exit tunnel (``cosmo.csp.cylinder``).
+"""Protein synthesis through an analytic exit tunnel (``cosmo.csp.cylinder``).
 
 A parallel of :mod:`cosmo.csp.protocol` for the **cylinder ribosome model**. Instead
 of explicit rigid CG ribosome beads, the ribosome is a pure boundary condition -- an
@@ -55,6 +55,7 @@ from cosmo.csp.core import (TUNNEL_AXIS, RunParams, add_cterm_restraint,
                             _make_cfg, _write_pdb, _quiet, _vprint)
 from cosmo.utils.config import strtobool
 from cosmo.csp import kinetics
+from cosmo.csp import synth_mrna
 
 # Default tunnel wall stiffness (kJ/mol/nm^2 = 20 kcal/mol/A^2): the radial +
 # exit-face + PTC-end "infinite wall" is a stiff finite harmonic.
@@ -285,9 +286,12 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
         Root output directory; each length writes to ``<out_root>/L_<L>/``.
     mrna : str, optional
         mRNA sequence file (one codon per residue) for the codon-resolved kinetics.
-        Required for per-codon timing (unless ``params.uniform_codon_time`` is set).
-    codon_time_table_path : str, optional
-        Per-codon mean-time table; ``None`` -> the bundled E. coli 310 K table.
+        Required for per-codon timing (unless ``params.uniform_codon_time`` is set). The
+        INI also accepts ``fastest``/``slowest`` to auto-build a synonymous-codon mRNA;
+        that is resolved to a written file in :func:`read_cylinder_config`.
+    codon_time_table_path : str
+        Per-codon mean-time table (required for per-codon timing; pick one under
+        ``assets/csp/codon_dwell_times/``). There is no bundled default.
     params : CylinderParams, optional
         Per-length run parameters + tunnel geometry (defaults to the dataclass defaults).
 
@@ -443,9 +447,11 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     - ``L0`` / ``L_max`` -- start / final nascent length (blank ``L_max`` -> full).
     - ``outdir`` -- root output directory (per-length subfolders ``L_<L>/``).
     - ``model`` -- nascent-chain force field (default ``hps_kr``).
-    - **Kinetics** (same as CSP): ``mrna``, ``codon_times`` (a codon table path, or a
-      positive number of seconds for uniform timing; blank -> bundled E. coli 310 K),
-      ``scale_factor``, ``time_stage_1``, ``time_stage_2``, ``random_seed``,
+    - **Kinetics** (same as CSP): ``mrna`` (per-codon sequence, or ``fastest``/``slowest``
+      to auto-build a synonymous-codon mRNA), ``codon_times`` (a codon table path for
+      per-codon timing -- required, no bundled default; pick one under
+      ``assets/csp/codon_dwell_times/`` -- or a positive number of seconds for uniform
+      timing), ``scale_factor``, ``time_stage_1``, ``time_stage_2``, ``random_seed``,
       ``max_steps_per_stage``, ``min_steps_per_stage``.
     - **Integrator / MD**: ``dt``, ``ref_t``, ``tau_t``, ``nstout``, ``device``,
       ``ppn``, ``minimize`` (yes/no), ``constraints`` ('None' | 'AllBonds'),
@@ -494,6 +500,24 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     outdir = opt("outdir") or "synth_out"
     mrna = opt("mrna")
     _uniform_codon_time, codon_time_table_path = kinetics.parse_codon_times(opt("codon_times"))
+    # mrna = "fastest"/"slowest": one-shot prep -- write the synonymous-codon mRNA next
+    # to the PDB and hand that file to the normal per-codon path. Reserved keywords, so a
+    # real mRNA filename must not be "fastest"/"slowest".
+    if mrna is not None and mrna.strip().lower() in synth_mrna.SYNTHETIC_MRNA_MODES:
+        _mode = mrna.strip().lower()
+        if _uniform_codon_time is not None:
+            raise ValueError(
+                f"{config_file}: mrna={_mode} is incompatible with a uniform "
+                f"'codon_times' (a number, {_uniform_codon_time:g} s): fastest/slowest "
+                f"picks the per-amino-acid extreme codon, which needs a codon-time "
+                f"*table* (e.g. one under assets/csp/codon_dwell_times/), not a single "
+                f"uniform time.")
+        if codon_time_table_path is None:
+            raise ValueError(
+                f"{config_file}: mrna={_mode} needs a 'codon_times' table path -- it "
+                f"defines which synonymous codon is {_mode}.")
+        mrna = synth_mrna.write_synthetic_mrna(pdb_file, codon_time_table_path, _mode)
+        log(f"  mrna={_mode}: wrote synonymous-codon mRNA -> {mrna}")
 
     p = CylinderParams()
     # --- integrator / MD ---
@@ -559,18 +583,20 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     if opt("dissociation_steps") is not None:
         p.dissociation_steps = as_int(opt("dissociation_steps"))
 
-    if p.uniform_codon_time is None and mrna is None:
+    # Per-codon timing needs both the (protein-specific) mRNA and an explicit codon-time
+    # table -- there is no bundled default (pick one under assets/csp/codon_dwell_times/).
+    if p.uniform_codon_time is None and (mrna is None or codon_time_table_path is None):
         raise ValueError(
-            f"{config_file}: per-codon kinetics need an 'mrna' file (or set "
-            f"'codon_times' to a positive number of seconds for a uniform codon time). "
-            f"A 'codon_times' table path is optional (defaults to the bundled "
-            f"E. coli 310 K table).")
+            f"{config_file}: per-codon kinetics need both an 'mrna' file and a "
+            f"'codon_times' table path (e.g. one under assets/csp/codon_dwell_times/), "
+            f"or set 'codon_times' to a positive number of seconds for a uniform codon "
+            f"time.")
 
     log(f"  inputs: pdb_file={pdb_file} (ribosome: analytic tunnel, no PDB)")
     log(f"  schedule: L0={L0}, L_max={L_max if L_max is not None else 'full'}, "
         f"model={p.model}, constraints={p.constraints}")
     _timing = (f"uniform (codon_time={p.uniform_codon_time:g} s)" if p.uniform_codon_time is not None
-               else f"per-codon (mrna={mrna}, codon_times={codon_time_table_path or 'bundled E. coli 310 K'})")
+               else f"per-codon (mrna={mrna}, codon_times={codon_time_table_path})")
     log(f"  timing: {_timing}; scale_factor={p.scale_factor:g}, "
         f"time_stage_1={p.time_stage_1:g} s, time_stage_2={p.time_stage_2:g} s")
     log(f"  tunnel: r={p.tunnel_radius_nm} nm, length={p.tunnel_length_nm} nm, "
@@ -600,7 +626,7 @@ def cylinder(argv: Optional[List[str]] = None) -> None:
 
     parser = argparse.ArgumentParser(
         prog="cosmo-cylinder",
-        description="Co-translational synthesis through an analytic exit tunnel (the "
+        description="Protein synthesis through an analytic exit tunnel (the "
                     "cylinder ribosome model) on cosmo's IDP force field. Grows the "
                     "nascent chain N->C, restraining the C-terminus on the tunnel axis "
                     "at the PTC; an analytic cylindrical bore (hole in an infinite wall) "
