@@ -21,8 +21,8 @@ UAA       0.005513             STOP
 
 - **RNA alphabet** (`U`), tab-separated, `#` comments ignored; **64 rows** (61 sense +
   3 stop). Larger time = slower codon; stop codons carry the amino acid `STOP`.
-- The **third column (amino acid)** is what `mrna = fastest`/`slowest` uses to pick each
-  residue's extreme synonymous codon — see [Fastest / slowest mRNA](#fastest-slowest-mrna).
+- The **third column (amino acid)** is what `mrna = fastest`/`slowest`/`median` uses to pick
+  each residue's synonymous codon — see [Fastest / slowest / median mRNA](#fastest-slowest-mrna).
 - Every organism directory also has a **`*_dwell_time_methods.md`** with the full
   provenance (source dataset, references, how relative data were scaled to seconds).
 
@@ -68,16 +68,33 @@ Keep the thermostat consistent with the table's temperature (the *E. coli* table
 full key reference.
 
 (fastest-slowest-mrna)=
-## Fastest / slowest mRNA
+## Fastest / slowest / median mRNA
 
-Because each table carries the codon→amino-acid mapping (column 3), you can set
-`mrna = fastest` or `slowest` (instead of a sequence file) to auto-build a
-synonymous-codon mRNA that encodes your protein with every residue's fastest/slowest
-codon **for the chosen table** — the extremes of the codon-optimization axis. The runner
-reads the protein sequence from `pdb_file`, picks each residue's extreme synonymous codon
-(plus a terminating stop), and writes `mrna_fastest.txt` / `mrna_slowest.txt` next to the
-PDB. This needs a `codon_times` **table** (it defines fast/slow); a uniform numeric
-`codon_times` is rejected. To pre-generate one standalone:
+Because each table carries the codon→amino-acid mapping (column 3), you can have cosmo
+build an mRNA that keeps the **protein sequence fixed** but reassigns each residue's
+**codon** — a controlled walk along the synonymous-mutation (codon-optimization) axis.
+Since the protein, its native structure, and its contacts are identical across these
+mRNAs and only the elongation *timing* changes, any difference in the co-translational
+folding they produce is attributable to codon kinetics alone. Set `mrna` to a keyword
+instead of a filename:
+
+- **`fastest`** — the shortest-`τ` synonymous codon at every residue → the fastest
+  translation the protein's codons allow (minimises the mean total dwell time).
+- **`slowest`** — the longest-`τ` synonymous codon at every residue → the slowest
+  translation (maximises the mean total dwell); the slow codons act as translational
+  pauses that give each emerging segment more time to fold.
+- **`median`** — the middle-`τ` synonymous codon at every residue → a neutral reference
+  between the two extremes. When an amino acid has an even number of synonymous codons
+  there is no single middle, so cosmo takes the **faster (shorter-`τ`) of the two
+  central** codons; the pick is deterministic.
+
+Here `τ` is the codon's mean per-codon dwell time from the chosen `codon_times` table.
+The runner reads the protein sequence from `pdb_file`, picks one codon per residue as
+above, appends a terminating stop codon, and writes `mrna_fastest.txt` /
+`mrna_slowest.txt` / `mrna_median.txt` next to the PDB. Because the pick is made per
+amino acid, the mode needs a `codon_times` **table** (it defines which codon is
+fast/slow/median); a uniform numeric `codon_times` is rejected. To pre-generate one
+standalone:
 
 ```bash
 cosmo-make-mrna --pdb my_protein.pdb \

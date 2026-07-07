@@ -1,13 +1,14 @@
-"""Synthetic mRNA preparation: build a *fastest*- or *slowest*-codon mRNA.
+"""Synthetic mRNA preparation: build a *fastest*-, *slowest*- or *median*-codon mRNA.
 
-A ``fastest`` / ``slowest`` mRNA encodes the target protein with, for every residue,
-the fastest / slowest synonymous codon for that amino acid -- the extreme of the
-"synonymous mutation" (codon-optimization) axis while the protein sequence is held
-fixed. Because the mRNA is only a *timing* input to the synthesis workflow (the
+A ``fastest`` / ``slowest`` / ``median`` mRNA encodes the target protein with, for every
+residue, the fastest / slowest / median-dwell-time synonymous codon for that amino acid
+-- a point on the "synonymous mutation" (codon-optimization) axis while the protein
+sequence is held fixed (``median`` is a neutral, non-extreme reference between the two
+extremes). Because the mRNA is only a *timing* input to the synthesis workflow (the
 structure comes from the PDB), this is a one-shot **preparation step**: it reads the
-protein's amino-acid sequence from the PDB, picks the extreme codon per residue from a
-codon dwell-time table, writes ``mrna_fastest.txt`` / ``mrna_slowest.txt`` next to the
-PDB, and hands that file to the normal per-codon path.
+protein's amino-acid sequence from the PDB, picks the chosen codon per residue from a
+codon dwell-time table, writes ``mrna_fastest.txt`` / ``mrna_slowest.txt`` /
+``mrna_median.txt`` next to the PDB, and hands that file to the normal per-codon path.
 
 The codon -> amino-acid mapping and the per-codon dwell time both come from the
 3-column dwell-time tables under ``assets/csp/codon_dwell_times/`` (``codon  time  aa``);
@@ -19,8 +20,8 @@ import argparse
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-# The two reserved mRNA keywords. A real mRNA *filename* must not be one of these.
-SYNTHETIC_MRNA_MODES = ("fastest", "slowest")
+# The reserved mRNA keywords. A real mRNA *filename* must not be one of these.
+SYNTHETIC_MRNA_MODES = ("fastest", "slowest", "median")
 
 # Standard genetic code (RNA codon -> amino-acid 3-letter name; STOP for the three stop
 # codons). Only a *fallback* -- the dwell-time tables carry the amino acid in column 3.
@@ -131,12 +132,15 @@ def read_protein_sequence(pdb_path: str) -> List[str]:
     return seq
 
 
-def extreme_codon_per_aa(table: Dict[str, Tuple[float, str]], mode: str) -> Dict[str, str]:
-    """Map each amino acid to its fastest (or slowest) synonymous codon.
+def select_codon_per_aa(table: Dict[str, Tuple[float, str]], mode: str) -> Dict[str, str]:
+    """Map each amino acid to its fastest, slowest or median-dwell-time synonymous codon.
 
     For every amino acid (and the ``STOP`` group), consider only its codons present in
-    ``table`` and pick the smallest- (``mode='fastest'``) or largest- (``'slowest'``)
-    dwell-time codon. Ties break on the codon string, so the choice is deterministic.
+    ``table`` and pick the smallest- (``mode='fastest'``), largest- (``'slowest'``) or
+    median- (``'median'``) dwell-time codon. When the amino acid has an even number of
+    synonymous codons there is no single middle, so ``median`` takes the faster
+    (shorter-time) of the two central codons -- index ``(n - 1) // 2`` of the
+    time-sorted list. Ties break on the codon string, so every choice is deterministic.
     """
     if mode not in SYNTHETIC_MRNA_MODES:
         raise ValueError(f"mode must be one of {SYNTHETIC_MRNA_MODES}; got {mode!r}.")
@@ -146,14 +150,19 @@ def extreme_codon_per_aa(table: Dict[str, Tuple[float, str]], mode: str) -> Dict
     chosen: Dict[str, str] = {}
     for aa, items in groups.items():
         items.sort()                                  # by (time, codon)
-        chosen[aa] = items[-1][1] if mode == "slowest" else items[0][1]
+        if mode == "slowest":
+            chosen[aa] = items[-1][1]
+        elif mode == "fastest":
+            chosen[aa] = items[0][1]
+        else:                                         # median (lower median if even)
+            chosen[aa] = items[(len(items) - 1) // 2][1]
     return chosen
 
 
 def build_synthetic_codons(aa_seq: List[str], table: Dict[str, Tuple[float, str]],
                            mode: str) -> List[str]:
-    """Build the codon list for a fastest/slowest mRNA: one extreme codon per residue,
-    plus a terminating (fastest/slowest) stop codon.
+    """Build the codon list for a fastest/slowest/median mRNA: one chosen codon per
+    residue, plus a terminating (fastest/slowest/median) stop codon.
 
     Raises
     ------
@@ -161,7 +170,7 @@ def build_synthetic_codons(aa_seq: List[str], table: Dict[str, Tuple[float, str]
         If an amino acid in ``aa_seq`` has no codon in ``table``, or the table has no
         stop codon to terminate the mRNA.
     """
-    chosen = extreme_codon_per_aa(table, mode)
+    chosen = select_codon_per_aa(table, mode)
     codons: List[str] = []
     for i, aa in enumerate(aa_seq):
         if aa not in chosen:
@@ -179,10 +188,10 @@ def build_synthetic_codons(aa_seq: List[str], table: Dict[str, Tuple[float, str]
 
 def write_synthetic_mrna(pdb_path: str, codon_time_table_path: str, mode: str,
                          out_dir: str = None, filename: str = None) -> str:
-    """Write a fastest/slowest synonymous-codon mRNA for ``pdb_path`` and return its path.
+    """Write a fastest/slowest/median synonymous-codon mRNA for ``pdb_path`` and return its path.
 
     Reads the protein sequence from ``pdb_path`` and the dwell times + codon->amino-acid
-    map from ``codon_time_table_path``, encodes each residue with its extreme codon
+    map from ``codon_time_table_path``, encodes each residue with its chosen codon
     (plus a terminating stop), and writes the raw-nucleotide mRNA to
     ``<out_dir>/mrna_<mode>.txt`` (``out_dir`` defaults to the PDB's directory).
 
@@ -192,8 +201,8 @@ def write_synthetic_mrna(pdb_path: str, codon_time_table_path: str, mode: str,
         Protein PDB (source of the amino-acid sequence).
     codon_time_table_path : str
         Codon dwell-time table (``codon  time  amino_acid``).
-    mode : {'fastest', 'slowest'}
-        Pick the fastest or slowest synonymous codon per residue.
+    mode : {'fastest', 'slowest', 'median'}
+        Pick the fastest, slowest or median-dwell-time synonymous codon per residue.
     out_dir : str, optional
         Output directory (default: the directory containing ``pdb_path``).
     filename : str, optional
@@ -227,10 +236,10 @@ def write_synthetic_mrna(pdb_path: str, codon_time_table_path: str, mode: str,
 
 
 def main(argv=None) -> None:
-    """``cosmo-make-mrna`` CLI: write a fastest/slowest mRNA for a protein + table."""
+    """``cosmo-make-mrna`` CLI: write a fastest/slowest/median mRNA for a protein + table."""
     ap = argparse.ArgumentParser(
         prog="cosmo-make-mrna",
-        description="Write a fastest/slowest synonymous-codon mRNA for a protein "
+        description="Write a fastest/slowest/median synonymous-codon mRNA for a protein "
                     "(preparation step for the cosmo.csp synthesis workflow).",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -238,7 +247,7 @@ def main(argv=None) -> None:
     ap.add_argument("--codon-times", required=True,
                     help="codon dwell-time table (columns: codon  time  amino_acid)")
     ap.add_argument("--mode", required=True, choices=SYNTHETIC_MRNA_MODES,
-                    help="pick the fastest or slowest synonymous codon per residue")
+                    help="pick the fastest, slowest or median synonymous codon per residue")
     ap.add_argument("--out-dir", default=None,
                     help="output directory (default: next to the PDB)")
     ap.add_argument("-o", "--outfile", default=None,

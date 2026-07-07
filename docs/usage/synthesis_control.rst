@@ -51,7 +51,7 @@ Example ``csp.ini``:
 
         ; --- codon-resolved kinetics ---
         mrna         = mrna.txt        ; one codon per residue (required for per-codon timing);
-                                       ; or "fastest"/"slowest" to auto-build a synonymous-codon mRNA
+                                       ; or "fastest"/"slowest"/"median" to auto-build a synonymous-codon mRNA
         codon_times  = trans_times.txt ; table path = per-codon (required, no bundled default);
                                        ; a positive number of s = uniform instead
         scale_factor = 4331293         ; in-vivo seconds -> in-silico ns compression (larger = faster)
@@ -126,7 +126,7 @@ Inputs & length schedule
      - str
      - for per-codon timing
      - ``—``
-     - mRNA sequence file (raw nucleotides; one codon per residue plus one stop), **or** the keyword ``fastest`` / ``slowest`` to auto-build a synonymous-codon mRNA (each residue's fastest/slowest codon per the ``codon_times`` table, written next to the PDB). Required unless ``codon_times`` is a number (uniform timing). A real filename must not be ``fastest``/``slowest``.
+     - mRNA sequence file (raw nucleotides; one codon per residue plus one stop), **or** the keyword ``fastest`` / ``slowest`` / ``median`` to auto-build a synonymous-codon mRNA (each residue's fastest/slowest/median-dwell-time codon per the ``codon_times`` table, written next to the PDB). Required unless ``codon_times`` is a number (uniform timing). A real filename must not be ``fastest``/``slowest``/``median``.
    * - ``codon_times``
      - str or float
      - for per-codon timing
@@ -306,9 +306,9 @@ Per-codon vs. uniform timing (``mrna`` / ``codon_times``)
     per-codon timing (``mrna`` required); a **positive number of seconds** →
     uniform timing (no ``mrna``). There is no bundled default — per-codon timing needs
     an explicit table path (pick one under ``assets/csp/codon_dwell_times/``). A
-    codon-time table filename must not be a bare number. Setting ``mrna = fastest`` or
-    ``slowest`` auto-builds a synonymous-codon mRNA from the protein + table (see
-    :doc:`codon_dwell_times`).
+    codon-time table filename must not be a bare number. Setting ``mrna = fastest``,
+    ``slowest`` or ``median`` auto-builds a synonymous-codon mRNA from the protein + table
+    (see :doc:`codon_dwell_times`).
 
 Ribosome ↔ nascent excluded volume
     The rigid ribosome interacts with the chain via the O'Brien **12-10-6**

@@ -276,7 +276,7 @@ For a compact tabular reference of every `csp.ini` option, see {doc}`synthesis_c
 | `model` | no | `hps_kr` | Nascent force field. **Any model works** (`hps_kr` / `hps_urry` / `mpipi`); `hps_kr` is only the default. The ribosome 12-10-6 wall uses the model-independent O'Brien `Rmin/2` tables (`OBRIEN_RMIN_2_NM` / `OBRIEN_RNA_RMIN_2_BEADS`), so the model only sets the nascent IDP↔IDP interaction. |
 | `L0` | no | `1` | Start nascent-chain length. |
 | `L_max` | no | full length | Final nascent length. |
-| `mrna` | cond. | — | mRNA file (one codon per residue), **or** `fastest`/`slowest` to auto-build a synonymous-codon mRNA (see [Fastest / slowest mRNA](#fastest-slowest-mrna)). Required for per-codon timing (unless `codon_times` is a number). A real filename must not be `fastest`/`slowest`. |
+| `mrna` | cond. | — | mRNA file (one codon per residue), **or** `fastest`/`slowest`/`median` to auto-build a synonymous-codon mRNA (see [Fastest / slowest / median mRNA](#fastest-slowest-mrna)). Required for per-codon timing (unless `codon_times` is a number). A real filename must not be `fastest`/`slowest`/`median`. |
 | `codon_times` | cond. | — | A **table path** = per-codon timing (required, no bundled default — pick one under `assets/csp/codon_dwell_times/`); a **positive number of seconds** = uniform codon time (no `mrna` needed). A table filename must **not** be a bare number. |
 | `outdir` | no | `synth_out` | Output root. |
 

@@ -119,7 +119,7 @@ L_max = 10                   ; blank -> full residue count
 
 ; --- kinetics (same O'Brien codon timing as cosmo-csp) ---
 mrna         = mrna.txt      ; one codon per residue (required for per-codon timing);
-                             ; or "fastest"/"slowest" to auto-build a synonymous-codon mRNA
+                             ; or "fastest"/"slowest"/"median" to auto-build a synonymous-codon mRNA
 codon_times  = ../../assets/csp/codon_dwell_times/ecoli/ecoli_codon_dwell_times_310K.txt  ; table path (required; or a number of s = uniform)
 scale_factor = 4331293
 random_seed  = 1

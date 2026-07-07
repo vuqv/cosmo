@@ -93,9 +93,9 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     mrna : str, optional
         mRNA sequence file (one codon per residue) for the codon-resolved kinetics.
         Required for per-codon timing; not needed for uniform timing
-        (``params.uniform_codon_time`` set). (The INI also accepts ``fastest``/``slowest``
-        to auto-build a synonymous-codon mRNA; that is resolved to a written file in
-        :func:`read_csp_config` before this function is called.)
+        (``params.uniform_codon_time`` set). (The INI also accepts
+        ``fastest``/``slowest``/``median`` to auto-build a synonymous-codon mRNA; that is
+        resolved to a written file in :func:`read_csp_config` before this function is called.)
     codon_time_table_path : str
         Per-codon mean-time table (required for per-codon timing; pick one under
         ``assets/csp/codon_dwell_times/``). There is no bundled default.
@@ -318,9 +318,10 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     Kinetic keys
     ------------
     - ``mrna`` -- mRNA sequence file (one codon per residue + 1 stop). Required for
-      per-codon timing. May also be the keyword ``fastest`` / ``slowest`` to auto-build a
-      synonymous-codon mRNA (each residue's fastest/slowest codon per the ``codon_times``
-      table, written next to the PDB); a real filename must not be ``fastest``/``slowest``.
+      per-codon timing. May also be the keyword ``fastest`` / ``slowest`` / ``median`` to
+      auto-build a synonymous-codon mRNA (each residue's fastest/slowest/median-dwell-time
+      codon per the ``codon_times`` table, written next to the PDB); a real filename must
+      not be ``fastest``/``slowest``/``median``.
     - ``codon_times`` -- either a **path** to a per-codon mean-time table
       (``CODON  seconds  amino_acid``; required for per-codon, no bundled default -- pick
       one under ``assets/csp/codon_dwell_times/``) **or** a **positive number of seconds**
@@ -383,16 +384,16 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     outdir = opt("outdir") or "synth_out"
     mrna = opt("mrna")
     _uniform_codon_time, codon_time_table_path = kinetics.parse_codon_times(opt("codon_times"))
-    # mrna = "fastest"/"slowest": one-shot prep -- write the synonymous-codon mRNA next
-    # to the PDB and hand that file to the normal per-codon path. Reserved keywords, so a
-    # real mRNA filename must not be "fastest"/"slowest".
+    # mrna = "fastest"/"slowest"/"median": one-shot prep -- write the synonymous-codon
+    # mRNA next to the PDB and hand that file to the normal per-codon path. Reserved
+    # keywords, so a real mRNA filename must not be "fastest"/"slowest"/"median".
     if mrna is not None and mrna.strip().lower() in synth_mrna.SYNTHETIC_MRNA_MODES:
         _mode = mrna.strip().lower()
         if _uniform_codon_time is not None:
             raise ValueError(
                 f"{config_file}: mrna={_mode} is incompatible with a uniform "
-                f"'codon_times' (a number, {_uniform_codon_time:g} s): fastest/slowest "
-                f"picks the per-amino-acid extreme codon, which needs a codon-time "
+                f"'codon_times' (a number, {_uniform_codon_time:g} s): {_mode} "
+                f"picks a per-amino-acid synonymous codon, which needs a codon-time "
                 f"*table* (e.g. one under assets/csp/codon_dwell_times/), not a single "
                 f"uniform time.")
         if codon_time_table_path is None:
