@@ -296,7 +296,10 @@ Notes on individual options
 Required inputs (``pdb_file`` / ``ribosome``)
     A synthesis run cannot start without both. ``pdb_file`` supplies the sequence
     (the length-``L`` model is ``buildCoarseGrainModel`` on residues ``1..L`` — no
-    STRIDE, no contact map). ``ribosome`` is the truncated CG ribosome providing
+    STRIDE, no contact map). **It may be an all-atom PDB or a Cα-only CG structure** —
+    only the Cα positions and residue names are read (unlike the sibling ``topo`` Gō
+    model, which needs an all-atom structure for STRIDE + heavy-atom native contacts).
+    ``ribosome`` is the truncated CG ribosome providing
     the P-/A-anchors and the rigid scenery; it must carry tRNA beads under the fixed
     names (segids ``PtR``/``AtR``, resid 76, beads ``R``/``P``/``BR2``) or anchor
     lookup — and the always-on PTC-geometry optimization — fail.

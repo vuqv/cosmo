@@ -1,0 +1,54 @@
+# Citation File Format — https://citation-file-format.github.io/
+# GitHub reads this to render a "Cite this repository" button.
+# Keep this file in sync with docs/citation.rst.
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below (preferred) and the software."
+title: "COSMO: COarse-grained Simulation of intrinsically disordered prOteins with OpenMM"
+abstract: >-
+  COSMO is a coarse-grained simulation engine for intrinsically disordered
+  proteins and related biomolecules, built on OpenMM. It implements the HPS
+  hydropathy-scale force fields (hps_urry / hps_kr / hps_ss) and the Mpipi model,
+  and includes a per-codon co-translational-synthesis protocol (CSP) ported from
+  the topo project.
+type: software
+authors:
+  - family-names: Vu
+    given-names: Quyen
+    # orcid: "https://orcid.org/[PLACEHOLDER]"
+  - family-names: "O'Brien"
+    given-names: "Edward P."
+version: "0.1.0"              # see pyproject.toml
+date-released: "[YYYY-MM-DD]"
+license: GPL-3.0
+url: "https://github.com/vuqv/cosmo"
+repository-code: "https://github.com/vuqv/cosmo"
+keywords:
+  - coarse-grained
+  - molecular-dynamics
+  - intrinsically-disordered-proteins
+  - biomolecular-condensates
+  - phase-separation
+  - HPS-model
+  - Mpipi
+  - co-translational-synthesis
+  - OpenMM
+# The application paper that introduces this coarse-grained toolkit. GitHub
+# prefers this over the software entry above.
+preferred-citation:
+  type: article
+  title: "Noncovalent Lasso Entanglements are Common in Experimentally Derived Intrinsically Disordered Protein Ensembles and Strongly Influenced by Protein Length and Charge"
+  authors:
+    - family-names: Vu
+      given-names: "Quyen V."
+    - family-names: Sitarik
+      given-names: Ian
+    - family-names: Li
+      given-names: "Mai Suan"
+    - family-names: "O'Brien"
+      given-names: "Edward P."
+  journal: "The Journal of Physical Chemistry B"
+  year: 2025
+  volume: 129
+  start: 4682
+  end: 4691
+  # doi: "[PLACEHOLDER — add the JPCB DOI]"

@@ -14,12 +14,16 @@ phase separation, protein–RNA complexes, and **protein synthesis**.
 **New here?** Read :doc:`overview` to see the two things COSMO does and jump to the
 right tutorials, and :doc:`modules/introduction` for installation and package layout.
 
+**Using COSMO in a paper?** See :doc:`citation` for how to cite the software and the
+underlying HPS / Mpipi force fields (and the synthesis references when you run CSP).
+
 .. toctree::
    :maxdepth: 1
    :caption: Getting started
 
    overview
    modules/introduction
+   citation
 
 .. toctree::
    :maxdepth: 2
@@ -41,6 +45,7 @@ right tutorials, and :doc:`modules/introduction` for installation and package la
    usage/codon_dwell_times
    usage/continuous_synthesis
    usage/cylinder_synthesis
+   usage/synthesis_resume
    usage/synthesis_control
 
 .. toctree::

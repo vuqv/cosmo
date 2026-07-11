@@ -271,7 +271,7 @@ For a compact tabular reference of every `csp.ini` option, see {doc}`synthesis_c
 
 | Key | Required | Default | Meaning |
 |-----|----------|---------|---------|
-| `pdb_file` | **yes** | — | All-atom / CA native PDB of the target protein; the CG model is built from its first `L` residues. |
+| `pdb_file` | **yes** | — | Native PDB of the target protein — **all-atom *or* a Cα-only CG structure both work** (only the Cα positions and residue names are read; cosmo's sequence-based model has no STRIDE / native-contact step). The CG model is built from its first `L` residues. |
 | `ribosome` | **yes** | — | Truncated CG ribosome PDB (P-/A-anchors + rigid scenery). |
 | `model` | no | `hps_kr` | Nascent force field. **Any model works** (`hps_kr` / `hps_urry` / `mpipi`); `hps_kr` is only the default. The ribosome 12-10-6 wall uses the model-independent O'Brien `Rmin/2` tables (`OBRIEN_RMIN_2_NM` / `OBRIEN_RNA_RMIN_2_BEADS`), so the model only sets the nascent IDP↔IDP interaction. |
 | `L0` | no | `1` | Start nascent-chain length. |

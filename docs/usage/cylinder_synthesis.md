@@ -81,9 +81,15 @@ inward push that keeps the in-tunnel chain extended) or the **exit face** (`x_ex
 inner corner at the mouth is rounded by a fillet of radius `rho = tunnel_mouth_round` so the
 potential stays continuous and the MD stays stable.
 
-The C-terminus is **seeded and position-restrained on the tunnel axis at the PTC**
-`(x_lo, y0, z0)` (stiffness `restraint_k`); each new residue is seeded there. There is no
-A/P tRNA tether and no translocation switch — the chain simply extrudes forward as it grows.
+The C-terminus is **position-restrained on the tunnel axis at the PTC** `(x_lo, y0, z0)`
+(stiffness `restraint_k`). Each new residue is *seeded* one equilibrium peptide bond
+**deeper** than that rest point — toward the closed PTC end — so the new `L-1↔L` bond
+starts at its equilibrium length instead of collapsed onto the previous C-terminus; the
+restraint and the closed-end wall then lift the new residue back onto the PTC while the
+older chain ratchets forward. (This is the analytic-tunnel analogue of the explicit
+protocol's A/P-site offset, without the ribosome, and is what keeps a rigid `AllBonds`
+build stable here too.) There is no A/P tRNA tether and no translocation switch — the
+chain simply extrudes forward as it grows.
 
 ```{note}
 **How it differs from the {doc}`coarse-grained ribosome model <continuous_synthesis>`.**
@@ -110,7 +116,7 @@ Example `cylinder.ini`:
 ```ini
 [OPTIONS]
 ; --- inputs (no `ribosome` PDB: the tunnel is analytic) ---
-pdb_file = asyn.pdb          ; full native PDB of the nascent chain
+pdb_file = asyn.pdb          ; native PDB (all-atom OR Cα-only CG; only Cα + resnames read)
 model    = hps_kr            ; nascent IDP force field
 
 ; --- length schedule ---
@@ -171,9 +177,9 @@ These behave exactly as on the {doc}`synthesis_control` page (inherited from the
 `RunParams`): `model` (default `hps_kr`; any IDP model works), `scale_factor`,
 `codon_times`, `random_seed`, `ribosome_traffic` / `initiation_rate` (traffic
 correction), `max_steps_per_stage` / `min_steps_per_stage` (testing-only), `constraints`
-(`None` flexible default, or `AllBonds` for rigid bonds), `restraint_k`, `minimize`,
-`dt` / `ref_t` / `tau_t` / `nstout`,
-`device` / `ppn`.
+(`None` flexible default; the equilibrium-bond seed above also keeps `AllBonds` stable),
+`restraint_k`, `minimize`, `dt` / `ref_t` / `tau_t` / `nstout`, `device` / `ppn`, and
+`resume` (`auto`/`yes`/`no`; CLI `--fresh` forces `no` — see {doc}`synthesis_resume`).
 
 ```{warning}
 `time_stage_1` / `time_stage_2` are accepted (inherited) but have **no effect** in the
@@ -193,11 +199,17 @@ from its **whole** codon dwell, not a three-way split.
 │   └── traj.log, traj.psf, ...
 ├── ejection/               # free run, restraint off (if ejection_steps > 0)
 ├── dissociation/           # second free run (if dissociation_steps > 0)
-└── dwell_times.dat         # per-residue: codon, sampled dwell (s), ns, integration steps
+├── dwell_times.dat         # per-residue: codon, sampled dwell (s), ns, integration steps
+└── progress.log            # append-only DONE/RUNNING resume status
 ```
 
 **Movie.** `cosmo-csp-movie -o <outdir>` stitches the per-length trajectories (it
 auto-detects the flat `L_<L>/` layout used here vs. the 3-stage layout of `cosmo-csp`).
+
+**Resume.** Like `cosmo-csp`, an interrupted cylinder run continues from the last
+completed residue when re-invoked (`resume = auto`, on by default) — the schedule is
+re-read from `dwell_times.dat` and the seed reloaded from the last `L_<L>/traj_final.pdb`,
+tracked by `progress.log`. See {doc}`synthesis_resume`.
 
 ---
 
