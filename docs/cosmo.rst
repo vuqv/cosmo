@@ -8,8 +8,10 @@ Subpackages
    :maxdepth: 4
 
    cosmo.core
+   cosmo.mdrun
    cosmo.parameters
    cosmo.reporter
+   cosmo.utils
    cosmo.csp
 
 Module contents
