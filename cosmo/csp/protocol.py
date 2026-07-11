@@ -63,6 +63,7 @@ from cosmo.csp.ribosome import load_ribosome
 from cosmo.parameters import model_parameters
 from cosmo.utils.config import strtobool
 from cosmo.csp import kinetics
+from cosmo.csp import resume as resume_mod
 from cosmo.csp import synth_mrna
 
 
@@ -140,26 +141,11 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     print(f"P-anchor (PtR 76 R): {p_anchor} nm")
     print(f"A-anchor (AtR 76 R): {a_anchor} nm")
 
-    # Hold/seed targets (fixed points the C-terminus is position-restrained to).
-    # The PTC geometry is always optimized: place the A-site and P-site target points
-    # exactly one peptide bond apart (the model's bond_length_protein -- 0.380 nm for
-    # hps_kr, not topo's 0.381) and clear of the ribosome excluded volume. Seeding the
-    # new residue at a_target while the previous C-terminus rests at p_target makes the
-    # always-present peptide bond start at its equilibrium length.
-    pep_nm = float(model_parameters.parameters[ep.model]["bond_length_protein"])
-    a_target, p_target = optimal_ptc_targets(ribo, peptide_nm=pep_nm)
-    print(f"[PTC geometry] optimal PTC targets "
-          f"(|A-P| = {np.linalg.norm(a_target - p_target):.4f} nm = 1 peptide bond "
-          f"@ {pep_nm} nm; fixed points, not bonds):")
-    print(f"  A-site target (new-AA seed + stage-1/2 restraint): {a_target} nm")
-    print(f"  P-site target (prev-AA / stage-3 restraint)       : {p_target} nm")
-
-    # Tunnel-wall plane (auto-derived -- never a stale user knob): the lower
-    # (deeper-in-tunnel, smaller-x) C-terminus hold plane, so the held C-terminus sits
-    # at (just on) the plane while the chain cannot slip below the synthesis point.
-    wall_x0 = float(min(a_target[0], p_target[0]))
-    if ep.tunnel_wall:
-        print(f"Tunnel wall plane: x >= {wall_x0:.4f} nm (auto: lower C-terminus hold plane).")
+    # The PTC restraint targets (a_target/p_target) and the tunnel-wall plane are set
+    # below, in the fresh/resume branch: on a fresh start they are solved once
+    # (optimal_ptc_targets, SLSQP) and written into the schedule-file header; on resume
+    # they are re-read from that header so the restraint geometry is pinned identical to
+    # the residues already on disk (see cosmo.csp.resume).
 
     # --- schedule bounds ----------------------------------------------------
     N_full = len(mda.Universe(full_pdb).select_atoms("protein and name CA"))
@@ -169,13 +155,76 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
         raise ValueError(f"require 1 <= L0 <= L_max <= N_full; got L0={L0}, "
                          f"L_max={L_max}, N_full={N_full}.")
 
-    # --- kinetics: intrinsic / real per-codon mFPT lists --------------------
-    # Need intrinsic[L_max] valid -> at least L_max + 1 codons.
-    intrinsic, real, codons = kinetics.build_codon_time_lists(
-        L_max + 1, uniform_codon_time=ep.uniform_codon_time,
-        mrna_path=mrna, codon_time_table_path=codon_time_table_path,
-        ribosome_traffic=ep.ribosome_traffic, initiation_rate=ep.initiation_rate)
-    rng = random.Random(ep.random_seed)
+    dwell_log = out_path / "dwell_times.dat"
+
+    # --- decide fresh vs. resume --------------------------------------------
+    # The schedule (per-residue step counts) and the PTC restraint geometry are the
+    # immutable plan: drawn/solved once at a fresh start, persisted to dwell_times.dat,
+    # then re-read verbatim on resume (no RNG, no SLSQP) so an interrupted run continues
+    # with a kinetic schedule + restraint geometry identical to the uninterrupted run.
+    # See cosmo.csp.resume.
+    if ep.resume not in ("auto", "yes", "no"):
+        raise ValueError(f"resume must be 'auto', 'yes' or 'no'; got {ep.resume!r}.")
+    if ep.resume == "yes":
+        if not resume_mod.progress_exists(out_path):
+            raise SystemExit(
+                f"[resume] resume = yes but no {resume_mod.PROGRESS_FILENAME} in "
+                f"{out_path}/ (nothing to resume). Use resume = no to start fresh.")
+        do_resume = True
+    elif ep.resume == "auto":
+        do_resume = resume_mod.progress_exists(out_path) and dwell_log.is_file()
+    else:   # "no"
+        do_resume = False
+
+    prog = None
+    resume_L = L0
+    prev_final: Optional[np.ndarray] = None
+    if do_resume:
+        # Re-read the immutable plan; recover progress; drop the <=1 in-flight unit.
+        schedule, a_target, p_target, wall_x0 = resume_mod.read_schedule(dwell_log)
+        resume_mod.schedule_covers(schedule, L0, L_max)
+        prog = resume_mod.read_progress(out_path)
+        resume_mod.verify_completed_units(out_path, prog, L0)
+        dropped = resume_mod.drop_running_units(out_path, prog)
+        resume_L = max(prog.last_done_residue + 1, L0)
+        if prog.last_done_residue >= L0:
+            prev_final = resume_mod.load_final_pdb(
+                resume_mod.residue_final_path(out_path, prog.last_done_residue))
+        print(f"[resume] {prog.last_done_residue} length(s) complete on disk"
+              + (f"; dropped in-flight {dropped}" if dropped else "")
+              + f"; continuing from L={resume_L}.")
+    else:
+        # Fresh start: solve the PTC geometry once, draw the whole schedule from the
+        # seeded RNG, then persist both (schedule rows + PTC header) and open progress.
+        pep_nm = float(model_parameters.parameters[ep.model]["bond_length_protein"])
+        a_target, p_target = optimal_ptc_targets(ribo, peptide_nm=pep_nm)
+        wall_x0 = float(min(a_target[0], p_target[0]))
+        intrinsic, real, codons = kinetics.build_codon_time_lists(
+            L_max + 1, uniform_codon_time=ep.uniform_codon_time,
+            mrna_path=mrna, codon_time_table_path=codon_time_table_path,
+            ribosome_traffic=ep.ribosome_traffic, initiation_rate=ep.initiation_rate)
+        rng = random.Random(ep.random_seed)
+        schedule = []
+        for L in range(L0, L_max + 1):
+            (s1, s2, s3), (t1, t2, t3) = kinetics.stage_steps(
+                L, intrinsic, real, time_stage_1=ep.time_stage_1,
+                time_stage_2=ep.time_stage_2, scale_factor=ep.scale_factor,
+                dt_ps=ep.dt_ps, rng=rng, max_steps_per_stage=ep.max_steps_per_stage,
+                min_steps_per_stage=ep.min_steps_per_stage)
+            codon = codons[L - 1] if codons is not None else "uniform"
+            schedule.append(resume_mod.SchedRow(
+                L=L, codon=codon, t_total=intrinsic[L],
+                times=(t1, t2, t3), steps=(s1, s2, s3)))
+        resume_mod.write_schedule(dwell_log, schedule, ep, a_target, p_target, wall_x0)
+        resume_mod.write_progress_header(out_path)
+
+    # --- PTC restraint targets + tunnel wall (from whichever branch above) --
+    print(f"[PTC geometry] optimal PTC targets "
+          f"(|A-P| = {np.linalg.norm(a_target - p_target):.4f} nm; fixed points):")
+    print(f"  A-site target (new-AA seed + stage-1/2 restraint): {a_target} nm")
+    print(f"  P-site target (prev-AA / stage-3 restraint)       : {p_target} nm")
+    if ep.tunnel_wall:
+        print(f"Tunnel wall plane: x >= {wall_x0:.4f} nm (auto: lower C-terminus hold plane).")
 
     print()
     print("=" * 66)
@@ -188,46 +237,30 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     if ep.max_steps_per_stage is not None:
         print(f"  TEST CLAMP: <= {ep.max_steps_per_stage} steps/stage "
               f"(~{3 * ep.max_steps_per_stage} steps/residue). Remove for production.")
+
+    # --- up-front cost report: exact step total, nominal wall-time ----------
+    total_steps = (sum(sum(r.steps) for r in schedule)
+                   + max(ep.ejection_steps, 0) + max(ep.dissociation_steps, 0))
+    print(f"[schedule] {L_max - L0 + 1} residues, {total_steps:,} planned MD steps"
+          f"{resume_mod.est_walltime(total_steps, ep)}")
+    print(f"Per-residue dwell-time table: {dwell_log}")
     print(f"Synthesizing {full_pdb}: L = {L0} .. {L_max} (N_full = {N_full}), "
           f"model={ep.model}.")
 
-    # --- per-residue dwell-time log (one machine-parsable row per residue) --
-    dwell_log = out_path / "dwell_times.dat"
-    dwell_fh = open(dwell_log, "w")
-    dwell_fh.write(
-        "# O'Brien continuous-synthesis per-residue dwell times (cosmo.csp)\n"
-        f"#   scale_factor={ep.scale_factor:g}  dt={ep.dt_ps} ps  "
-        f"time_stage_1={ep.time_stage_1:g} s  time_stage_2={ep.time_stage_2:g} s\n"
-        f"#   timing={'uniform' if ep.uniform_codon_time is not None else 'per-codon'}  "
-        f"random_seed={ep.random_seed}\n"
-        "#   t1/t2/t3 = sampled peptidyl-transfer / translocation / tRNA-binding "
-        "dwell (s); steps = clamped integration steps actually run\n"
-        "# L  codon  t_invivo_total_s  t1_s  t2_s  t3_s  "
-        "ns1  ns2  ns3  steps1  steps2  steps3\n")
-    dwell_fh.flush()
-
-    # --- main loop: one residue = three sub-stages --------------------------
-    prev_final: Optional[np.ndarray] = None
-    for L in range(L0, L_max + 1):
-        (s1, s2, s3), (t1, t2, t3) = kinetics.stage_steps(
-            L, intrinsic, real, time_stage_1=ep.time_stage_1,
-            time_stage_2=ep.time_stage_2, scale_factor=ep.scale_factor,
-            dt_ps=ep.dt_ps, rng=rng, max_steps_per_stage=ep.max_steps_per_stage,
-            min_steps_per_stage=ep.min_steps_per_stage)
-
-        codon = codons[L - 1] if codons is not None else "uniform"
-        print(f"L={L:>3d}  {codon:>5s}  dwell {intrinsic[L]:>9.4g} s  "
+    # --- main loop: one residue = three sub-stages, one L_<L>/ dir each ------
+    for L in range(resume_L, L_max + 1):
+        (s1, s2, s3) = schedule[L - L0].steps
+        codon = schedule[L - L0].codon
+        print(f"L={L:>3d}  {codon:>5s}  dwell {schedule[L - L0].t_total:>9.4g} s  "
               f"steps {s1:>4d}/{s2:>4d}/{s3:>4d}")
 
-        dwell_fh.write(
-            f"{L:4d}  {codon:>5s}  {intrinsic[L]:.6e}  "
-            f"{t1:.6e}  {t2:.6e}  {t3:.6e}  "
-            f"{t1 * 1e9 / ep.scale_factor:.6e}  {t2 * 1e9 / ep.scale_factor:.6e}  "
-            f"{t3 * 1e9 / ep.scale_factor:.6e}  {s1:8d}  {s2:8d}  {s3:8d}\n")
-        dwell_fh.flush()
+        resume_mod.append_progress(out_path, f"L_{L:03d}", "RUNNING")
 
         ldir = f"L_{L:03d}"
         cold = prev_final is None
+        # Consolidated layout: all three stages share one L_<L>/ directory -- shared
+        # traj.psf + native_1_L.pdb, per-stage traj_s{1,2,3}.dcd, one folded
+        # traj_runinfo.log, and a single traj_final.pdb (stage 3 only).
         # Stage 1: deliver the new residue at the A-site and restrain there (cold start
         # lays the initial segment from the P-anchor instead).
         stage1_anchor = p_target if cold else a_target
@@ -235,8 +268,8 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
                         prev_final=prev_final, out_root=out_path, params=ep, ribo=ribo,
                         wall_x0_nm=wall_x0,
                         cterm_seed=stage1_anchor, restrain=True,
-                        out_subdir=f"{ldir}/stage_1", n_steps_override=s1,
-                        label="stage 1 peptidyl-transfer")
+                        out_subdir=ldir, outname="traj_s1", persist_final=False,
+                        n_steps_override=s1, label="stage 1 peptidyl-transfer")
 
         # Stage 2: continue from stage 1, still held at the A-site. Skip the redundant
         # minimization (the seeded structure is stage 1's already-relaxed final).
@@ -244,44 +277,61 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
                         prev_final=None, seed_override=f1, out_root=out_path, params=ep,
                         ribo=ribo, wall_x0_nm=wall_x0,
                         cterm_seed=stage1_anchor, restrain=True,
-                        out_subdir=f"{ldir}/stage_2", n_steps_override=s2,
-                        minimize_override=False, label="stage 2 translocation")
+                        out_subdir=ldir, outname="traj_s2", persist_final=False,
+                        n_steps_override=s2, minimize_override=False,
+                        label="stage 2 translocation")
 
-        # Stage 3: translocate A->P (restrain the C-terminus to the P-target).
+        # Stage 3: translocate A->P (restrain the C-terminus to the P-target). Its final
+        # is the one persisted traj_final.pdb -- the seed for L+1 and the resume target.
         f3 = run_length(L, full_pdb=full_pdb, p_anchor=p_target, a_anchor=a_anchor,
                         prev_final=None, seed_override=f2, out_root=out_path, params=ep,
                         ribo=ribo, wall_x0_nm=wall_x0,
                         cterm_seed=p_target, restrain=True,
-                        out_subdir=f"{ldir}/stage_3", n_steps_override=s3,
-                        label="stage 3 tRNA-binding")
+                        out_subdir=ldir, outname="traj_s3", persist_final=True,
+                        n_steps_override=s3, label="stage 3 tRNA-binding")
         prev_final = f3
+        # The DONE line is the commit point: all three stages of L are on disk.
+        resume_mod.append_progress(out_path, f"L_{L:03d}", "DONE")
 
-    dwell_fh.close()
     print()
-    print(f"Done. Synthesized {L0} -> {L_max}. Per-residue/-stage outputs under {out_path}/")
+    print(f"Done. Synthesized {L0} -> {L_max}. Per-residue outputs under {out_path}/L_<L>/")
     print(f"Per-residue dwell-time table: {dwell_log}")
 
     # --- post-synthesis: ejection then dissociation (both free runs) --------
+    # Each phase is its own progress unit; on resume a completed phase is skipped and its
+    # final structure reloaded to seed the next phase.
     if ep.ejection_steps > 0:
-        print()
-        print(f"=== Ejection (L = {L_max}, {ep.ejection_steps} steps, restraint OFF) "
-              f"-> {out_path / 'ejection'}/ ===")
-        prev_final = run_length(
-            L_max, full_pdb=full_pdb, p_anchor=p_target, a_anchor=a_anchor,
-            prev_final=None, seed_override=prev_final, out_root=out_path, params=ep,
-            ribo=ribo, wall_x0_nm=wall_x0, restrain=False,
-            out_subdir="ejection", n_steps_override=ep.ejection_steps, label="ejection")
+        if do_resume and prog.is_done("ejection"):
+            prev_final = resume_mod.load_final_pdb(
+                resume_mod.phase_final_path(out_path, "ejection"))
+            print("[resume] ejection already complete; skipping.")
+        else:
+            print()
+            print(f"=== Ejection (L = {L_max}, {ep.ejection_steps} steps, restraint OFF) "
+                  f"-> {out_path / 'ejection'}/ ===")
+            resume_mod.append_progress(out_path, "ejection", "RUNNING")
+            prev_final = run_length(
+                L_max, full_pdb=full_pdb, p_anchor=p_target, a_anchor=a_anchor,
+                prev_final=None, seed_override=prev_final, out_root=out_path, params=ep,
+                ribo=ribo, wall_x0_nm=wall_x0, restrain=False,
+                out_subdir="ejection", n_steps_override=ep.ejection_steps, label="ejection")
+            resume_mod.append_progress(out_path, "ejection", "DONE")
 
     if ep.dissociation_steps > 0:
-        print()
-        print(f"=== Dissociation (L = {L_max}, {ep.dissociation_steps} steps, restraint OFF) "
-              f"-> {out_path / 'dissociation'}/ ===")
-        run_length(
-            L_max, full_pdb=full_pdb, p_anchor=p_target, a_anchor=a_anchor,
-            prev_final=None, seed_override=prev_final, out_root=out_path, params=ep,
-            ribo=ribo, wall_x0_nm=wall_x0, restrain=False,
-            out_subdir="dissociation", n_steps_override=ep.dissociation_steps,
-            label="dissociation")
+        if do_resume and prog.is_done("dissociation"):
+            print("[resume] dissociation already complete; skipping.")
+        else:
+            print()
+            print(f"=== Dissociation (L = {L_max}, {ep.dissociation_steps} steps, restraint OFF) "
+                  f"-> {out_path / 'dissociation'}/ ===")
+            resume_mod.append_progress(out_path, "dissociation", "RUNNING")
+            run_length(
+                L_max, full_pdb=full_pdb, p_anchor=p_target, a_anchor=a_anchor,
+                prev_final=None, seed_override=prev_final, out_root=out_path, params=ep,
+                ribo=ribo, wall_x0_nm=wall_x0, restrain=False,
+                out_subdir="dissociation", n_steps_override=ep.dissociation_steps,
+                label="dissociation")
+            resume_mod.append_progress(out_path, "dissociation", "DONE")
 
 
 # --------------------------------------------------------------------------
@@ -451,6 +501,14 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
         p.ejection_steps = as_int(opt("ejection_steps"))
     if opt("dissociation_steps") is not None:
         p.dissociation_steps = as_int(opt("dissociation_steps"))
+    # Resume policy: auto (default; resume iff an interrupted run is present), yes
+    # (require a resumable run), no (always fresh). See cosmo.csp.resume.
+    if opt("resume") is not None:
+        r = opt("resume").strip().lower()
+        if r not in ("auto", "yes", "no"):
+            raise ValueError(f"{config_file}: resume must be 'auto', 'yes' or 'no', "
+                             f"got {opt('resume')!r}.")
+        p.resume = r
 
     # Per-codon timing needs both the (protein-specific) mRNA and an explicit codon-time
     # table -- there is no bundled default (pick one under assets/csp/codon_dwell_times/).
@@ -513,6 +571,9 @@ def csp(argv: Optional[List[str]] = None) -> None:
                         help="override the output directory from the config file.")
     parser.add_argument("--device", default=None, choices=["CPU", "GPU"],
                         help="override the compute device from the config file.")
+    parser.add_argument("--no-resume", "--fresh", dest="no_resume", action="store_true",
+                        help="ignore any interrupted run and start fresh "
+                             "(overrides resume in the config file).")
 
     if argv is None and len(sys.argv) == 1:
         parser.print_help()
@@ -528,6 +589,8 @@ def csp(argv: Optional[List[str]] = None) -> None:
         cfg.outdir = args.outdir
     if args.device:
         cfg.params.device = args.device
+    if args.no_resume:
+        cfg.params.resume = "no"
 
     run_continuous_synthesis(
         cfg.pdb_file, cfg.ribosome, L0=cfg.L0, L_max=cfg.L_max, out_root=cfg.outdir,

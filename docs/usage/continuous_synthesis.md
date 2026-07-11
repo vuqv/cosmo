@@ -48,7 +48,7 @@ vmd -e synth_out_csp/movie.tcl
 ```
 
 `cosmo-csp` writes, per residue `L` and sub-stage `s`, a standalone trajectory under
-`<outdir>/L_<L>/stage_<s>/`, an optional `ejection/` (and `dissociation/`) phase, and a
+`<outdir>/L_<L>/` (one folder per residue, per-stage `traj_s<s>.dcd`), an optional `ejection/` (and `dissociation/`) phase, and a
 per-residue dwell-time log `<outdir>/dwell_times.dat`.
 
 ---
@@ -147,7 +147,7 @@ electrostatics; the rigid ribosome's own interactions are constant and never com
 
 Each amino acid is added through **one elongation cycle**, split into three kinetic
 sub-steps; CSP runs **one MD segment per sub-step**. For nascent length `L` each sub-stage
-is a standalone short simulation (its own `L_<L>/stage_<s>/` folder); stage 3's final
+is a short simulation writing its own `traj_s<s>.dcd` in the shared `L_<L>/` folder; stage 3's final
 structure seeds the next residue's stage 1.
 
 | stage | real process | what the simulation does | C-terminus restrained to | mean dwell |
@@ -330,15 +330,25 @@ off** by the CSP runner (CSP needs the switchable A↔P position restraint).
 
 ```text
 <outdir>/
-├── L_<L>/stage_<s>/        # one folder per residue L and sub-stage s ∈ {1,2,3}
-│   ├── traj.dcd            # (nascent-only) trajectory for that stage
-│   ├── traj_final.pdb      # last conformation (seeds the next stage/residue)
-│   ├── traj.log            # energies
-│   └── traj.psf, traj.chk, traj_runinfo.log, native_1_<L>.pdb
+├── L_<L>/                  # ONE folder per residue L (consolidated layout)
+│   ├── traj.psf            # nascent topology (shared across the 3 stages; f(L) only)
+│   ├── native_1_<L>.pdb    # length-L native structure (shared)
+│   ├── traj_s1.dcd         # (nascent-only) trajectory, stage 1  (s2/s3 likewise)
+│   ├── traj_s1.log         # energies, stage 1
+│   ├── traj_runinfo.log    # folded run-info: one [run:...]/[result:...] per stage
+│   └── traj_final.pdb      # stage-3 final — seeds L+1 and is the resume-reload target
 ├── ejection/               # post-synthesis ejection phase (if ejection_steps > 0)
 ├── dissociation/           # post-synthesis free run (if dissociation_steps > 0)
-└── dwell_times.dat         # per-residue dwell-time log
+├── dwell_times.dat         # per-residue dwell-time log / schedule (#PTC header)
+└── progress.log            # append-only DONE/RUNNING resume status
 ```
+
+Each residue's three sub-stages share **one** `L_<L>/` directory: `traj.psf` and
+`native_1_<L>.pdb` depend only on `L` and are written once; trajectories stay split per
+stage (`traj_s{1,2,3}.dcd`); only stage 3 writes `traj_final.pdb`. There is no per-stage
+`.chk` — per-residue **resume** reloads `traj_final.pdb`. Re-invoking `cosmo-csp` on an
+interrupted `<outdir>` continues from the last completed residue (`resume = auto` by
+default; `--fresh` to override); see `cosmo.csp.resume`.
 
 **`dwell_times.dat`** records, per residue, the codon, the three sampled dwell **times in
 seconds** (`t1`/`t2`/`t3`), their nanosecond equivalents, and the integer MD step counts —

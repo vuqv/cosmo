@@ -146,7 +146,7 @@ Inputs & length schedule
      - str
      - no
      - ``synth_out``
-     - Output root; each residue writes ``L_<L>/stage_<1,2,3>/`` beneath it.
+     - Output root; each residue writes one ``L_<L>/`` folder (per-stage ``traj_s<1,2,3>.dcd`` + a shared ``traj.psf``).
 
 .. note::
 
@@ -327,7 +327,7 @@ Post-synthesis phases (``ejection_steps`` / ``dissociation_steps``)
 
 Output layout and progress log
     Every stage writes a standalone, **nascent-only** trajectory to
-    ``<outdir>/L_<L>/stage_<s>/``. A per-residue ``<outdir>/dwell_times.dat``
+    ``<outdir>/L_<L>/`` (per-stage ``traj_s<s>.dcd`` + a shared ``traj.psf``). A per-residue ``<outdir>/dwell_times.dat``
     records the codon and the three sampled dwell times (seconds, ns, MD steps).
     Stitch the per-stage trajectories into one VMD movie with ``cosmo-csp-movie -o
     <outdir> --ribosome <ribosome>.pdb``. Set ``COSMO_CSP_VERBOSE=1`` for the full

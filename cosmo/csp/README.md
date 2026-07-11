@@ -126,11 +126,19 @@ model-dependent (the residue's formal charge, e.g. mpipi's partial charges). The
 
 ## Output
 
-`<outdir>/L_<L>/stage_<1,2,3>/` per residue (each a standalone cosmo run: `traj.dcd`,
-`traj.log`, `traj.psf`, `traj.chk`, `traj_final.pdb`, `traj_runinfo.log`,
-`native_1_<L>.pdb`), plus a per-residue `dwell_times.dat`, and optional `ejection/` /
-`dissociation/`. Stage 3's `traj_final.pdb` seeds the next residue. The cylinder runner
-writes the flat `<outdir>/L_<L>/` layout (one segment per residue).
+`<outdir>/L_<L>/` — **one folder per residue** (consolidated layout): a shared
+`traj.psf` + `native_1_<L>.pdb` (functions of `L` only, written once), per-stage
+`traj_s{1,2,3}.dcd` + `.log`, one folded `traj_runinfo.log` (a section per stage), and a
+single `traj_final.pdb` (stage-3 final — it seeds the next residue and is the
+resume-reload target). No per-stage `.chk`. Plus a per-residue `dwell_times.dat` and
+optional `ejection/` / `dissociation/`. The cylinder runner writes the flat
+`<outdir>/L_<L>/traj.*` layout (one segment per residue).
+
+**Resume.** Re-invoking `cosmo-csp` / `cosmo-cylinder` on an interrupted `<outdir>`
+continues from the last completed residue — the schedule + PTC geometry are re-read from
+`dwell_times.dat` (no RNG redraw / SLSQP re-solve) and the seed is reloaded from the last
+`traj_final.pdb`, tracked by `progress.log`. On by default (`resume = auto`; `yes`/`no`
+or `--fresh` override). See `cosmo.csp.resume`.
 
 See [`../../sandbox/validate/`](../../sandbox/validate/) for a runnable proof-of-concept
 on α-synuclein (both runners + the movie stitcher).

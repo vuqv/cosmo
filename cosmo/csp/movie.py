@@ -8,7 +8,7 @@ present and parks the not-yet-synthesized beads out of view.
 
 Two output layouts are auto-detected:
 
-* **CSP 3-stage** (:mod:`cosmo.csp.protocol`): ``<out>/L_<L>/stage_<1,2,3>/traj.*`` --
+* **CSP 3-stage** (:mod:`cosmo.csp.protocol`): ``<out>/L_<L>/traj_s<1,2,3>.dcd`` + a shared ``traj.psf`` --
   the three sub-stage segments of each residue are played in order.
 * **cylinder / flat** (:mod:`cosmo.csp.cylinder`): ``<out>/L_<L>/traj.*`` -- one
   segment per residue.
@@ -90,14 +90,16 @@ def find_segments(out_root: str,
 
     Auto-detects the layout per length directory ``<out_root>/L_<L>/``:
 
-    - if it contains ``stage_<s>/`` subfolders (CSP 3-stage), each stage is a segment
-      in numeric stage order (``L=<L> s<s>``);
-    - otherwise the flat ``L_<L>/traj.*`` is a single segment (``L=<L>``).
+    - if it contains per-stage ``traj_s<1,2,3>.dcd`` + a shared ``traj.psf`` (the
+      consolidated CSP 3-stage layout), each stage is a segment in numeric stage order
+      (``L=<L> s<s>``);
+    - otherwise the flat ``L_<L>/traj.*`` is a single segment (``L=<L>``; the cylinder
+      runner).
 
     ``n_atoms`` for a length-``L`` segment is ``L`` (nascent-only output). Only segments
-    with a ``.psf`` and a readable trajectory are kept; the trajectory is the ``.dcd``
-    when it has frames, else the ``_final.pdb`` snapshot (see :func:`_pick_traj`).
-    Lengths are sorted ascending.
+    with a ``.psf`` and a readable trajectory are kept. A 0-byte (headerless) stage DCD is
+    skipped quietly; for stage 3 the single ``traj_final.pdb`` still contributes its
+    conformation. Lengths are sorted ascending.
     """
     lengths = []
     for d in glob.glob(os.path.join(out_root, "L_*")):
@@ -108,17 +110,28 @@ def find_segments(out_root: str,
 
     segments: List[Tuple[str, int, str, str]] = []
     for L, d in lengths:
-        stage_dirs = sorted(glob.glob(os.path.join(d, "stage_*")),
-                            key=lambda p: int(re.search(r"stage_(\d+)$", p).group(1))
-                            if re.search(r"stage_(\d+)$", p) else 0)
-        if stage_dirs:
-            for sd in stage_dirs:
-                sm = re.search(r"stage_(\d+)$", os.path.basename(sd))
-                psf = os.path.join(sd, f"{outname}.psf")
-                traj = _pick_traj(sd, outname)
-                if os.path.isfile(psf) and traj is not None:
-                    segments.append((f"L={L} s{sm.group(1) if sm else '?'}", L, psf, traj))
+        per_stage = sorted(
+            glob.glob(os.path.join(d, "traj_s*.dcd")),
+            key=lambda p: int(re.search(r"traj_s(\d+)\.dcd$", p).group(1))
+            if re.search(r"traj_s(\d+)\.dcd$", p) else 0)
+        psf = os.path.join(d, "traj.psf")
+        if per_stage and os.path.isfile(psf):
+            # Consolidated CSP layout: shared traj.psf + per-stage traj_s{1,2,3}.dcd.
+            for sd in per_stage:
+                sm = re.search(r"traj_s(\d+)\.dcd$", os.path.basename(sd))
+                s = sm.group(1) if sm else "?"
+                traj = None
+                if os.path.getsize(sd) > 0:
+                    traj = sd
+                elif s == "3" and os.path.isfile(os.path.join(d, "traj_final.pdb")):
+                    # Coarse nstout can leave a stage DCD empty; stage 3's single final
+                    # still contributes (stages 1/2 have no per-stage final now, so an
+                    # empty s1/s2 DCD is simply skipped).
+                    traj = os.path.join(d, "traj_final.pdb")
+                if traj is not None:
+                    segments.append((f"L={L} s{s}", L, psf, traj))
         else:
+            # Flat per-length (cylinder): L_<L>/traj.psf + traj.dcd (+ traj_final.pdb).
             psf = os.path.join(d, f"{outname}.psf")
             traj = _pick_traj(d, outname)
             if os.path.isfile(psf) and traj is not None:
@@ -175,7 +188,8 @@ def stitch_movie(out_root: str, out_prefix: str = "movie",
     if not segments:
         raise SystemExit(
             f"no per-length/-stage trajectories found under {out_root!r} "
-            f"(expected {out_root}/L_<L>/[stage_<s>/]{outname}.dcd + .psf).")
+            f"(expected {out_root}/L_<L>/traj_s<1,2,3>.dcd + traj.psf, or a flat "
+            f"{out_root}/L_<L>/{outname}.dcd + .psf).")
 
     # Append the post-synthesis phases (at the final length) after growth.
     for name, psf, dcd in find_post(out_root, outname=outname):
@@ -319,7 +333,7 @@ def main(argv: Optional[List[str]] = None) -> None:
     p = argparse.ArgumentParser(
         prog="cosmo-csp-movie",
         description="Stitch the CSP per-residue/-stage trajectories "
-                    "(<out_root>/L_<L>/[stage_<s>/]traj.dcd) -- plus any post-synthesis "
+                    "(<out_root>/L_<L>/traj_s<1,2,3>.dcd or a flat traj.dcd) -- plus any post-synthesis "
                     "phase (ejection/ dissociation/ stallation/) -- into one "
                     "VMD-playable movie that grows the nascent chain N->C.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)

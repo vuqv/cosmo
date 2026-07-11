@@ -202,8 +202,11 @@ def setup_simulation(cfg, built, control_file=None, shift_positions=True):
         vel_source = f"Boltzmann distribution at {cfg.ref_t}"
 
     # Record run provenance (package versions, hardware, GPU, timing) to a
-    # side-channel <outname>_runinfo.log -- does not affect the simulation.
-    runinfo_path = cfg.output_path('_runinfo.log')
+    # side-channel <outname>_runinfo.log -- does not affect the simulation. A driver may
+    # instead point every phase at one shared file and fold them (cfg.runinfo_path +
+    # cfg.runinfo_append/_section), e.g. the CSP runner writes one traj_runinfo.log per
+    # residue with a section per stage. These cfg attrs are absent for ordinary runs.
+    runinfo_path = getattr(cfg, 'runinfo_path', None) or cfg.output_path('_runinfo.log')
     runinfo.write_run_start(
         runinfo_path,
         control_file=control_file,
@@ -215,6 +218,9 @@ def setup_simulation(cfg, built, control_file=None, shift_positions=True):
         ppn=cfg.ppn,
         coord_source=coord_source,
         vel_source=vel_source,
+        title=getattr(cfg, 'runinfo_title', None),
+        append=getattr(cfg, 'runinfo_append', False),
+        section_label=getattr(cfg, 'runinfo_section', None),
     )
     print(f"Writing run metadata to {runinfo_path}")
 
@@ -223,7 +229,8 @@ def setup_simulation(cfg, built, control_file=None, shift_positions=True):
                       checkpoint=checkpoint, runinfo_path=runinfo_path)
 
 
-def attach_reporters(cfg, simulation, append=False, total_steps=None):
+def attach_reporters(cfg, simulation, append=False, total_steps=None,
+                     checkpoint=True, trajectory=True):
     """Attach checkpoint, trajectory and log reporters to ``simulation``.
 
     Replaces any existing reporters. Files are written to
@@ -240,6 +247,15 @@ def attach_reporters(cfg, simulation, append=False, total_steps=None):
     total_steps : int, optional
         Total step count advertised to the StateDataReporter (for the
         remaining-time/speed estimate). Defaults to ``cfg.md_steps``.
+    checkpoint : bool, optional
+        Whether to attach the ``<outname>.chk`` checkpoint reporter. The CSP
+        nascent-only path sets this ``False`` (per-residue resume reloads
+        ``traj_final.pdb``, never a ``.chk``).
+    trajectory : bool, optional
+        Whether to attach the standard full-system ``<outname>.dcd`` reporter. The CSP
+        nascent-only path sets this ``False`` and attaches its own
+        :class:`~cosmo.csp.core.NascentDCDReporter` afterwards, so the trajectory file
+        is opened once (no double-open of the same path).
     """
     if total_steps is None:
         total_steps = cfg.md_steps
@@ -247,11 +263,13 @@ def attach_reporters(cfg, simulation, append=False, total_steps=None):
     # Checkpoint frequency (nstchk) is independent of the trajectory frequency
     # (nstxout); it falls back to nstxout when not set in the config.
     simulation.reporters = []
-    simulation.reporters.append(
-        mm.app.CheckpointReporter(cfg.checkpoint_path(), cfg.checkpoint_interval()))
-    simulation.reporters.append(
-        mm.app.DCDReporter(cfg.output_path('.dcd'), cfg.nstxout,
-                           enforcePeriodicBox=bool(cfg.pbc), append=append))
+    if checkpoint:
+        simulation.reporters.append(
+            mm.app.CheckpointReporter(cfg.checkpoint_path(), cfg.checkpoint_interval()))
+    if trajectory:
+        simulation.reporters.append(
+            mm.app.DCDReporter(cfg.output_path('.dcd'), cfg.nstxout,
+                               enforcePeriodicBox=bool(cfg.pbc), append=append))
     # cosmoReporter writes a clean, fixed-width log: each float column uses
     # log_precision decimals and every column is padded to log_width characters so
     # the columns line up. Columns are separated by two spaces (aligned and still

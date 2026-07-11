@@ -29,6 +29,7 @@ from cosmo.csp.protocol import (CSPConfig, csp, read_csp_config,
 from cosmo.csp.cylinder import (CylinderConfig, CylinderParams, cylinder,
                                 read_cylinder_config, run_cylinder_synthesis)
 from cosmo.csp import kinetics
+from cosmo.csp import resume
 
 __all__ = [
     "CSPConfig",
@@ -43,4 +44,5 @@ __all__ = [
     "read_cylinder_config",
     "run_cylinder_synthesis",
     "kinetics",
+    "resume",
 ]

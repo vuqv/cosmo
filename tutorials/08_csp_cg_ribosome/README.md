@@ -59,7 +59,7 @@ residue is seeded one peptide bond (0.380 nm) from the C-terminus, EV-clear.
 ```bash
 cd tutorials/08_csp_cg_ribosome
 
-python -m cosmo.csp -f csp.ini      # -> synth_out_csp/L_<L>/stage_<1,2,3>/
+python -m cosmo.csp -f csp.ini      # -> synth_out_csp/L_<L>/  (per-stage traj_s<1,2,3>.dcd)
 #   installed console script:  cosmo-csp -f csp.ini
 ```
 
@@ -81,9 +81,9 @@ Writes a fixed-width VMD-playable movie (`movie.dcd` / `movie.psf` / `movie.tcl`
 
 ## What it produces
 
-- `synth_out_csp/L_001/ … L_008/`, each with `stage_1/2/3/` sub-runs — the
+- `synth_out_csp/L_001/ … L_008/`, each with per-stage `traj_s1/2/3.dcd` — the
   A→P restraint switch across the three O'Brien sub-stages.
-- **Nascent-only trajectories**: each `stage_*/traj.psf`/`.dcd` contains only the
+- **Nascent-only trajectories**: the shared `L_<L>/traj.psf` + per-stage `traj_s*.dcd` contain only the
   `L` nascent beads — the 4576-bead ribosome is excluded from the trajectory and
   re-attached as static scenery by the movie stitcher's `--ribosome` overlay.
 - `synth_out_csp/dwell_times.dat` — per-residue dwell-time table.
