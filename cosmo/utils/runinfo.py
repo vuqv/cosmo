@@ -22,15 +22,17 @@ Typical use from a run script::
     simulation.step(nsteps_remain)
     cosmo.runinfo.write_run_end(path, simulation=simulation, start_epoch=start)
 
-The log is a simple INI-like text file with ``[run_start]``, ``[cuda_metadata]``
-(GPU runs only), and ``[run_end]`` sections.
+The log is a simple INI-like text file: a one-line ``# COSMO run info`` banner
+followed by aligned ``[run]``, ``[software]``, ``[hardware]``, ``[gpu]`` (GPU runs
+only) and ``[result]`` sections. The first four are written before the run so a
+crashed run still leaves a "what was attempted" file; ``[result]`` is appended at
+the end.
 """
 import os
 import platform as py_platform
 import shutil
 import socket
 import subprocess
-import sys
 import time
 from datetime import datetime
 
@@ -110,24 +112,51 @@ def collect_cuda_metadata(simulation) -> dict:
     return cuda_info
 
 
+_KEY_W = 16  # key column width for aligned "key : value" lines
+
+
+def _human_time(seconds: float) -> str:
+    """Wall-clock as a single human-friendly figure (s / min / h)."""
+    if seconds < 90:
+        return f"{seconds:.2f} s"
+    if seconds < 5400:
+        return f"{seconds / 60:.1f} min"
+    return f"{seconds / 3600:.2f} h"
+
+
+def _context_from_path(path: str) -> str:
+    """Short banner context from the output dir, e.g. ``.../L_008/stage_3/x.log`` -> ``L_008/stage_3``."""
+    parts = [p for p in os.path.dirname(os.path.abspath(path)).split(os.sep) if p]
+    return "/".join(parts[-2:]) if parts else ""
+
+
+def write_banner(path: str, title: str) -> None:
+    """(Over)write the file with the ``# COSMO run info`` banner header."""
+    header = "COSMO run info" + (f"  ·  {title}" if title else "")
+    with open(path, "w") as f:
+        f.write(f"# {header}\n")
+        f.write(f"# {'=' * len(header)}\n")
+
+
 def write_section(path: str, section_name: str, kv_pairs: dict, mode: str = "a") -> None:
-    """Write one metadata section (``[name]`` header + ``key: value`` lines)."""
+    """Append one metadata section (``[name]`` header + aligned ``key : value`` lines)."""
     with open(path, mode) as f:
         f.write(f"\n[{section_name}]\n")
         for k, v in kv_pairs.items():
-            f.write(f"{k}: {v}\n")
+            f.write(f"{k:<{_KEY_W}}: {v}\n")
 
 
 def write_run_start(path: str, *, control_file, checkpoint_file, restart,
                     steps_planned, simulation, use_gpu, ppn,
-                    coord_source=None, vel_source=None) -> None:
+                    coord_source=None, vel_source=None, title=None) -> None:
     """
-    Write the ``[run_start]`` provenance section, overwriting any existing file.
+    Write the banner + ``[run]``/``[software]``/``[hardware]`` (and ``[gpu]``)
+    provenance sections, overwriting any existing file.
 
     Records timing, input/checkpoint paths, planned step count, the source of the
     initial coordinates/velocities, package versions (Python/NumPy/ParmEd/OpenMM),
-    hardware (host, OS, CPU count, selected platform), and — for GPU runs — a
-    ``[cuda_metadata]`` section.
+    hardware (host, OS, CPU, selected platform), and — for GPU runs — a friendly
+    accelerator line plus a detailed ``[gpu]`` section.
 
     Parameters
     ----------
@@ -153,6 +182,9 @@ def write_run_start(path: str, *, control_file, checkpoint_file, restart,
     vel_source : str, optional
         Human-readable description of where the initial velocities came from
         (checkpoint or a Boltzmann distribution).
+    title : str, optional
+        Short banner label (e.g. ``"L=8 · stage 3"``). When omitted, a context is
+        derived from the output directory (e.g. ``"L_008/stage_3"``).
     """
     try:
         import parmed as pmd
@@ -160,36 +192,47 @@ def write_run_start(path: str, *, control_file, checkpoint_file, restart,
     except Exception:
         parmed_version = "not installed"
 
-    info = {
-        "start_time_iso": datetime.now().astimezone().isoformat(),
-        "control_file": control_file,
-        "checkpoint_file": checkpoint_file,
-        "restart_mode": restart,
+    write_banner(path, title if title is not None else _context_from_path(path))
+
+    run = {
+        "started": datetime.now().astimezone().isoformat(timespec="seconds").replace("T", " "),
+        "restart": "yes" if restart else "no",
         "steps_planned": steps_planned,
-        "initial_coordinates": coord_source if coord_source is not None else "unknown",
-        "initial_velocities": vel_source if vel_source is not None else "unknown",
-        "python_version": sys.version.replace("\n", " "),
-        "numpy_version": _module_version(np),
-        "parmed_version": parmed_version,
-        "openmm_version": _module_version(mm),
-        "hostname": socket.gethostname(),
-        "os": py_platform.platform(),
-        "machine": py_platform.machine(),
-        "processor": py_platform.processor() or "not reported",
-        "cpu_count": os.cpu_count(),
-        "requested_threads_ppn": ppn,
-        "selected_platform": simulation.context.getPlatform().getName(),
-        "use_gpu": use_gpu,
+        "control_file": control_file if control_file is not None else "(none)",
+        "checkpoint_file": checkpoint_file if checkpoint_file is not None else "(none)",
+        "init_coords": coord_source if coord_source is not None else "unknown",
+        "init_velocities": vel_source if vel_source is not None else "unknown",
     }
-    write_section(path, "run_start", info, mode="w")
-    if use_gpu:
-        write_section(path, "cuda_metadata", collect_cuda_metadata(simulation))
+    write_section(path, "run", run)
+
+    software = {
+        "python": py_platform.python_version(),
+        "numpy": _module_version(np),
+        "parmed": parmed_version,
+        "openmm": _module_version(mm),
+    }
+    write_section(path, "software", software)
+
+    hardware = {
+        "host": socket.gethostname(),
+        "os": py_platform.platform(),
+        "platform": simulation.context.getPlatform().getName(),
+        "cpu": f"{py_platform.machine()} · {os.cpu_count()} cores · {ppn} threads requested",
+    }
+    cuda = collect_cuda_metadata(simulation) if use_gpu else None
+    if cuda:
+        hardware["accelerator"] = (f"{cuda.get('CudaDeviceName', 'GPU')} · "
+                                   f"{cuda.get('CudaPrecision', '?')} precision")
+    write_section(path, "hardware", hardware)
+
+    if cuda:
+        write_section(path, "gpu", cuda)
 
 
 def write_run_end(path: str, *, simulation, start_epoch: float,
                   final_structure=None) -> None:
     """
-    Append the ``[run_end]`` provenance section (wall-clock timing + final state).
+    Append the ``[result]`` section (status + wall-clock timing + final state).
 
     Parameters
     ----------
@@ -207,12 +250,12 @@ def write_run_end(path: str, *, simulation, start_epoch: float,
     elapsed = time.time() - start_epoch
     state = simulation.context.getState()
     info = {
-        "end_time_iso": datetime.now().astimezone().isoformat(),
-        "elapsed_seconds": f"{elapsed:.2f}",
-        "elapsed_hours": f"{elapsed / 3600:.4f}",
-        "final_step": state.getStepCount(),
-        "final_time_ns": f"{state.getTime().value_in_unit(unit.nanosecond):.6f}",
+        "status": "completed",
+        "wall_clock": _human_time(elapsed),
+        "steps_run": state.getStepCount(),
+        "sim_time": f"{state.getTime().value_in_unit(unit.nanosecond):.4g} ns",
+        "ended": datetime.now().astimezone().isoformat(timespec="seconds").replace("T", " "),
     }
     if final_structure is not None:
         info["final_structure"] = final_structure
-    write_section(path, "run_end", info)
+    write_section(path, "result", info)
