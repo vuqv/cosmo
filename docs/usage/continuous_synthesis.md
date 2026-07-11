@@ -257,72 +257,26 @@ tunnel wall remain, so the chain diffuses out along +x. An optional **dissociati
 
 ---
 
-## Configuration reference (`csp.ini`)
+## Configuration
 
 CSP reads a single INI control file with one `[OPTIONS]` section
-(`cosmo.csp.protocol.read_csp_config`). **Units are OpenMM defaults** — nm, ps, kJ/mol, K,
-kJ/mol/nm² — and **dwell times are in seconds**. Integers may use `_` separators.
+(`cosmo.csp.protocol.read_csp_config`). **Every control key — for both `cosmo-csp` and
+`cosmo-cylinder` — is documented in one place:** {doc}`synthesis_control` (grouped into
+*shared*, *coarse-grained-ribosome-only*, and *cylinder-only* keys, with types and
+defaults). Units are OpenMM defaults (nm, ps, kJ/mol, K, kJ/mol/nm²) and dwell times are
+in seconds.
 
-```{tip}
-For a compact tabular reference of every `csp.ini` option, see {doc}`synthesis_control`.
-```
+A few CSP-specific behaviors worth calling out (the physics behind the keys):
 
-### Inputs & schedule
-
-| Key | Required | Default | Meaning |
-|-----|----------|---------|---------|
-| `pdb_file` | **yes** | — | Native PDB of the target protein — **all-atom *or* a Cα-only CG structure both work** (only the Cα positions and residue names are read; cosmo's sequence-based model has no STRIDE / native-contact step). The CG model is built from its first `L` residues. |
-| `ribosome` | **yes** | — | Truncated CG ribosome PDB (P-/A-anchors + rigid scenery). |
-| `model` | no | `hps_kr` | Nascent force field. **Any model works** (`hps_kr` / `hps_urry` / `mpipi`); `hps_kr` is only the default. The ribosome 12-10-6 wall uses the model-independent O'Brien `Rmin/2` tables (`OBRIEN_RMIN_2_NM` / `OBRIEN_RNA_RMIN_2_BEADS`), so the model only sets the nascent IDP↔IDP interaction. |
-| `L0` | no | `1` | Start nascent-chain length. |
-| `L_max` | no | full length | Final nascent length. |
-| `mrna` | cond. | — | mRNA file (one codon per residue), **or** `fastest`/`slowest`/`median` to auto-build a synonymous-codon mRNA (see [Fastest / slowest / median mRNA](#fastest-slowest-mrna)). Required for per-codon timing (unless `codon_times` is a number). A real filename must not be `fastest`/`slowest`/`median`. |
-| `codon_times` | cond. | — | A **table path** = per-codon timing (required, no bundled default — pick one under `assets/csp/codon_dwell_times/`); a **positive number of seconds** = uniform codon time (no `mrna` needed). A table filename must **not** be a bare number. |
-| `outdir` | no | `synth_out` | Output root. |
-
-There is **no `domain_def`, `stride_output_file`, or `nascent_ev_radii` key** — those are
-topo's Gō-model inputs and do not apply to cosmo's sequence-based chain.
-
-### O'Brien kinetics
-
-| Key | Default | Meaning |
-|-----|---------|---------|
-| `scale_factor` | `4331293` | In-vivo-s → in-silico-ns compression (larger = fewer steps = faster). |
-| `time_stage_1` | `0.00034` | Mean peptidyl-transfer dwell, **seconds**. |
-| `time_stage_2` | `0.004201` | Mean translocation dwell, **seconds**. |
-| `random_seed` | — | Seed for the FPT sampler. |
-| `ribosome_traffic` | `no` | Apply the ribosome-traffic (polysome) dwell-time correction on top of the per-codon kinetics; off = single-ribosome timing. |
-| `initiation_rate` | `0.083333` | Translation initiation rate (1/s); used **only** when `ribosome_traffic = yes`. |
-| `max_steps_per_stage` | — (uncapped) | **Testing only** — upper clamp on each stage's step count. |
-| `min_steps_per_stage` | `1` | **Testing only** — lower clamp. |
-| `ejection_steps` | `0` | Post-synthesis ejection phase (steps); `0` = skip. |
-| `dissociation_steps` | `0` | Post-synthesis dissociation phase (steps); `0` = skip. |
-
-```{warning}
-**`max_steps_per_stage` / `min_steps_per_stage` are testing-only.** They clamp the MD step
-count so examples finish quickly, which **breaks the physical timescale mapping**. Leave
-them **unset** in production so step counts come entirely from the kinetics. The sampled
-dwell **times in seconds** are always written to `dwell_times.dat` regardless.
-```
-
-### MD / ribosome mechanics (`RunParams` fields)
-
-| Key | Default | Meaning |
-|-----|---------|---------|
-| `dt` | `0.01` | Timestep, ps. |
-| `ref_t` | `300` | Temperature, K. |
-| `tau_t` | `0.01` | Langevin friction, 1/ps. |
-| `nstout` | `50` | Trajectory/log output interval (steps). |
-| `device` | `CPU` | `GPU` / `CPU`. |
-| `ppn` | `1` | CPU threads (CPU platform). |
-| `constraints` | `None` | Bond treatment: `None` (flexible harmonic bonds, default) or `AllBonds` (rigid distance constraints — larger-timestep path). |
-| `restraint_k` | `83680` | C-terminus harmonic restraint constant, kJ/mol/nm². |
-| `minimize` | `yes` | Energy-minimize the seeded structure before each stage's MD. |
-| `tunnel_wall` | `yes` | One-sided tunnel wall (floor below the synthesis point); plane auto-placed. |
-
-There is **no `rigid_ribosome` key** (supplying the `ribosome` PDB *is* the signal to load
-it as rigid scenery), output is **always nascent-only**, and `trna_tether` is **forced
-off** by the CSP runner (CSP needs the switchable A↔P position restraint).
+- **`pdb_file` may be all-atom or a Cα-only CG structure** — only the Cα positions and
+  residue names are read (cosmo has no STRIDE / native-contact step), so there is **no**
+  `domain_def` / `stride_output_file` / `nascent_ev_radii` key (those are topo's Gō-model
+  inputs).
+- **PTC geometry is always optimized** (A/P targets one peptide bond apart, EV-clear), so
+  each new residue is delivered with its bond at equilibrium — no knob.
+- **The ribosome is always rigid scenery** (supplying the `ribosome` PDB *is* the signal;
+  no `rigid_ribosome` key), output is always nascent-only, and `trna_tether` is forced off
+  (CSP needs the switchable A↔P position restraint).
 
 ---
 

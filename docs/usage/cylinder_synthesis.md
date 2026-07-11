@@ -105,87 +105,18 @@ knobs (`trna_tether`, `tunnel_wall`) and the always-on PTC-geometry optimization
 
 ---
 
-## Configuration reference (`cylinder.ini`)
+## Configuration
 
-Read by `cosmo.csp.cylinder.read_cylinder_config`. **Units are OpenMM defaults.** The
-kinetics and MD keys share the semantics of the {doc}`synthesis_control` page; the tunnel
-geometry and post-elongation phase are specific to this runner.
+Read by `cosmo.csp.cylinder.read_cylinder_config`. **Every control key is documented in
+one place:** {doc}`synthesis_control` — the *shared* keys (inputs, kinetics, integrator,
+post-synthesis, `resume`) plus the **Cylinder-runner-only** `tunnel_*` geometry keys
+(`tunnel_radius`, `tunnel_length`, `tunnel_x_lo`, `tunnel_center`, `tunnel_k`,
+`tunnel_mouth_round`) that define the analytic bore. A runnable `cylinder.ini` example is
+on that page and in `tutorials/07_csp_cylinder/`.
 
-Example `cylinder.ini`:
-
-```ini
-[OPTIONS]
-; --- inputs (no `ribosome` PDB: the tunnel is analytic) ---
-pdb_file = asyn.pdb          ; native PDB (all-atom OR Cα-only CG; only Cα + resnames read)
-model    = hps_kr            ; nascent IDP force field
-
-; --- length schedule ---
-L0    = 5
-L_max = 10                   ; blank -> full residue count
-
-; --- kinetics (same O'Brien codon timing as cosmo-csp) ---
-mrna         = mrna.txt      ; one codon per residue (required for per-codon timing);
-                             ; or "fastest"/"slowest"/"median" to auto-build a synonymous-codon mRNA
-codon_times  = ../../assets/csp/codon_dwell_times/ecoli/ecoli_codon_dwell_times_310K.txt  ; table path (required; or a number of s = uniform)
-scale_factor = 4331293
-random_seed  = 1
-max_steps_per_stage = 60     ; TEST CLAMP (delete for production)
-min_steps_per_stage = 30
-
-; --- mechanics / integrator ---
-restraint_k = 83680          ; C-terminus -> PTC restraint (kJ/mol/nm^2)
-minimize    = yes
-dt = 0.01 ; ref_t = 300 ; tau_t = 0.01 ; nstout = 20
-
-; --- analytic exit tunnel ---
-tunnel_radius      = 0.9     ; bore radius r (nm); ~3 CG beads wide
-tunnel_length      = 10.0    ; bore length (nm); x_exit = x_lo + length
-tunnel_x_lo        = 0.0     ; PTC / closed end (nm); C-terminus seeded on-axis here
-tunnel_center      = 0.0, 0.0 ; tunnel axis (y0, z0) (nm)
-tunnel_k           = 8368    ; wall stiffness (kJ/mol/nm^2 = 20 kcal/mol/A^2)
-tunnel_mouth_round = 0.2     ; mouth-corner fillet radius rho (nm)
-
-; --- post-synthesis free runs (both release the C-terminus restraint) ---
-ejection_steps     = 40   ; release restraint -> chain diffuses out the exit; 0 -> skip
-dissociation_steps = 40   ; second free run -> chain drifts fully clear; 0 -> skip
-
-; --- hardware / output ---
-device = CPU ; ppn = 1 ; outdir = synth_out_cyl
-```
-
-### Analytic tunnel geometry
-
-| Key | Default | Meaning |
-|-----|---------|---------|
-| `tunnel_radius` | `0.9` | Bore radius `r` (nm); ~3 CG beads wide. |
-| `tunnel_length` | `10.0` | Bore length (nm). `x_exit = tunnel_x_lo + tunnel_length` (derived). |
-| `tunnel_x_lo` | `0.0` | PTC / closed end (nm); the C-terminus is seeded on-axis here. |
-| `tunnel_center` | `0.0, 0.0` | Tunnel axis `(y0, z0)` (nm). The axis runs along +x. |
-| `tunnel_k` | `8368` | Wall stiffness (kJ/mol/nm² = 20 kcal/mol/Å²). |
-| `tunnel_mouth_round` | `0.2` | Mouth-corner fillet radius `rho` (nm). |
-
-### Post-elongation
-
-| Key | Default | Meaning |
-|-----|---------|---------|
-| `ejection_steps` | `0` | Free run with the C-terminus restraint released so the finished chain diffuses out the exit (+x); `0` = skip. Use a **long** run so the chain can clear the tunnel. |
-| `dissociation_steps` | `0` | Second free run (restraint still off) so the chain drifts fully clear of the exit; `0` = skip. |
-
-### Shared kinetics & MD keys
-
-These behave exactly as on the {doc}`synthesis_control` page (inherited from the shared
-`RunParams`): `model` (default `hps_kr`; any IDP model works), `scale_factor`,
-`codon_times`, `random_seed`, `ribosome_traffic` / `initiation_rate` (traffic
-correction), `max_steps_per_stage` / `min_steps_per_stage` (testing-only), `constraints`
-(`None` flexible default; the equilibrium-bond seed above also keeps `AllBonds` stable),
-`restraint_k`, `minimize`, `dt` / `ref_t` / `tau_t` / `nstout`, `device` / `ppn`, and
-`resume` (`auto`/`yes`/`no`; CLI `--fresh` forces `no` — see {doc}`synthesis_resume`).
-
-```{warning}
-`time_stage_1` / `time_stage_2` are accepted (inherited) but have **no effect** in the
-cylinder runner: with a single MD segment per residue, each residue's step count comes
-from its **whole** codon dwell, not a three-way split.
-```
+Two cylinder-specific points: there is **no `ribosome` PDB** (the tunnel is analytic), and
+`time_stage_1` / `time_stage_2` are accepted but have **no effect** — with a single MD
+segment per residue the whole codon dwell `τ` is one segment, not a three-way split.
 
 ---
 
