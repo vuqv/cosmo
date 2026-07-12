@@ -2,9 +2,10 @@
 
 All notable changes to COSMO are documented here. The format is loosely based on
 [Keep a Changelog](https://keepachangelog.com/); releases correspond to git tags.
-For releases before v1.4, see the [git tags](https://github.com/vuqv/cosmo/tags).
+Releases use CalVer `YEAR.N` (the Nth release of the year). For releases before
+`2026.1` (the old `vX.Y` tags), see the [git tags](https://github.com/vuqv/cosmo/tags).
 
-## [v1.4] — 2026-07-12
+## [2026.1] — 2026-07-12
 
 Large release: the project was renamed to **COSMO**, RNA gained `mpipi` support, and a
 new co-translational protein-synthesis subsystem (`cosmo.csp`) was added.
@@ -13,7 +14,7 @@ new co-translational protein-synthesis subsystem (`cosmo.csp`) was added.
 ### ⚠️ Breaking
 - **Renamed the project and package `hpsOpenMM` / `hps` → `COSMO` / `cosmo`.** All
   import paths, class names, console commands, and docs moved from `hps*` to `cosmo*`.
-  v1.4 is **not import-compatible** with v1.3.1.
+  This release is **not import-compatible** with the previous release (`v1.3.1`).
 
 ### Added
 - **`cosmo.csp` — co-translational protein synthesis subsystem** (mirrors the sibling

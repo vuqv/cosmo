@@ -24,10 +24,33 @@ project = u'COSMO'
 copyright = u'2022, Quyen Vu'
 author = u'Quyen Vu'
 
-# The short X.Y version
-version = '1.4'
-# The full version, including alpha/beta/rc tags
-release = 'v1.4'
+# Release version — CalVer YEAR.N (see scripts/next_version.sh). Auto-derived, never
+# hand-edited per release: on a CI tag build use the pushed tag; otherwise the newest
+# YEAR.N tag in git; else a YEAR.dev marker.
+import subprocess
+import datetime
+
+
+def _release_version():
+    ref = os.environ.get('GITHUB_REF', '')
+    if ref.startswith('refs/tags/'):
+        return ref[len('refs/tags/'):]
+    try:
+        tags = subprocess.check_output(
+            ['git', 'tag', '--list', '[0-9][0-9][0-9][0-9].[0-9]*'],
+            cwd=os.path.dirname(os.path.abspath(__file__)),
+            text=True, stderr=subprocess.DEVNULL).split()
+        cal = sorted((t for t in tags if t.count('.') == 1
+                      and t.split('.')[0].isdigit() and t.split('.')[1].isdigit()),
+                     key=lambda t: (int(t.split('.')[0]), int(t.split('.')[1])))
+        if cal:
+            return cal[-1]
+    except Exception:
+        pass
+    return datetime.datetime.utcnow().strftime('%Y') + '.dev'
+
+
+version = release = _release_version()
 
 
 # -- General configuration ---------------------------------------------------
@@ -140,7 +163,8 @@ html_static_path = ['_static']
 html_css_files = ['custom.css']
 html_logo = "_static/logo.svg"        # the bead-chain mark; Furo shows it above the title
 html_favicon = "_static/favicon.svg"  # same mark, for the browser tab
-html_title = "COSMO"
+# No html_title override -> Furo uses the default "COSMO <release> documentation",
+# so the CalVer release version (e.g. 2026.1) shows in the title.
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
 #
