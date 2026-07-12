@@ -40,7 +40,7 @@ run for **one MD segment** whose length is set by the codon's translation time.
 |------|------|
 | `asyn.pdb` | Full-length nascent protein (only the first `L` residues exist at each length). |
 | `mrna.txt` | Demo mRNA (140 cycled sense codons + `UAA` stop) — times each residue. |
-| `cylinder.ini` | Analytic-tunnel config (`model = hps_kr`, per-codon mRNA + the *E. coli* 310 K table from `assets/csp/codon_dwell_times/`, then `ejection` + `dissociation` free runs). |
+| `cylinder.ini` | Analytic-tunnel config (`model = hps_kr`, per-codon mRNA + the *E. coli* 310 K table from `assets/csp/codon_dwell_times/`, then an `ejection` free run). |
 
 ## Run it
 
@@ -79,10 +79,9 @@ reference (both synthesis models, all options), see
 
 - `synth_out_cyl/L_005/ … L_010/` — one folder per chain length, each with the MD
   trajectory and the nascent structure at that length.
-- `synth_out_cyl/ejection/` then `synth_out_cyl/dissociation/` — the post-synthesis
-  free runs: the C-terminus restraint is dropped (`ejection_steps`) so the finished
-  chain diffuses out of the bore, then a second free run (`dissociation_steps`) lets
-  it drift fully clear. Set either to `0` to skip.
+- `synth_out_cyl/ejection/` — the post-synthesis free run: the C-terminus restraint
+  is dropped (`ejection_steps`) so the finished chain diffuses out of the bore. Set to
+  `0` to skip.
 - `synth_out_cyl/dwell_times.dat` — per-residue codon + dwell-time table; the
   per-codon variation is visible here (e.g. `AUU` ≈ 2 ms vs. `CGU` ≈ 72 ms).
 

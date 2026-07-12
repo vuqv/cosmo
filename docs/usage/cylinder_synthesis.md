@@ -45,7 +45,7 @@ cd synth_out_cyl && vmd -e movie.tcl                     # movie.tcl loads its f
 ```
 
 `cosmo-cylinder` writes, per residue `L`, a standalone trajectory under `<outdir>/L_<L>/`,
-optional post-synthesis free runs (`ejection/` then `dissociation/`), and a per-residue
+an optional post-synthesis free run (`ejection/`), and a per-residue
 dwell-time log `<outdir>/dwell_times.dat`.
 
 ---
@@ -96,8 +96,8 @@ chain simply extrudes forward as it grows.
 (1) No `ribosome` PDB — the tunnel is analytic, its geometry set by the `tunnel_*` keys.
 (2) **One MD segment per residue** (no peptidyl-transfer / translocation / tRNA-binding
 sub-stages), so `time_stage_1` / `time_stage_2` are inherited but **unused** — the whole
-codon dwell is a single segment. (3) The post-synthesis free runs are `ejection_steps`
-then `dissociation_steps` (same keywords as the explicit-ribosome runner, both drop the
+codon dwell is a single segment. (3) The post-synthesis free run is `ejection_steps`
+(same keyword as the explicit-ribosome runner, dropping the
 C-terminus restraint). (4) The explicit-ribosome
 knobs (`trna_tether`, `tunnel_wall`) and the always-on PTC-geometry optimization do not apply.
 (5) Purely steric — no ribosome electrostatics.
@@ -129,7 +129,6 @@ segment per residue the whole codon dwell `τ` is one segment, not a three-way s
 │   ├── traj_final.pdb      # last conformation (seeds the next residue)
 │   └── traj.log, traj.psf, ...
 ├── ejection/               # free run, restraint off (if ejection_steps > 0)
-├── dissociation/           # second free run (if dissociation_steps > 0)
 ├── dwell_times.dat         # per-residue: codon, sampled dwell (s), ns, integration steps
 └── progress.log            # append-only DONE/RUNNING resume status
 ```

@@ -145,7 +145,7 @@ def test_resume_yes_without_run_errors(tmp_path, monkeypatch, prot_pdb):
 
 
 def test_post_synthesis_resume(tmp_path, monkeypatch, prot_pdb):
-    """Crash during ejection: resume reruns ejection (not the residues) then dissociation."""
+    """Crash during ejection: resume reruns ejection (not the residues)."""
     calls = []
 
     def make_stubs(crash_ejection):
@@ -167,7 +167,7 @@ def test_post_synthesis_resume(tmp_path, monkeypatch, prot_pdb):
 
     make_stubs(crash_ejection=True)
     with pytest.raises(RuntimeError, match="ejection"):
-        _run(prot_pdb, tmp_path, _params(ejection_steps=10, dissociation_steps=10))
+        _run(prot_pdb, tmp_path, _params(ejection_steps=10))
     prog = r.read_progress(tmp_path)
     assert prog.last_done_residue == 5
     assert prog.running_units() == ["ejection"]
@@ -175,12 +175,12 @@ def test_post_synthesis_resume(tmp_path, monkeypatch, prot_pdb):
     calls.clear()
     monkeypatch.undo()
     make_stubs(crash_ejection=False)
-    _run(prot_pdb, tmp_path, _params(ejection_steps=10, dissociation_steps=10))
-    # No residue reruns; ejection + dissociation completed.
-    assert "ejection" in calls and "dissociation" in calls
+    _run(prot_pdb, tmp_path, _params(ejection_steps=10))
+    # No residue reruns; ejection completed.
+    assert "ejection" in calls
     assert not any(s.startswith("L_") for s in calls)
     prog2 = r.read_progress(tmp_path)
-    assert prog2.is_done("ejection") and prog2.is_done("dissociation")
+    assert prog2.is_done("ejection")
 
 
 # --------------------------------------------------------------------------

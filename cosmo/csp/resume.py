@@ -56,7 +56,7 @@ def cylinder_final_path(out_root: Path, L: int) -> Path:
 
 
 def phase_final_path(out_root: Path, name: str) -> Path:
-    """Path of a post-synthesis phase's final (``ejection`` / ``dissociation``)."""
+    """Path of a post-synthesis phase's final (``ejection``)."""
     return Path(out_root) / name / "traj_final.pdb"
 
 

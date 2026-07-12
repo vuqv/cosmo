@@ -37,7 +37,7 @@ new co-translational protein-synthesis subsystem (`cosmo.csp`) was added.
 - **Resume** for synthesis runs — continue from the last completed residue via
   `progress.log` and a consolidated on-disk layout (HPC-requeue safe).
 - **Rigid-bond (`AllBonds`) support** and model-independent CSP steric radii.
-- **Post-synthesis phases** — optional `ejection` then `dissociation` free runs.
+- **Post-synthesis phase** — an optional `ejection` free run.
 - **Movie tool** (`cosmo-csp-movie`) — stitch per-residue/-stage trajectories into a
   VMD movie, with `--tunnel` (analytic tunnel) or `--ribosome` (CG ribosome) scenery.
 - **RNA support**: CA/P coarse-grained representation (retain the phosphate **P** bead

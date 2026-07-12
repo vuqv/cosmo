@@ -127,7 +127,7 @@ class CylinderParams(RunParams):
     temperature, restraint constant, output, ...) **and** every kinetic field
     (``scale_factor``, ``time_stage_1``/``time_stage_2``, ``uniform_codon_time``,
     ``max_steps_per_stage``, ...) is inherited unchanged; only the analytic-tunnel
-    geometry and the post-elongation phase fields are new.
+    geometry fields are new.
     """
     tunnel_radius_nm: float = 0.9          # bore radius r (~3 CG beads wide)
     tunnel_length_nm: float = 10.0         # bore length; x_exit = x_lo + length
@@ -135,8 +135,8 @@ class CylinderParams(RunParams):
     tunnel_center_nm: Tuple[float, float] = (0.0, 0.0)   # (y0, z0): tunnel axis
     tunnel_k: float = TUNNEL_CYL_K         # wall stiffness (kJ/mol/nm^2)
     tunnel_mouth_round_nm: float = 0.2     # mouth-corner fillet radius rho
-    # (ejection_steps / dissociation_steps -- the post-synthesis free runs -- are
-    # inherited from RunParams; the analytic tunnel stays on throughout.)
+    # (ejection_steps -- the post-synthesis free run -- is inherited from RunParams;
+    # the analytic tunnel stays on throughout.)
 
 
 # --------------------------------------------------------------------------
@@ -156,8 +156,8 @@ def run_length(L: int, *, full_pdb: str,
     The System is the nascent chain only (no ribosome beads); the analytic tunnel
     (:func:`add_tunnel_cylinder`) supplies all ribosome confinement.
 
-    The same routine drives an elongation step and the post-synthesis free runs
-    (ejection / dissociation); these arguments tailor it:
+    The same routine drives an elongation step and the post-synthesis free run
+    (ejection); these arguments tailor it:
 
     - ``seed_point`` : where to place the **new** C-terminal residue ``L`` when
       continuing from ``prev_final`` (default ``cterm_seed``). The kinetic driver passes
@@ -168,10 +168,10 @@ def run_length(L: int, *, full_pdb: str,
       chain ratchets out. Unused for cold start / ``seed_override``.
     - ``seed_override`` : use these ``(L, 3)`` nm coordinates directly (the fully
       synthesized structure) instead of cold-start / new-residue placement.
-    - ``restrain`` : if False, drop the C-terminus restraint (ejection/dissociation --
-      the finished protein is released and free to diffuse out the exit).
+    - ``restrain`` : if False, drop the C-terminus restraint (ejection -- the finished
+      protein is released and free to diffuse out the exit).
     - ``out_subdir`` : output folder under ``out_root`` (default ``L_<L>``); e.g.
-      ``ejection`` / ``dissociation``.
+      ``ejection``.
     - ``n_steps_override`` : run this many steps instead of ``params.n_steps`` (the
       kinetic driver passes the per-residue codon-dwell step count here).
     - ``label`` : console-summary text.
@@ -417,7 +417,7 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
               f"Remove for production.")
 
     total_steps = (sum(r.steps for r in schedule)
-                   + max(params.ejection_steps, 0) + max(params.dissociation_steps, 0))
+                   + max(params.ejection_steps, 0))
     print(f"[schedule] {L_max - L0 + 1} residues, {total_steps:,} planned MD steps"
           f"{resume_mod.est_walltime(total_steps, params)}")
     print(f"Per-residue dwell-time table: {dwell_log}")
@@ -441,13 +441,11 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
     print(f"Done. Synthesized {L0} -> {L_max}. Per-length outputs under {out_path}/")
     print(f"Per-residue dwell-time table: {dwell_log}")
 
-    # Post-synthesis free runs: once the chain reaches its final length, release the
-    # C-terminus restraint and let the finished protein diffuse out the exit (ejection),
-    # then continue as a second free run so it drifts fully clear (dissociation). Both
-    # continue the length-L_max system from the previous final structure; the analytic
-    # tunnel stays on (only way out is the exit).
-    # Each phase is its own progress unit; on resume a completed phase is skipped and its
-    # final structure reloaded to seed the next phase.
+    # Post-synthesis free run: once the chain reaches its final length, release the
+    # C-terminus restraint and let the finished protein diffuse out the exit (ejection).
+    # It continues the length-L_max system from the previous final structure; the analytic
+    # tunnel stays on (only way out is the exit). The ejection phase is its own progress
+    # unit; on resume a completed phase is skipped.
     if params.ejection_steps > 0:
         if do_resume and prog.is_done("ejection"):
             prev_final = resume_mod.load_final_pdb(
@@ -466,23 +464,6 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
                 label=f"Ejection (L = {L_max})")
             resume_mod.append_progress(out_path, "ejection", "DONE")
             print(f"Done. Ejection written to {out_path / 'ejection'}/")
-
-    if params.dissociation_steps > 0:
-        if do_resume and prog.is_done("dissociation"):
-            print("[resume] dissociation already complete; skipping.")
-        else:
-            print()
-            print(f"=== Dissociation (L = {L_max}, {params.dissociation_steps} steps, "
-                  f"C-terminus restraint OFF) -> {out_path / 'dissociation'}/ ===")
-            resume_mod.append_progress(out_path, "dissociation", "RUNNING")
-            run_length(
-                L_max, full_pdb=full_pdb, prev_final=None, out_root=out_path, params=params,
-                cterm_seed=cterm_seed, x_lo=x_lo, x_exit=x_exit, seed_override=prev_final,
-                restrain=False, out_subdir="dissociation",
-                n_steps_override=params.dissociation_steps,
-                label=f"Dissociation (L = {L_max})")
-            resume_mod.append_progress(out_path, "dissociation", "DONE")
-            print(f"Done. Dissociation written to {out_path / 'dissociation'}/")
 
 
 # --------------------------------------------------------------------------
@@ -526,8 +507,8 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     - **Tunnel geometry**: ``tunnel_radius`` (nm), ``tunnel_length`` (nm),
       ``tunnel_x_lo`` (nm), ``tunnel_center`` (``"y0,z0"`` nm), ``tunnel_k``
       (kJ/mol/nm^2), ``tunnel_mouth_round`` (nm).
-    - **Post-synthesis**: ``ejection_steps`` / ``dissociation_steps`` -- free runs
-      with the C-terminus restraint released (0 = skip).
+    - **Post-synthesis**: ``ejection_steps`` -- free run with the C-terminus restraint
+      released (0 = skip).
 
     Inline ``#``/``;`` comments are ignored. **Units:** OpenMM defaults.
     """
@@ -651,11 +632,9 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
         p.tunnel_k = float(opt("tunnel_k"))
     if opt("tunnel_mouth_round") is not None:
         p.tunnel_mouth_round_nm = float(opt("tunnel_mouth_round"))
-    # --- post-elongation ---
+    # --- post-synthesis ---
     if opt("ejection_steps") is not None:
         p.ejection_steps = as_int(opt("ejection_steps"))
-    if opt("dissociation_steps") is not None:
-        p.dissociation_steps = as_int(opt("dissociation_steps"))
     # Resume policy (same as CSP): auto (default) / yes / no. See cosmo.csp.resume.
     if opt("resume") is not None:
         r = opt("resume").strip().lower()
@@ -684,9 +663,8 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
         f"x_lo={p.tunnel_x_lo_nm} nm, center={p.tunnel_center_nm} nm, "
         f"k={p.tunnel_k} kJ/mol/nm^2, mouth_round={p.tunnel_mouth_round_nm} nm")
     log(f"  mechanics: restraint_k={p.restraint_k} kJ/mol/nm^2, minimize={p.minimize}")
-    if p.ejection_steps or p.dissociation_steps:
-        log(f"  post-synthesis: ejection={p.ejection_steps} steps, "
-            f"dissociation={p.dissociation_steps} steps")
+    if p.ejection_steps:
+        log(f"  post-synthesis: ejection={p.ejection_steps} steps")
     else:
         log("  post-synthesis: off")
     log(f"  integrator: dt={p.dt_ps} ps, ref_t={p.ref_t} K, tau_t={p.tau_t} /ps, nstout={p.nstout}")

@@ -48,7 +48,7 @@ cd synth_out_csp && vmd -e movie.tcl        # movie.tcl loads its files by basen
 ```
 
 `cosmo-csp` writes, per residue `L` and sub-stage `s`, a standalone trajectory under
-`<outdir>/L_<L>/` (one folder per residue, per-stage `traj_s<s>.dcd`), an optional `ejection/` (and `dissociation/`) phase, and a
+`<outdir>/L_<L>/` (one folder per residue, per-stage `traj_s<s>.dcd`), an optional `ejection/` phase, and a
 per-residue dwell-time log `<outdir>/dwell_times.dat`.
 
 ---
@@ -368,12 +368,11 @@ optimization reduces how often this fires (equilibrium seeding lowers the stage-
 ~50×), but it is a *quality* improvement, not a full substitute for the guard.
 ```
 
-### 7. After the last residue: ejection (and dissociation)
+### 7. After the last residue: ejection
 
 Once the final residue is added, the simulation runs a **post-synthesis ejection phase**
 (`ejection_steps`): the C-terminus restraint is **released** while the rigid ribosome and
-tunnel wall remain, so the chain diffuses out along +x. An optional **dissociation** phase
-(`dissociation_steps`) continues the free protein away from the ribosome.
+tunnel wall remain, so the chain diffuses out along +x.
 
 ---
 
@@ -413,7 +412,6 @@ A few CSP-specific behaviors worth calling out (the physics behind the keys):
 │   ├── traj_runinfo.log    # folded run-info: one [run:...]/[result:...] per stage
 │   └── traj_final.pdb      # stage-3 final — seeds L+1 and is the resume-reload target
 ├── ejection/               # post-synthesis ejection phase (if ejection_steps > 0)
-├── dissociation/           # post-synthesis free run (if dissociation_steps > 0)
 ├── dwell_times.dat         # per-residue dwell-time log / schedule (#PTC header)
 └── progress.log            # append-only DONE/RUNNING resume status
 ```

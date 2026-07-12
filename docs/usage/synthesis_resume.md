@@ -93,7 +93,7 @@ At the output root, alongside the per-residue `L_<L>/` directories:
   finish. The **`DONE` line is the commit point**: a short append is effectively atomic on
   POSIX, so every crash is recoverable — die before `DONE` and that unit is `RUNNING`
   (dropped and redone); die after `DONE` and resume picks up at the next residue. The
-  post-synthesis `ejection` / `dissociation` phases appear as their own units.
+  post-synthesis `ejection` phase appears as its own unit.
 
 On resume, the driver takes the last status per unit, drops the (at most one) `RUNNING`
 unit **and its directory**, reloads the last `DONE` residue's final structure as the seed,

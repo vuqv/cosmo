@@ -64,7 +64,7 @@ Example control files
         ; tunnel_wall = yes                ; one-sided tunnel floor (default on)
 
         ; --- post-synthesis + resume + hardware ---
-        ejection_steps = 20000 ; dissociation_steps = 0 ; resume = auto
+        ejection_steps = 20000 ; resume = auto
         device = GPU ; ppn = 4 ; outdir = synth_out
 
 ``cylinder.ini`` (analytic tunnel) — the shared keys are identical; it drops ``ribosome``
@@ -83,7 +83,7 @@ and adds the ``tunnel_*`` geometry:
         tunnel_radius = 0.9 ; tunnel_length = 10.0 ; tunnel_x_lo = 0.0
         tunnel_center = 0.0, 0.0 ; tunnel_k = 8368
 
-        ejection_steps = 300000 ; dissociation_steps = 0 ; resume = auto
+        ejection_steps = 300000 ; resume = auto
         device = GPU ; ppn = 4 ; outdir = synth_out
 
 
@@ -256,10 +256,6 @@ Shared options (both runners)
      - int
      - ``0``
      - Post-synthesis ejection phase length (steps); ``0`` = skip. Releases the C-terminus restraint so the chain diffuses out (+x).
-   * - ``dissociation_steps``
-     - int
-     - ``0``
-     - Post-synthesis dissociation phase length (steps); ``0`` = skip. A further free run away from the ribosome.
    * - ``resume``
      - str
      - ``auto``
@@ -385,11 +381,10 @@ Tunnel wall vs. analytic tunnel (``tunnel_wall`` / ``tunnel_*``)
     ``tunnel_center`` / ``tunnel_k`` / ``tunnel_mouth_round`` keys (see
     :doc:`cylinder_synthesis`).
 
-Post-synthesis phases (``ejection_steps`` / ``dissociation_steps``)
+Post-synthesis phase (``ejection_steps``)
     After the last residue, ``ejection_steps > 0`` runs a phase with the C-terminus
     restraint **released** (ribosome/tunnel still present), so the finished chain diffuses
-    out. ``dissociation_steps > 0`` continues the free protein away. Both write their own
-    output folders; ``0`` skips the phase.
+    out. It writes its own output folder; ``0`` skips the phase.
 
 Output layout, resume and movies
     Each residue writes one ``<outdir>/L_<L>/`` folder (CSP: shared ``traj.psf`` +

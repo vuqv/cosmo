@@ -21,8 +21,7 @@ completes.
 
 `cosmo-csp-movie` (`= python -m cosmo.csp.movie`) auto-detects the on-disk layout — the
 3-stage CSP layout (`<outdir>/L_<L>/traj_s<1,2,3>.dcd`) or the flat per-length layout
-(`<outdir>/L_<L>/traj.dcd`, used by the cylinder runner) — plus any `ejection/` and
-`dissociation/` phases, and writes:
+(`<outdir>/L_<L>/traj.dcd`, used by the cylinder runner) — plus any `ejection/` phase, and writes:
 
 ```text
 <outdir>/movie.psf     # single topology (padded to the final length)
@@ -87,7 +86,7 @@ the movie is self-contained.
 - **Parking scheme.** `--park cterm` stacks future beads on the C-terminus instead of the
   far sentinel (no per-frame hiding needed, but leaves a small bead cluster); `sentinel`
   (default) is cleaner.
-- **Post-synthesis phases.** `ejection/` and `dissociation/` free runs are appended
+- **Post-synthesis phase.** The `ejection/` free run is appended
   automatically when present, so the movie continues past full length into release.
 
 ## See also

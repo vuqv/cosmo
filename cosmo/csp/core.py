@@ -528,9 +528,8 @@ class RunParams:
     # --- test clamps (production: leave both at their defaults / None) ---
     max_steps_per_stage: Optional[int] = None  # cap each stage (tutorial: small)
     min_steps_per_stage: int = 1               # floor each stage
-    # --- post-synthesis phases (steps; 0 = skip) ---
-    ejection_steps: int = 0             # release the restraint; let the chain leave
-    dissociation_steps: int = 0         # free run; protein drifts off the ribosome
+    # --- post-synthesis phase (steps; 0 = skip) ---
+    ejection_steps: int = 0             # release the restraint; the finished chain diffuses free
 
 
 def _make_cfg(out_dir: Path, sub_pdb: str, params: RunParams,
@@ -604,8 +603,8 @@ def run_length(L: int, *, full_pdb: str,
     - ``seed_override`` : use these ``(L, 3)`` nm coordinates directly (continue a stage
       from the previous one's final, or seed a post-synthesis phase from the finished
       structure) instead of cold-start / new-residue placement.
-    - ``restrain`` : if ``False``, drop the C-terminus restraint (ejection /
-      dissociation -- the chain is released).
+    - ``restrain`` : if ``False``, drop the C-terminus restraint (ejection -- the
+      finished chain is released).
     - ``out_subdir`` : output folder under ``out_root`` (default ``L_<L>``); e.g.
       ``L_007/stage_2`` or ``ejection``.
     - ``n_steps_override`` : run this many steps instead of ``params.n_steps`` (the
