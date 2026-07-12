@@ -25,9 +25,9 @@ copyright = u'2022, Quyen Vu'
 author = u'Quyen Vu'
 
 # The short X.Y version
-version = '2022.0'
+version = '1.4'
 # The full version, including alpha/beta/rc tags
-release = 'v1.3'
+release = 'v1.4'
 
 
 # -- General configuration ---------------------------------------------------
