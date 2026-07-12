@@ -228,7 +228,7 @@ Shared options (both runners)
    * - ``trna_tether``
      - bool
      - ``no``
-     - C-terminus restraint mode. ``no`` (default) holds the C-terminus with the harmonic **position restraint** to the A/P target point (stiffness ``restraint_k``). ``yes`` uses O'Brien's full **tRNA tether** — a bond + two orienting angles + an improper to the A-site tRNA beads (stages 1-2) then the P-site beads (stage 3), plus a backbone orienting angle (``prev–N–R``) for the ``hps_ss`` model that aims the chain down the tunnel — which controls the chain's *orientation* as well as its position. Both drive the same A→P three-stage translocation. Requires a well-formed A/P tRNA (segids ``AtR``/``PtR``, resid 76, beads ``R``/``P``/``BR2``).
+     - C-terminus restraint mode. ``no`` (default) holds the C-terminus with the harmonic **position restraint** to the A/P target point (stiffness ``restraint_k``). ``yes`` uses O'Brien's full **tRNA tether** — a bond + two orienting angles + an improper to the A-site tRNA beads (stages 1-2) then the P-site beads (stage 3), plus a backbone orienting angle (``prev–N–R``, the ``hps_ss`` bistable backbone potential applied for all models) — which controls the chain's *orientation* as well as its position. Both drive the same A→P three-stage translocation. Requires a well-formed A/P tRNA (segids ``AtR``/``PtR``, resid 76, beads ``R``/``P``/``BR2``).
    * - ``minimize``
      - bool
      - ``yes``
@@ -335,9 +335,9 @@ replaces the explicit ribosome beads. Read only from ``cylinder.ini``.
    ``trna_tether`` selects the C-terminus restraint mode: ``no`` (default) uses the
    harmonic **position restraint** to the A/P target point; ``yes`` uses O'Brien's full
    **tRNA tether** (bond + 2 orienting angles + improper to the A-site tRNA beads in
-   stages 1-2, the P-site beads in stage 3; plus a backbone orienting angle for the
-   ``hps_ss`` model), which controls orientation as well as position. Both drive the
-   same A→P three-stage translocation.
+   stages 1-2, the P-site beads in stage 3; plus a backbone orienting angle, the
+   ``hps_ss`` bistable backbone potential applied for all models), which controls
+   orientation as well as position. Both drive the same A→P three-stage translocation.
 
 
 Notes on individual options

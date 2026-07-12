@@ -80,6 +80,29 @@ _TRNA_SITE_GEOM = {
 _IMPROPER_ENERGY = ("k*min(dtheta, 2*pi-dtheta)^2; dtheta = abs(theta-theta0); "
                     "pi = 3.1415926535")
 
+# Backbone orienting angle prev--N--R uses the hps_ss double-Gaussian backbone-angle
+# potential (a bistable well, minima ~92 deg / ~130 deg). Values mirror
+# cosmo.core.system.CosmoModel.addGaussianAngleForces (the source of truth). When the
+# nascent model already builds that force (hps_ss) the tether adds the angle to it; for the
+# angle-free models (hps_kr / hps_urry / mpipi) the tether supplies its OWN copy so the
+# peptidyl-tRNA linkage is identical across all models (OpenMM default units: kJ/mol, rad).
+_BACKBONE_ANGLE_ENERGY = (
+    "(-1/gamma)*log(exp(-gamma*(k_alpha*(theta-theta_alpha)^2 + eps_alpha))"
+    " + exp(-gamma*k_beta*(theta-theta_beta)^2))")
+_BACKBONE_ANGLE_PARAMS = {
+    "gamma": 0.0239, "eps_alpha": 17.9912,
+    "theta_alpha": 1.6, "theta_beta": 2.27,
+    "k_alpha": 445.1776, "k_beta": 110.0392,
+}
+
+
+def _new_backbone_angle_force() -> "mm.CustomAngleForce":
+    """A standalone copy of the hps_ss double-Gaussian backbone-angle force (no angles yet)."""
+    f = mm.CustomAngleForce(_BACKBONE_ANGLE_ENERGY)
+    for _name, _val in _BACKBONE_ANGLE_PARAMS.items():
+        f.addGlobalParameter(_name, _val)
+    return f
+
 # O'Brien's 12-10-6 excluded-volume form (U = eps[13(R/r)^12 - 18(R/r)^10 + 4(R/r)^6];
 # well minimum -eps at r = R), with the SUM combining rule R = Rmin/2_i + Rmin/2_j.
 _NC_126_ENERGY = ("eps*(13*(R/r)^12 - 18*(R/r)^10 + 4*(R/r)^6); R = rm1 + rm2")
@@ -361,9 +384,11 @@ def add_trna_tether(nascent_model, cterm_index: int, prev_index,
       (:data:`TRNA_TETHER_ANGLE_K`) -- fix the residue's bearing in the tRNA frame;
     - **improper** ``N -- R -- P -- BR2`` (periodic-harmonic on ``abs(theta-theta0)``,
       :data:`TRNA_TETHER_IMPROPER_K`) -- fixes the out-of-plane sense;
-    - **backbone orienting angle** ``prev -- N -- R`` (added to the model's
-      double-Gaussian angle force) -- aims the chain down the tunnel. Only present when
-      the nascent model has a Gaussian angle force (``hps_ss``); skipped otherwise.
+    - **backbone orienting angle** ``prev -- N -- R`` -- the hps_ss double-Gaussian
+      backbone-angle potential (bistable, minima ~92/130 deg) applied across the
+      peptide-tRNA junction. Added to the model's own angle force when it has one
+      (``hps_ss``); for the angle-free models (``hps_kr``/``hps_urry``/``mpipi``) the
+      tether supplies a dedicated copy, so the linkage is identical across all models.
 
     ``prev_index`` is the CA(N-1) particle index, or None (skips the backbone angle).
     ``P`` / ``BR2`` are resolved by bead name; a site missing either skips that
@@ -412,10 +437,20 @@ def add_trna_tether(nascent_model, cterm_index: int, prev_index,
                        [TRNA_TETHER_IMPROPER_K, d2r(imp_deg)])
         system.addForce(imf)
 
-    # 4. backbone orienting angle prev -- N -- R (aims the chain down the tunnel).
-    #    Only if the nascent model has a Gaussian angle force (hps_ss); else skipped.
-    if prev_index is not None and getattr(nascent_model, "gaussianAngleForce", None) is not None:
-        nascent_model.gaussianAngleForce.addAngle(int(prev_index), int(cterm_index), R_idx)
+    # 4. backbone orienting angle prev -- N -- R: applies the hps_ss double-Gaussian
+    #    backbone-angle potential across the peptide-tRNA junction (bistable, theta ~=
+    #    92/130 deg), keeping the terminal segment in a physical orientation. Added to the
+    #    model's own angle force when it has one (hps_ss); for the angle-free models
+    #    (hps_kr / hps_urry / mpipi) the tether supplies a dedicated force, so the linkage
+    #    is identical across all models.
+    if prev_index is not None:
+        gaf = getattr(nascent_model, "gaussianAngleForce", None)
+        if gaf is not None:
+            gaf.addAngle(int(prev_index), int(cterm_index), R_idx)
+        else:
+            bbf = _new_backbone_angle_force()
+            bbf.addAngle(int(prev_index), int(cterm_index), R_idx)
+            system.addForce(bbf)
 
 
 def add_tunnel_wall(system, nascent_indices, x0_nm: float,
