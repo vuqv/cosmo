@@ -106,7 +106,8 @@ CSP partitions the per-codon dwell time into these three pieces and reproduces t
   restraint** to the target *point* (`U = k·|r − r₀|²`, `k = restraint_k = 83680
   kJ/mol/nm²` = 200 kcal/mol/Å²; default) or, with `trna_tether = yes`, by the full
   **O'Brien tRNA tether** — a bond + two orienting angles + an improper to the A76 tRNA
-  beads, which also fixes the chain's *orientation*. **Switching the A-/P-site hold A→P is
+  beads (plus a backbone orienting angle `prev–N–R` for the `hps_ss` model, which aims
+  the chain down the tunnel), which also fixes the chain's *orientation*. **Switching the A-/P-site hold A→P is
   how translocation is reproduced** — the position restraint moves its target point; the
   tether re-attaches to the P-site beads in stage 3. (The `k` is a *per-particle* parameter
   so this force coexists with the tunnel wall, whose global constant is also `k`.)

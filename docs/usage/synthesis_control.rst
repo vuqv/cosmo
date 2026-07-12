@@ -60,7 +60,7 @@ Example control files
 
         ; --- integrator / ribosome mechanics ---
         dt = 0.01 ; ref_t = 300 ; tau_t = 0.01 ; nstout = 50
-        constraints = None ; restraint_k = 83680 ; minimize = yes
+        constraints = None ; minimize = yes
         ; tunnel_wall = yes                ; one-sided tunnel floor (default on)
 
         ; --- post-synthesis + resume + hardware ---
@@ -76,12 +76,12 @@ and adds the ``tunnel_*`` geometry:
         pdb_file = asyn.pdb ; model = hps_kr        ; (no `ribosome` PDB)
         L0 = 1 ; L_max = ; mrna = mrna.txt ; codon_times = trans_times.txt
         scale_factor = 4331293 ; random_seed = 1
-        constraints = None ; restraint_k = 83680 ; minimize = yes
+        constraints = None ; minimize = yes
         dt = 0.01 ; ref_t = 300 ; tau_t = 0.01 ; nstout = 50
 
         ; --- analytic exit tunnel (cylinder only) ---
         tunnel_radius = 0.9 ; tunnel_length = 10.0 ; tunnel_x_lo = 0.0
-        tunnel_center = 0.0, 0.0 ; tunnel_k = 8368 ; tunnel_mouth_round = 0.2
+        tunnel_center = 0.0, 0.0 ; tunnel_k = 8368
 
         ejection_steps = 300000 ; dissociation_steps = 0 ; resume = auto
         device = GPU ; ppn = 4 ; outdir = synth_out
@@ -171,16 +171,6 @@ Shared options (both runners)
      - no
      - ``—`` (nondet.)
      - Seed for the first-passage-time sampler — makes the whole dwell schedule reproducible.
-   * - ``ribosome_traffic``
-     - bool
-     - no
-     - ``no``
-     - Apply the ribosome-traffic (polysome) dwell-time correction, if available, on top of the per-codon kinetics. Off by default (single-ribosome timing).
-   * - ``initiation_rate``
-     - float
-     - no
-     - ``0.083333``
-     - Translation initiation rate (1/s). Consumed **only** when ``ribosome_traffic = yes``.
    * - ``max_steps_per_stage``
      - int
      - no
@@ -238,7 +228,7 @@ Shared options (both runners)
    * - ``trna_tether``
      - bool
      - ``no``
-     - C-terminus restraint mode. ``no`` (default) holds the C-terminus with the harmonic **position restraint** to the A/P target point (stiffness ``restraint_k``). ``yes`` uses O'Brien's full **tRNA tether** — a bond + two orienting angles + an improper to the A-site tRNA beads (stages 1-2) then the P-site beads (stage 3) — which controls the chain's *orientation* as well as its position. Both drive the same A→P three-stage translocation. Requires a well-formed A/P tRNA (segids ``AtR``/``PtR``, resid 76, beads ``R``/``P``/``BR2``).
+     - C-terminus restraint mode. ``no`` (default) holds the C-terminus with the harmonic **position restraint** to the A/P target point (stiffness ``restraint_k``). ``yes`` uses O'Brien's full **tRNA tether** — a bond + two orienting angles + an improper to the A-site tRNA beads (stages 1-2) then the P-site beads (stage 3), plus a backbone orienting angle (``prev–N–R``) for the ``hps_ss`` model that aims the chain down the tunnel — which controls the chain's *orientation* as well as its position. Both drive the same A→P three-stage translocation. Requires a well-formed A/P tRNA (segids ``AtR``/``PtR``, resid 76, beads ``R``/``P``/``BR2``).
    * - ``minimize``
      - bool
      - ``yes``
@@ -345,8 +335,9 @@ replaces the explicit ribosome beads. Read only from ``cylinder.ini``.
    ``trna_tether`` selects the C-terminus restraint mode: ``no`` (default) uses the
    harmonic **position restraint** to the A/P target point; ``yes`` uses O'Brien's full
    **tRNA tether** (bond + 2 orienting angles + improper to the A-site tRNA beads in
-   stages 1-2, the P-site beads in stage 3), which controls orientation as well as
-   position. Both drive the same A→P three-stage translocation.
+   stages 1-2, the P-site beads in stage 3; plus a backbone orienting angle for the
+   ``hps_ss`` model), which controls orientation as well as position. Both drive the
+   same A→P three-stage translocation.
 
 
 Notes on individual options
