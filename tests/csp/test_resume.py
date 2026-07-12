@@ -90,6 +90,11 @@ def test_cylinder_schedule_round_trip(tmp_path):
 # --------------------------------------------------------------------------
 # schedule_covers
 # --------------------------------------------------------------------------
+def test_schedule_covers_ok():
+    rows = [r.SchedRow(L, "X", 0.0, (0, 0, 0), (1, 1, 1)) for L in range(3, 8)]
+    r.schedule_covers(rows, 3, 7)   # no raise
+
+
 @pytest.mark.parametrize("L0,L_max", [(3, 8), (2, 7), (1, 10)])
 def test_schedule_covers_mismatch(L0, L_max):
     rows = [r.SchedRow(L, "X", 0.0, (0, 0, 0), (1, 1, 1)) for L in range(3, 8)]
@@ -113,6 +118,16 @@ def test_progress_parse_last_status(tmp_path):
     assert prog.running_units() == ["L_004"]
 
 
+def test_progress_last_status_wins(tmp_path):
+    """A unit that goes RUNNING then DONE reads as DONE (last status wins)."""
+    r.write_progress_header(tmp_path)
+    r.append_progress(tmp_path, "ejection", "RUNNING")
+    r.append_progress(tmp_path, "ejection", "DONE")
+    prog = r.read_progress(tmp_path)
+    assert prog.is_done("ejection")
+    assert prog.running_units() == []
+
+
 def test_progress_empty(tmp_path):
     r.write_progress_header(tmp_path)
     prog = r.read_progress(tmp_path)
@@ -127,6 +142,15 @@ def _touch_final(out_root, L):
     fp = r.residue_final_path(out_root, L)
     fp.parent.mkdir(parents=True, exist_ok=True)
     fp.write_text("ATOM\n")
+
+
+def test_verify_completed_units_ok(tmp_path):
+    r.write_progress_header(tmp_path)
+    for L in (1, 2, 3):
+        r.append_progress(tmp_path, f"L_{L:03d}", "DONE")
+        _touch_final(tmp_path, L)
+    prog = r.read_progress(tmp_path)
+    r.verify_completed_units(tmp_path, prog, L0=1)   # no raise
 
 
 def test_verify_completed_units_missing_hole(tmp_path):
@@ -154,6 +178,14 @@ def test_drop_running_units(tmp_path):
     assert r.residue_final_path(tmp_path, 1).is_file()
 
 
+def test_drop_running_units_none(tmp_path):
+    """No RUNNING unit (clean finish) -> nothing dropped."""
+    r.write_progress_header(tmp_path)
+    r.append_progress(tmp_path, "L_001", "DONE")
+    prog = r.read_progress(tmp_path)
+    assert r.drop_running_units(tmp_path, prog) == []
+
+
 def test_load_final_pdb(tmp_path):
     pdb = tmp_path / "traj_final.pdb"
     pdb.write_text(
@@ -163,6 +195,11 @@ def test_load_final_pdb(tmp_path):
     coords = r.load_final_pdb(pdb)
     assert coords.shape == (2, 3)
     np.testing.assert_allclose(coords, [[1.0, 2.0, 3.0], [1.1, 2.1, 3.1]], atol=1e-6)
+
+
+def test_load_final_pdb_missing(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        r.load_final_pdb(tmp_path / "nope.pdb")
 
 
 def test_cylinder_final_path_layout(tmp_path):

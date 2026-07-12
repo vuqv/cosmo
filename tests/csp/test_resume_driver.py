@@ -144,6 +144,45 @@ def test_resume_yes_without_run_errors(tmp_path, monkeypatch, prot_pdb):
         _run(prot_pdb, tmp_path, _params(resume="yes"))
 
 
+def test_post_synthesis_resume(tmp_path, monkeypatch, prot_pdb):
+    """Crash during ejection: resume reruns ejection (not the residues) then dissociation."""
+    calls = []
+
+    def make_stubs(crash_ejection):
+        monkeypatch.setattr(protocol, "load_ribosome",
+                            lambda *a, **k: types.SimpleNamespace(n=10))
+        monkeypatch.setattr(protocol, "read_anchor", lambda *a, **k: np.zeros(3))
+        monkeypatch.setattr(protocol, "optimal_ptc_targets",
+                            lambda ribo, **k: (np.array([1.0, 0.0, 0.0]),
+                                               np.array([1.38, 0.0, 0.0])))
+
+        def fake_run_length(L, **kw):
+            sub = kw["out_subdir"]
+            if crash_ejection and sub == "ejection":
+                raise RuntimeError("crash in ejection")
+            calls.append(sub)
+            _write_final_pdb(kw["out_root"] / sub / "traj_final.pdb", L)
+            return np.zeros((L, 3))
+        monkeypatch.setattr(protocol, "run_length", fake_run_length)
+
+    make_stubs(crash_ejection=True)
+    with pytest.raises(RuntimeError, match="ejection"):
+        _run(prot_pdb, tmp_path, _params(ejection_steps=10, dissociation_steps=10))
+    prog = r.read_progress(tmp_path)
+    assert prog.last_done_residue == 5
+    assert prog.running_units() == ["ejection"]
+
+    calls.clear()
+    monkeypatch.undo()
+    make_stubs(crash_ejection=False)
+    _run(prot_pdb, tmp_path, _params(ejection_steps=10, dissociation_steps=10))
+    # No residue reruns; ejection + dissociation completed.
+    assert "ejection" in calls and "dissociation" in calls
+    assert not any(s.startswith("L_") for s in calls)
+    prog2 = r.read_progress(tmp_path)
+    assert prog2.is_done("ejection") and prog2.is_done("dissociation")
+
+
 # --------------------------------------------------------------------------
 # INI parsing of the resume key
 # --------------------------------------------------------------------------

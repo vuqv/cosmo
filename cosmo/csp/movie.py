@@ -13,7 +13,7 @@ Two output layouts are auto-detected:
 * **cylinder / flat** (:mod:`cosmo.csp.cylinder`): ``<out>/L_<L>/traj.*`` -- one
   segment per residue.
 
-Any post-synthesis phase (``ejection/`` / ``dissociation/`` / ``stallation/``) is
+Any post-synthesis phase (``ejection/`` / ``dissociation/``) is
 appended after the growth sequence. A ready-to-run ``movie.tcl`` is also written.
 
 Mirrors the sibling ``topo`` project's ``topo/csp/movie.py``.
@@ -41,7 +41,7 @@ import numpy as np
 SENTINEL_A = 99999.0
 
 # Post-synthesis phase folders, in play order (harmlessly absent if not run).
-POST_PHASES = ("ejection", "dissociation", "stallation")
+POST_PHASES = ("ejection", "dissociation")
 
 
 def _pick_traj(phase_dir: str, outname: str = "traj") -> Optional[str]:
@@ -334,7 +334,7 @@ def main(argv: Optional[List[str]] = None) -> None:
         prog="cosmo-csp-movie",
         description="Stitch the CSP per-residue/-stage trajectories "
                     "(<out_root>/L_<L>/traj_s<1,2,3>.dcd or a flat traj.dcd) -- plus any post-synthesis "
-                    "phase (ejection/ dissociation/ stallation/) -- into one "
+                    "phase (ejection/ dissociation/) -- into one "
                     "VMD-playable movie that grows the nascent chain N->C.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     p.add_argument("-o", "--out-root", required=True,

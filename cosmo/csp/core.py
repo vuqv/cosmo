@@ -517,6 +517,8 @@ class RunParams:
     time_stage_2: float = 0.004201      # mean translocation dwell (s)
     # Uniform-timing mean codon time (s), or None for per-codon timing from the mRNA.
     uniform_codon_time: Optional[float] = None
+    # ribosome_traffic / initiation_rate: HIDDEN/deferred (off by default; not exposed
+    # in the docs or example csp.ini). Still parsed if present.
     ribosome_traffic: bool = False      # apply the external traffic correction if available
     initiation_rate: float = 0.083333   # translation initiation rate (1/s), traffic only
     random_seed: Optional[int] = None   # seed for the FPT sampler (reproducibility)
