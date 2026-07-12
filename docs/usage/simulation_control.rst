@@ -28,46 +28,47 @@ Example ``md.ini``:
 .. code-block::
 
         [OPTIONS]
+
+        ; --- system input & force field ---
+        pdb_file = asyn.pdb
+        model = hps_urry     ; hps_urry (default), hps_kr, hps_ss, or mpipi
+
+        ; --- integration & bonds ---
         md_steps = 500_000   ; number of steps (underscores allowed)
         dt = 0.01            ; time step in ps
+        ; constraints = AllBonds        ; None (flexible harmonic, default) or AllBonds (rigid)
+        ; constraint_tolerance = 1e-5   ; only used with constraints = AllBonds
+
+        ; --- thermostat (temperature coupling) ---
+        tcoupl = yes
+        ref_t = 310          ; Kelvin
+        tau_t = 0.01         ; ps^-1
+
+        ; --- periodic boundaries & pressure ---
+        pbc = yes
+        box_dimension = 30   ; cubic 30 nm; or [30, 30, 60] for a box
+        pcoupl = no
+        ref_p = 1
+        frequency_p = 25
+
+        ; --- output & reporting  (all files -> <output_dir>/<outname>.*, default traj/traj.*) ---
+        output_dir = traj
+        outname = asyn
         nstxout = 1000       ; steps between trajectory (DCD) frames
         nstlog = 1000        ; steps between log writes
         nstchk = 1000        ; steps between checkpoint writes (defaults to nstxout)
         nstcomm = 100        ; center-of-mass motion removal; off by default, omit for multi-chain runs
         log_precision = 4    ; decimal places for float columns in the .log
         log_width = 14       ; min column width for aligned, fixed-width .log
-        ; force-field model: hps_urry, hps_kr, hps_ss, or mpipi
-        model = hps_urry
-        ; bond treatment: None (flexible harmonic bonds, default) or AllBonds (rigid)
-        ; constraints = AllBonds
-        ; constraint_tolerance = 1e-5   ; only used with constraints = AllBonds
 
-        ; temperature coupling
-        tcoupl = yes
-        ref_t = 310          ; Kelvin
-        tau_t = 0.01         ; ps^-1
-
-        ; pressure coupling (requires pbc = yes)
-        pcoupl = no
-        ref_p = 1
-        frequency_p = 25
-
-        ; periodic boundary condition
-        pbc = yes
-        box_dimension = 30   ; cubic 30 nm; or [30, 30, 60] for a box
-
-        ; input
-        pdb_file = asyn.pdb
+        ; --- initial state, restart & minimization ---
         ; init_position = traj/asyn_final.pdb  ; optional: start from these coords
-        ; output  (all files -> <output_dir>/<outname>.*, default traj/traj.*)
-        output_dir = traj
-        outname = asyn
-        ; hardware
-        device = GPU
-        ppn = 4
-        ; restart
         restart = no
         minimize = yes
+
+        ; --- hardware ---
+        device = GPU
+        ppn = 4
 
 
 Parameter summary
@@ -87,6 +88,26 @@ description).
      - Required
      - Default
      - Description
+   * - **System input & force field**
+     -
+     -
+     -
+     -
+   * - ``pdb_file``
+     - str
+     - **yes**
+     - ``—``
+     - Input structure (``.pdb`` / ``.cif``) used to build the model (topology, force field) and the initial coordinates.
+   * - ``model``
+     - str
+     - no
+     - ``hps_urry``
+     - Force-field model: ``hps_urry``, ``hps_kr``, ``hps_ss``, or ``mpipi``. See :doc:`../tutorials/02_models`.
+   * - **Integration & bonds**
+     -
+     -
+     -
+     -
    * - ``md_steps``
      - int
      - no
@@ -97,6 +118,91 @@ description).
      - no
      - ``0.01``
      - Integration time step.
+   * - ``constraints``
+     - str
+     - no
+     - ``None``
+     - Bond treatment: ``None`` (flexible harmonic bonds, the default) or ``AllBonds`` (rigid distance constraints, so a larger ``dt`` can be used). See the note below.
+   * - ``constraint_tolerance``
+     - float
+     - no
+     - ``1e-5``
+     - Integrator relative constraint tolerance. Only meaningful when ``constraints = AllBonds``; harmless otherwise.
+   * - **Thermostat (temperature coupling)**
+     -
+     -
+     -
+     -
+   * - ``tcoupl``
+     - bool
+     - no
+     - ``yes``
+     - Langevin thermostat on/off. (NVE is not used.)
+   * - ``ref_t``
+     - float [K]
+     - if ``tcoupl = yes``
+     - ``—``
+     - Reference temperature. Read only when ``tcoupl = yes``.
+   * - ``tau_t``
+     - float [ps⁻¹]
+     - if ``tcoupl = yes``
+     - ``—``
+     - Friction coefficient coupling the system to the heat bath. Read only when ``tcoupl = yes``.
+   * - **Periodic boundaries & pressure**
+     -
+     -
+     -
+     -
+   * - ``pbc``
+     - bool
+     - no
+     - ``no``
+     - Periodic boundary conditions on/off.
+   * - ``box_dimension``
+     - float or [x,y,z] [nm]
+     - if ``pbc = yes``
+     - ``—``
+     - Box size: a scalar ``L`` gives a cubic ``L×L×L`` box; a list ``[x, y, z]`` a rectangular box.
+   * - ``pcoupl``
+     - bool
+     - no
+     - ``no``
+     - Monte Carlo barostat on/off. Requires ``pbc = yes``.
+   * - ``ref_p``
+     - float [bar]
+     - if ``pcoupl = yes``
+     - ``1``
+     - Reference pressure. Read only when ``pcoupl = yes``.
+   * - ``frequency_p``
+     - int [steps]
+     - if ``pcoupl = yes``
+     - ``25``
+     - Barostat move attempt frequency. Read only when ``pcoupl = yes``.
+   * - **Output & reporting**
+     -
+     -
+     -
+     -
+   * - ``output_dir``
+     - str
+     - no
+     - ``traj``
+     - Folder for all generated files; created if missing. One run = one self-contained folder.
+   * - ``outname``
+     - str
+     - no
+     - ``traj``
+     - Basename for generated files: ``<output_dir>/<outname>.dcd``, ``.log``, ``.psf``, ``.chk``, ``_init.pdb``, ``_final.pdb`` (and ``_ff.dat`` for HPS models).
+   * - ``protein_code``
+     - str
+     - no
+     - ``—``
+     - Legacy output prefix. When set and ``outname`` is not given, it is used as ``outname``. Prefer ``outname`` in new control files.
+   * - ``checkpoint``
+     - str
+     - no
+     - ``<output_dir>/<outname>.chk``
+     - Explicit checkpoint path override. Normally leave unset so it lands in the run folder.
    * - ``nstxout``
      - int
      - no
@@ -127,91 +233,16 @@ description).
      - no
      - ``14``
      - Minimum width (characters) of each ``.log`` column, right-justified, so columns line up. Each column uses ``max(header_length, log_width)``. Set to ``none`` to disable fixed-width formatting.
-   * - ``model``
-     - str
-     - no
-     - ``hps_urry``
-     - Force-field model: ``hps_urry``, ``hps_kr``, ``hps_ss``, or ``mpipi``. See :doc:`../tutorials/02_models`.
-   * - ``tcoupl``
-     - bool
-     - no
-     - ``yes``
-     - Langevin thermostat on/off. (NVE is not used.)
-   * - ``ref_t``
-     - float [K]
-     - if ``tcoupl = yes``
-     - ``—``
-     - Reference temperature. Read only when ``tcoupl = yes``.
-   * - ``tau_t``
-     - float [ps⁻¹]
-     - if ``tcoupl = yes``
-     - ``—``
-     - Friction coefficient coupling the system to the heat bath. Read only when ``tcoupl = yes``.
-   * - ``pcoupl``
-     - bool
-     - no
-     - ``no``
-     - Monte Carlo barostat on/off. Requires ``pbc = yes``.
-   * - ``ref_p``
-     - float [bar]
-     - if ``pcoupl = yes``
-     - ``1``
-     - Reference pressure. Read only when ``pcoupl = yes``.
-   * - ``frequency_p``
-     - int [steps]
-     - if ``pcoupl = yes``
-     - ``25``
-     - Barostat move attempt frequency. Read only when ``pcoupl = yes``.
-   * - ``pbc``
-     - bool
-     - no
-     - ``no``
-     - Periodic boundary conditions on/off.
-   * - ``box_dimension``
-     - float or [x,y,z] [nm]
-     - if ``pbc = yes``
-     - ``—``
-     - Box size: a scalar ``L`` gives a cubic ``L×L×L`` box; a list ``[x, y, z]`` a rectangular box.
-   * - ``pdb_file``
-     - str
-     - **yes**
-     - ``—``
-     - Input structure (``.pdb`` / ``.cif``) used to build the model (topology, force field) and the initial coordinates.
+   * - **Initial state, restart & minimization**
+     -
+     -
+     -
+     -
    * - ``init_position``
      - str
      - no
      - ``—``
      - Optional starting coordinates for a fresh run (e.g. a previous run's ``_final.pdb``). When set, these coordinates are used as-is (no origin shift) instead of ``pdb_file``'s; the atom count must match the built system. Ignored on restart (coordinates come from the checkpoint).
-   * - ``output_dir``
-     - str
-     - no
-     - ``traj``
-     - Folder for all generated files; created if missing. One run = one self-contained folder.
-   * - ``outname``
-     - str
-     - no
-     - ``traj``
-     - Basename for generated files: ``<output_dir>/<outname>.dcd``, ``.log``, ``.psf``, ``.chk``, ``_init.pdb``, ``_final.pdb`` (and ``_ff.dat`` for HPS models).
-   * - ``protein_code``
-     - str
-     - no
-     - ``—``
-     - Legacy output prefix. When set and ``outname`` is not given, it is used as ``outname``. Prefer ``outname`` in new control files.
-   * - ``checkpoint``
-     - str
-     - no
-     - ``<output_dir>/<outname>.chk``
-     - Explicit checkpoint path override. Normally leave unset so it lands in the run folder.
-   * - ``device``
-     - str
-     - no
-     - ``CPU``
-     - Compute platform: ``CPU`` or ``GPU`` (CUDA).
-   * - ``ppn``
-     - int
-     - no
-     - ``1``
-     - Number of CPU threads. Read only when ``device = CPU``.
    * - ``restart``
      - bool
      - no
@@ -222,16 +253,21 @@ description).
      - no
      - ``yes``
      - Energy-minimize the input structure before dynamics. Forced ``no`` when ``restart = yes``.
-   * - ``constraints``
+   * - **Hardware**
+     -
+     -
+     -
+     -
+   * - ``device``
      - str
      - no
-     - ``None``
-     - Bond treatment: ``None`` (flexible harmonic bonds, the default) or ``AllBonds`` (rigid distance constraints, so a larger ``dt`` can be used). See the note below.
-   * - ``constraint_tolerance``
-     - float
+     - ``CPU``
+     - Compute platform: ``CPU`` or ``GPU`` (CUDA).
+   * - ``ppn``
+     - int
      - no
-     - ``1e-5``
-     - Integrator relative constraint tolerance. Only meaningful when ``constraints = AllBonds``; harmless otherwise.
+     - ``1``
+     - Number of CPU threads. Read only when ``device = CPU``.
 
 .. note::
 
@@ -241,33 +277,6 @@ description).
 
 Notes on individual options
 +++++++++++++++++++++++++++
-
-Output layout (``output_dir`` / ``outname``)
-    Every generated file is written to ``<output_dir>/<outname><suffix>``, so a run
-    is one self-contained folder (default ``traj/``): ``traj.dcd`` (trajectory),
-    ``traj.log`` (state log), ``traj.psf`` (topology), ``traj.chk`` (checkpoint),
-    ``traj_init.pdb`` (the built/minimized starting structure), ``traj_final.pdb``
-    (last conformation), ``traj_ff.dat`` (per-residue force-field dump, HPS
-    models only), and ``traj_runinfo.log`` (run provenance: software versions,
-    hardware, GPU, timing). ``output_dir`` is created automatically if missing. To keep
-    several runs side by side, point each at its own folder (e.g.
-    ``output_dir = runs/FUS_T300``) or change ``outname``. ``protein_code`` is the
-    legacy prefix: when set and ``outname`` is unset it becomes the basename.
-
-Output frequency and log formatting (``nstxout`` / ``nstlog`` / ``nstchk`` / ``nstcomm`` / ``log_precision`` / ``log_width``)
-    ``nstxout`` controls trajectory (DCD) frames; ``nstchk`` controls checkpoint
-    (``.chk``) writes independently and defaults to ``nstxout`` when omitted.
-    ``nstlog`` controls how often a row is appended to the ``.log``.
-    ``nstcomm`` is the center-of-mass motion removal interval — **off by default**
-    (omit it, or set ``none``). Enable it for a single chain; leave it off for
-    multi-chain / slab runs, where COM removal would couple the drift of
-    independent chains. The log reporter is
-    :class:`cosmo.cosmoReporter`, which writes a fixed-width, aligned ``.log``:
-    ``log_precision`` sets the decimals for float columns (default ``4``;
-    ``none`` for full precision) and ``log_width`` sets the minimum column width
-    (default ``14``; ``none`` to disable padding). Columns are separated by two
-    spaces and the header is a ``#`` comment, so the log stays both human-readable
-    and machine-parsable (see :func:`cosmo.reporter.readOpenMMReporterFile`).
 
 Force-field model (``model``)
     Selects the coarse-grained potential: ``hps_urry`` (default, Urry hydropathy
@@ -302,9 +311,32 @@ Periodic boundary conditions
     when ``pbc = yes``: a scalar ``L`` gives a cubic ``L×L×L`` box and a list
     ``[x, y, z]`` a rectangular box (e.g. an elongated box for slab/LLPS runs).
 
-Hardware (``device`` / ``ppn``)
-    ``device = GPU`` runs on CUDA (mixed precision, device 0). ``device = CPU``
-    uses ``ppn`` threads; ``ppn`` is ignored on GPU.
+Output layout (``output_dir`` / ``outname``)
+    Every generated file is written to ``<output_dir>/<outname><suffix>``, so a run
+    is one self-contained folder (default ``traj/``): ``traj.dcd`` (trajectory),
+    ``traj.log`` (state log), ``traj.psf`` (topology), ``traj.chk`` (checkpoint),
+    ``traj_init.pdb`` (the built/minimized starting structure), ``traj_final.pdb``
+    (last conformation), ``traj_ff.dat`` (per-residue force-field dump, HPS
+    models only), and ``traj_runinfo.log`` (run provenance: software versions,
+    hardware, GPU, timing). ``output_dir`` is created automatically if missing. To keep
+    several runs side by side, point each at its own folder (e.g.
+    ``output_dir = runs/FUS_T300``) or change ``outname``. ``protein_code`` is the
+    legacy prefix: when set and ``outname`` is unset it becomes the basename.
+
+Output frequency and log formatting (``nstxout`` / ``nstlog`` / ``nstchk`` / ``nstcomm`` / ``log_precision`` / ``log_width``)
+    ``nstxout`` controls trajectory (DCD) frames; ``nstchk`` controls checkpoint
+    (``.chk``) writes independently and defaults to ``nstxout`` when omitted.
+    ``nstlog`` controls how often a row is appended to the ``.log``.
+    ``nstcomm`` is the center-of-mass motion removal interval — **off by default**
+    (omit it, or set ``none``). Enable it for a single chain; leave it off for
+    multi-chain / slab runs, where COM removal would couple the drift of
+    independent chains. The log reporter is
+    :class:`cosmo.cosmoReporter`, which writes a fixed-width, aligned ``.log``:
+    ``log_precision`` sets the decimals for float columns (default ``4``;
+    ``none`` for full precision) and ``log_width`` sets the minimum column width
+    (default ``14``; ``none`` to disable padding). Columns are separated by two
+    spaces and the header is a ``#`` comment, so the log stays both human-readable
+    and machine-parsable (see :func:`cosmo.reporter.readOpenMMReporterFile`).
 
 ``restart`` and ``minimize``
     ``restart = yes`` loads positions **and** velocities from ``checkpoint`` and
@@ -321,3 +353,7 @@ Starting coordinates (``init_position``)
     together without restarting from a checkpoint. These coordinates are used
     as-is (no origin shift) and must have the same atom count as the built system.
     Ignored on a restart, where the checkpoint supplies positions and velocities.
+
+Hardware (``device`` / ``ppn``)
+    ``device = GPU`` runs on CUDA (mixed precision, device 0). ``device = CPU``
+    uses ``ppn`` threads; ``ppn`` is ignored on GPU.
