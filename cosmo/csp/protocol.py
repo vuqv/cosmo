@@ -30,9 +30,11 @@ stage       biology                                restraint target / seed
 
 Stage 3's final structure seeds the next residue's stage 1. The cold-start segment
 (``L == L0``) is laid down the tunnel from the P-anchor (no A-site delivery yet).
-Because CSP needs the restraint target to switch A<->P, it drives the **position
-restraint** path (``trna_tether`` is forced off): the supplied ribosome is always
-rigid scenery and the tunnel wall + excluded volume + electrostatics are on.
+The C-terminus is held either by a **position restraint** to the A/P target point
+(default) or, with ``trna_tether = yes``, by the **O'Brien tRNA tether** (bond +
+orienting angles + improper to the A-site tRNA beads in stages 1-2, the P-site beads
+in stage 3). Either way the supplied ribosome is rigid scenery and the tunnel wall +
+excluded volume + electrostatics are on.
 
 Drive it with an INI control file (see :func:`read_csp_config`)::
 
@@ -113,16 +115,19 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     if params is None:
         params = RunParams()
     ep = params
-    # CSP switches the C-terminus restraint target A->P across the three stages; that
-    # is the position-restraint path. The O'Brien tRNA tether (in cosmo) always targets
-    # the P-site bead and does not switch A/P, so it is incompatible with the 3-stage
-    # translocation -- force it off here.
+    # Two C-terminus restraint paths (selected by ep.trna_tether, from the INI):
+    #  - position restraint (default): a moving harmonic spring to the A/P target POINT,
+    #    switched A->A->P over the 3 stages;
+    #  - O'Brien tRNA tether (trna_tether = yes): a bond + orienting angles + improper to
+    #    the A-site tRNA beads (stages 1-2) then the P-site tRNA beads (stage 3), which
+    #    reproduces O'Brien's orientation control. The A<->P switch is by tether site
+    #    (tether_segid below), so the tether supports translocation too.
     if ep.trna_tether:
-        print("[csp] trna_tether is forced off: the 3-stage protocol uses the "
-              "position-restraint path so the C-terminus target can switch A->P.")
-        ep.trna_tether = False
-    print("C-terminus restraint: position restraint to the A/P target point "
-          "(a->a->p migration).")
+        print("C-terminus restraint: O'Brien tRNA tether (bond + 2 angles + improper; "
+              "A-site stages 1-2, P-site stage 3).")
+    else:
+        print("C-terminus restraint: position restraint to the A/P target point "
+              "(a->a->p migration).")
 
     out_path = Path(out_root)
     out_path.mkdir(parents=True, exist_ok=True)
@@ -258,6 +263,13 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
 
         ldir = f"L_{L:03d}"
         cold = prev_final is None
+        # Per-stage tRNA-tether site (used only when ep.trna_tether): the new residue is
+        # held at the A-site in stages 1-2 and translocated to the P-site in stage 3. At
+        # cold start (no previous residue) the first residue is held at the P-site. In
+        # stage 1 the previous residue (L-1) is additionally tethered to the P-site so
+        # both ends of the new peptide bond sit at the equilibrium PTC.
+        stage1_segid = "PtR" if cold else "AtR"
+        stage1_prev_segid = None if cold else "PtR"
         # Consolidated layout: all three stages share one L_<L>/ directory -- shared
         # traj.psf + native_1_L.pdb, per-stage traj_s{1,2,3}.dcd, one folded
         # traj_runinfo.log, and a single traj_final.pdb (stage 3 only).
@@ -269,7 +281,9 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
                         wall_x0_nm=wall_x0,
                         cterm_seed=stage1_anchor, restrain=True,
                         out_subdir=ldir, outname="traj_s1", persist_final=False,
-                        n_steps_override=s1, label="stage 1 peptidyl-transfer")
+                        n_steps_override=s1, tether_segid=stage1_segid,
+                        tether_prev_segid=stage1_prev_segid,
+                        label="stage 1 peptidyl-transfer")
 
         # Stage 2: continue from stage 1, still held at the A-site. Skip the redundant
         # minimization (the seeded structure is stage 1's already-relaxed final).
@@ -278,7 +292,8 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
                         ribo=ribo, wall_x0_nm=wall_x0,
                         cterm_seed=stage1_anchor, restrain=True,
                         out_subdir=ldir, outname="traj_s2", persist_final=False,
-                        n_steps_override=s2, minimize_override=False,
+                        n_steps_override=s2, tether_segid=stage1_segid,
+                        minimize_override=False,
                         label="stage 2 translocation")
 
         # Stage 3: translocate A->P (restrain the C-terminus to the P-target). Its final
@@ -288,7 +303,8 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
                         ribo=ribo, wall_x0_nm=wall_x0,
                         cterm_seed=p_target, restrain=True,
                         out_subdir=ldir, outname="traj_s3", persist_final=True,
-                        n_steps_override=s3, label="stage 3 tRNA-binding")
+                        n_steps_override=s3, tether_segid="PtR",
+                        label="stage 3 tRNA-binding")
         prev_final = f3
         # The DONE line is the commit point: all three stages of L are on disk.
         resume_mod.append_progress(out_path, f"L_{L:03d}", "DONE")
@@ -389,11 +405,11 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     (e.g. ``hps_urry``, ``mpipi``) transparently falls back to the shared hps_kr table
     for the steric radius only), ``dt``,
     ``ref_t``, ``tau_t``, ``nstout``, ``device``, ``ppn``, ``constraints`` (default
-    ``None`` -- flexible bonds), ``restraint_k``, ``minimize``, ``tunnel_wall``.
-    (``trna_tether`` is not honoured -- CSP forces the position restraint; the wall
-    plane is auto-derived; the PTC geometry is always optimized -- each new residue is
-    seeded/held one peptide bond from the previous C-terminus, EV-clear; output is
-    always nascent-only.)
+    ``None`` -- flexible bonds), ``restraint_k``, ``minimize``, ``tunnel_wall``,
+    ``trna_tether`` (default off -- the O'Brien tRNA tether vs. the position restraint).
+    (The wall plane is auto-derived; the PTC geometry is always optimized -- each new
+    residue is seeded/held one peptide bond from the previous C-terminus, EV-clear;
+    output is always nascent-only.)
 
     Inline ``#``/``;`` comments are ignored. **Units:** OpenMM defaults.
     """
@@ -478,6 +494,9 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
         p.minimize = bool(strtobool(opt("minimize")))
     if opt("tunnel_wall") is not None:
         p.tunnel_wall = bool(strtobool(opt("tunnel_wall")))
+    # C-terminus restraint mode: position restraint (default) vs. O'Brien tRNA tether.
+    if opt("trna_tether") is not None:
+        p.trna_tether = bool(strtobool(opt("trna_tether")))
 
     # --- O'Brien kinetic knobs ---
     if opt("scale_factor") is not None:

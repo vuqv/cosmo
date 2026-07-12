@@ -101,10 +101,14 @@ CSP partitions the per-codon dwell time into these three pieces and reproduces t
   **P-anchor** (P-site tRNA residue-76 `R` bead) and the **A-anchor** (A-site tRNA
   residue-76 `R` bead) — where the peptidyl-tRNA (P) and incoming aminoacyl-tRNA (A) hold
   the chain's C-terminus.
-- **C-terminus restraint — a harmonic position restraint.** The current C-terminal bead
-  is restrained to one of the anchors with `U = k·|r − r₀|²`,
-  `k = restraint_k = 83680 kJ/mol/nm²` (= 200 kcal/mol/Å²). **Switching the restraint
-  target A→P is how translocation is reproduced.** (The `k` is a *per-particle* parameter
+- **C-terminus restraint — position restraint (default) or O'Brien tRNA tether.** The
+  current C-terminal bead is held at the A-/P-site either by a harmonic **position
+  restraint** to the target *point* (`U = k·|r − r₀|²`, `k = restraint_k = 83680
+  kJ/mol/nm²` = 200 kcal/mol/Å²; default) or, with `trna_tether = yes`, by the full
+  **O'Brien tRNA tether** — a bond + two orienting angles + an improper to the A76 tRNA
+  beads, which also fixes the chain's *orientation*. **Switching the A-/P-site hold A→P is
+  how translocation is reproduced** — the position restraint moves its target point; the
+  tether re-attaches to the P-site beads in stage 3. (The `k` is a *per-particle* parameter
   so this force coexists with the tunnel wall, whose global constant is also `k`.)
 - **Tunnel wall — a one-sided plane.** Because the 50S is **truncated** to a shell around
   the exit tunnel, there are no ribosome beads below the PTC. A one-sided half-harmonic
@@ -159,10 +163,11 @@ structure seeds the next residue's stage 1.
 ```{note}
 **Mechanics vs. timing.** The restraint switch (an instantaneous A→P geometric move)
 happens at the **start of stage 3**, while the **duration** charged to translocation is
-**stage 2**. Explicit A/P tRNA bonded geometry is not modelled, and the tRNA *tether* is
-**forced off** for CSP — the switchable A↔P **position restraint** is what reproduces
-translocation. The **timing** (three codon-resolved dwell times per residue) is faithful
-to O'Brien; the per-stage **mechanics** are a reduced model.
+**stage 2**. With the default position restraint only the C-terminus *point* is held;
+explicit A/P tRNA bonded geometry (bond + angles + improper to the A-/P-site tRNA beads,
+switched A→P across the stages) **is** modelled when `trna_tether = yes`. The **timing**
+(three codon-resolved dwell times per residue) is faithful to O'Brien; the per-stage
+**mechanics** are a reduced model.
 ```
 
 ### 5. From codon to MD steps (the kinetics)
@@ -227,9 +232,10 @@ by `optimal_ptc_targets` **exactly one peptide bond apart** (cosmo's CG bond len
 volume, by minimizing the soft O'Brien tRNA-bond/angle/improper restraints + the 12-10-6
 wall over a deterministic multistart. Each new residue is delivered with its peptide bond
 at equilibrium, which drops the stage-1 potential energy by ~50× versus seeding at the raw
-`AtR`/`PtR`-76 `R` anchor beads (which sit ~0.9 nm apart, badly stretching the bond). The
-C-terminus is held by a **position restraint** to these points — not a bond to the tRNA
-beads. This is always on; there is no knob.
+`AtR`/`PtR`-76 `R` anchor beads (which sit ~0.9 nm apart, badly stretching the bond). By default the
+C-terminus is held by a **position restraint** to these points; with `trna_tether = yes`
+it is instead bonded to the A-/P-site tRNA beads (the full O'Brien tether). The PTC-target
+optimization itself is always on; there is no knob for it.
 
 ```{note}
 cosmo **defaults to flexible harmonic bonds** (`constraints = None`) because backbone
@@ -275,8 +281,9 @@ A few CSP-specific behaviors worth calling out (the physics behind the keys):
 - **PTC geometry is always optimized** (A/P targets one peptide bond apart, EV-clear), so
   each new residue is delivered with its bond at equilibrium — no knob.
 - **The ribosome is always rigid scenery** (supplying the `ribosome` PDB *is* the signal;
-  no `rigid_ribosome` key), output is always nascent-only, and `trna_tether` is forced off
-  (CSP needs the switchable A↔P position restraint).
+  no `rigid_ribosome` key) and output is always nascent-only. `trna_tether` defaults off
+  (the switchable A↔P position restraint); set `trna_tether = yes` for the full O'Brien
+  tRNA tether, which switches A→P by re-attaching to the P-site beads in stage 3.
 
 ---
 

@@ -505,7 +505,7 @@ class RunParams:
     # When a ribosome is present the output is always nascent-only (the rigid scenery is
     # static). ribosome<->nascent excluded volume is the O'Brien 12-10-6 (fixed eps /
     # Rmin/2 from model_parameters) -- no soft-wall knobs.
-    trna_tether: bool = True           # O'Brien tRNA tether vs. plain position restraint
+    trna_tether: bool = False          # O'Brien tRNA tether (opt-in) vs. plain position restraint
     tunnel_wall: bool = True           # one-sided planar wall x >= x0 (forward extrusion)
     tunnel_wall_k: float = TUNNEL_WALL_K  # x0 is always auto-derived per-structure (protocol)
 
@@ -578,6 +578,8 @@ def run_length(L: int, *, full_pdb: str,
                seed_override: Optional[np.ndarray] = None,
                restrain: bool = True, out_subdir: Optional[str] = None,
                n_steps_override: Optional[int] = None,
+               tether_segid: str = "PtR",
+               tether_prev_segid: Optional[str] = None,
                minimize_override: Optional[bool] = None,
                outname: str = "traj",
                persist_final: bool = True,
@@ -718,9 +720,18 @@ def run_length(L: int, *, full_pdb: str,
     #    (the CSP protocol uses the position-restraint path so the target can switch A->P).
     if restrain:
         if ribo is not None and params.trna_tether:
+            # tRNA tether for the current C-terminus (residue L) to this stage's site
+            # (A-site stages 1-2, P-site stage 3): bond + 2 orienting angles + improper
+            # + a backbone angle aiming the chain down the tunnel.
             prev_index = (L - 2) if L >= 2 else None
-            add_trna_tether(cgModel, L - 1, prev_index, ribo, L,
-                            segid="PtR", resid=76)
+            add_trna_tether(cgModel, L - 1, prev_index, ribo, L, segid=tether_segid)
+            # Optionally also tether the previous residue L-1 to its site (the P-site in
+            # stage 1, where L sits at A and L-1 rests at P) -- pins both ends of the new
+            # peptide bond at the equilibrium-PTC geometry.
+            if tether_prev_segid is not None and L >= 2:
+                pprev_index = (L - 3) if L >= 3 else None
+                add_trna_tether(cgModel, L - 2, pprev_index, ribo, L,
+                                segid=tether_prev_segid)
         else:
             add_cterm_restraint(cgModel.system, L - 1, p_anchor, params.restraint_k)
 

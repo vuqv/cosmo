@@ -44,9 +44,10 @@ each run for an **exponentially-sampled** dwell time (first-passage-time samplin
 | 3 | tRNA binding / waiting | `codon_total − stage1 − stage2` | → **P-target** |
 
 The A→P restraint switch between stages 2 and 3 reproduces translocation. Stage 3's
-final structure seeds the next residue. Because the target must switch A↔P, CSP drives
-the **position-restraint** path (the O'Brien tRNA tether is forced off). Dwell times
-map to integration steps the O'Brien way:
+final structure seeds the next residue. The C-terminus is held either by the default
+**position restraint** to the A/P target point or, with `trna_tether = yes`, by the full
+**O'Brien tRNA tether** (which switches A→P by re-attaching to the P-site beads in stage
+3). Dwell times map to integration steps the O'Brien way:
 
 ```
 t_sim_ns = dwell_s * 1e9 / scale_factor          # in-vivo -> in-silico

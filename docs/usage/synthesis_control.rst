@@ -234,7 +234,11 @@ Shared options (both runners)
    * - ``restraint_k``
      - float [kJ/mol/nm²]
      - ``83680``
-     - Stiffness of the C-terminus harmonic restraint to the PTC target (= 200 kcal/mol/Å²). Its ``k`` is a per-particle parameter so it coexists with the tunnel wall's global ``k``.
+     - Stiffness of the C-terminus harmonic restraint to the PTC target (= 200 kcal/mol/Å²). Its ``k`` is a per-particle parameter so it coexists with the tunnel wall's global ``k``. Used only in the position-restraint mode (``trna_tether = no``).
+   * - ``trna_tether``
+     - bool
+     - ``no``
+     - C-terminus restraint mode. ``no`` (default) holds the C-terminus with the harmonic **position restraint** to the A/P target point (stiffness ``restraint_k``). ``yes`` uses O'Brien's full **tRNA tether** — a bond + two orienting angles + an improper to the A-site tRNA beads (stages 1-2) then the P-site beads (stage 3) — which controls the chain's *orientation* as well as its position. Both drive the same A→P three-stage translocation. Requires a well-formed A/P tRNA (segids ``AtR``/``PtR``, resid 76, beads ``R``/``P``/``BR2``).
    * - ``minimize``
      - bool
      - ``yes``
@@ -337,10 +341,12 @@ replaces the explicit ribosome beads. Read only from ``cylinder.ini``.
 
 .. note::
 
-   Boolean options accept ``yes``/``no``, ``true``/``false``, ``1``/``0``. The
-   ``trna_tether`` field exists on ``RunParams`` but is **forced off** by the CSP runner —
-   CSP needs the switchable A↔P **position** restraint, so the O'Brien tRNA tether (which
-   targets only the P-site) is incompatible with the 3-stage translocation.
+   Boolean options accept ``yes``/``no``, ``true``/``false``, ``1``/``0``.
+   ``trna_tether`` selects the C-terminus restraint mode: ``no`` (default) uses the
+   harmonic **position restraint** to the A/P target point; ``yes`` uses O'Brien's full
+   **tRNA tether** (bond + 2 orienting angles + improper to the A-site tRNA beads in
+   stages 1-2, the P-site beads in stage 3), which controls orientation as well as
+   position. Both drive the same A→P three-stage translocation.
 
 
 Notes on individual options
