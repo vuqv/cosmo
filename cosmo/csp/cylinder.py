@@ -135,12 +135,8 @@ class CylinderParams(RunParams):
     tunnel_center_nm: Tuple[float, float] = (0.0, 0.0)   # (y0, z0): tunnel axis
     tunnel_k: float = TUNNEL_CYL_K         # wall stiffness (kJ/mol/nm^2)
     tunnel_mouth_round_nm: float = 0.2     # mouth-corner fillet radius rho
-    # Post-synthesis free runs (once the chain reaches its final length; 0 = skip).
-    # Both drop the C-terminus restraint: 'ejection' lets the finished protein diffuse
-    # out the exit, then 'dissociation' continues it as a second free run. The analytic
-    # tunnel stays on throughout (the only way out is the exit).
-    ejection_steps: int = 0
-    dissociation_steps: int = 0
+    # (ejection_steps / dissociation_steps -- the post-synthesis free runs -- are
+    # inherited from RunParams; the analytic tunnel stays on throughout.)
 
 
 # --------------------------------------------------------------------------

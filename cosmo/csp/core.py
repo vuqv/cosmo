@@ -869,6 +869,6 @@ def run_length(L: int, *, full_pdb: str,
                 asNumpy=True).value_in_unit(unit.nanometer)
 
     # One concise, column-aligned line per stage.
-    print(f"  L={L:>3d}  {(label or 'run'):<26s}  {cfg.md_steps:>6d} steps  "
+    print(f"  L={L:>3d}  {(label or 'run'):<26s}  {base_steps:>5d} steps  "
           f"{time.time() - start:>6.2f} s  PE={final_pe:>+13.4e} kJ/mol")
     return np.asarray(final)[:L]

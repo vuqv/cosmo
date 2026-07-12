@@ -398,6 +398,7 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     - ``random_seed`` -- seed for the FPT sampler (reproducible schedules).
     - ``max_steps_per_stage`` / ``min_steps_per_stage`` -- clamp each stage's step count.
     - ``ejection_steps`` / ``dissociation_steps`` -- post-synthesis free runs (0 = skip).
+    - ``resume`` -- ``auto`` (default) / ``yes`` / ``no``: continue an interrupted run.
 
     MD / ribosome keys: ``model`` (nascent IDP force field, default ``hps_kr``; any IDP
     model works -- the ribosome-NC 12-10-6 excluded volume is decoupled from it, always

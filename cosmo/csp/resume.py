@@ -93,7 +93,9 @@ def write_schedule(path: Path, rows: List[SchedRow], params,
             "# O'Brien continuous-synthesis per-residue dwell times (cosmo.csp)\n"
             f"#   scale_factor={params.scale_factor:g}  dt={params.dt_ps} ps  "
             f"time_stage_1={params.time_stage_1:g} s  time_stage_2={params.time_stage_2:g} s\n"
-            f"#   timing={timing}  random_seed={params.random_seed}\n"
+            f"#   timing={timing}  "
+            f"{'ribosome_traffic=on  ' if params.ribosome_traffic else ''}"
+            f"random_seed={params.random_seed}\n"
             "#   t1/t2/t3 = sampled peptidyl-transfer / translocation / tRNA-binding "
             "dwell (s); steps = clamped integration steps actually run\n")
         fh.write(f"#PTC schema {PROGRESS_SCHEMA}\n")
