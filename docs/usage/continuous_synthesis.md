@@ -180,11 +180,14 @@ maps each codon to its **mean in-vivo translation time** in seconds — the codo
 intrinsic **mean first-passage time (mFPT)**, `τ(codon)`.
 
 ```{note}
-**The codon-time table is organism-universal** (a property of organism + temperature, not
-of the protein), so cosmo ships one: the **Fluitt *E. coli* table at 310 K** (61 sense + 3
-stop codons, mean ≈ 0.068 s ≈ 15 aa/s) as `cosmo/csp/data/ecoli_trans_times_310K.txt`,
-used **by default** whenever `csp.ini` gives no `codon_times` key. Set `codon_times` to a
-table path only to override it. See `cosmo.csp.kinetics.default_codon_time_table_path`.
+**The codon-time table is an organism + temperature property** (not of the protein), so a
+per-codon run needs an explicit `codon_times` table path — **there is no bundled default**.
+The shared library under `assets/csp/codon_dwell_times/<organism>/` holds tables per
+organism, including the **Fluitt *E. coli* table at 310 K** (Fluitt, Pienaar & Viljoen,
+*Comput. Biol. Chem.* 2007; 61 sense + 3 stop codons, codon-usage-weighted mean ≈ 0.061 s
+≈ 16.5 aa/s) at `assets/csp/codon_dwell_times/ecoli/ecoli_codon_dwell_times_310K.txt`. Both
+`mrna` (the protein-specific sequence) and `codon_times` (the table) are mandatory for
+per-codon timing; see {doc}`codon_dwell_times`.
 ```
 
 **(b) First-passage-time sampling.** Each stage is gated by a single rate-limiting event,

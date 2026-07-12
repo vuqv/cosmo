@@ -73,9 +73,9 @@ full key reference.
 Because each table carries the codon→amino-acid mapping (column 3), you can have cosmo
 build an mRNA that keeps the **protein sequence fixed** but reassigns each residue's
 **codon** — a controlled walk along the synonymous-mutation (codon-optimization) axis.
-Since the protein, its native structure, and its contacts are identical across these
-mRNAs and only the elongation *timing* changes, any difference in the co-translational
-folding they produce is attributable to codon kinetics alone. Set `mrna` to a keyword
+Since the protein *sequence* is identical across these mRNAs and only the elongation
+*timing* changes, any difference in the co-translational behaviour they produce (extrusion,
+compaction) is attributable to codon kinetics alone. Set `mrna` to a keyword
 instead of a filename:
 
 - **`fastest`** — the shortest-`τ` synonymous codon at every residue → the fastest

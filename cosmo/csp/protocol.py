@@ -506,6 +506,13 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
     if opt("time_stage_2") is not None:
         p.time_stage_2 = float(opt("time_stage_2"))
     p.uniform_codon_time = _uniform_codon_time
+    # Retired keys -> point users at the single codon_times key.
+    for _legacy in ("trans_times", "uniform_ta", "uniform_mfpt"):
+        if opt(_legacy) is not None:
+            raise ValueError(
+                f"{config_file}: '{_legacy}' has been replaced by the single "
+                f"'codon_times' key -- set it to a codon-time table path (per-codon "
+                f"timing) or to a positive number of seconds (uniform codon time).")
     if opt("ribosome_traffic") is not None:
         p.ribosome_traffic = bool(strtobool(opt("ribosome_traffic")))
     if opt("initiation_rate") is not None:
