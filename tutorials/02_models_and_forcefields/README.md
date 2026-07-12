@@ -35,7 +35,8 @@ terms. Define additional models in `cosmo/parameters/model_parameters.py`.
 
 ### 1. Run the default model
 ```bash
-python run_simulation.py -f md.ini       # model = hps_urry
+cosmo-mdrun -f md.ini                # model = hps_urry  (== python -m cosmo.mdrun -f md.ini)
+python run_simulation.py -f md.ini   # equivalent in-folder shim
 ```
 You get the usual `traj/asyn.*` outputs (see Tutorial 1).
 

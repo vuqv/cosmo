@@ -41,7 +41,8 @@ You do not know the right box size a priori, so you build it in stages
 
 ### 1. Stage 1 — NPT compression
 ```bash
-python run_simulation.py -f md_npt.ini
+cosmo-mdrun -f md_npt.ini                # == python -m cosmo.mdrun -f md_npt.ini
+python run_simulation.py -f md_npt.ini   # equivalent in-folder shim
 ```
 Watch the box dimensions in the build/run log shrink as the barostat drives the
 system toward `ref_p = 1 bar` at `ref_t = 310 K`. Outputs go to `traj/NON.*`.

@@ -59,8 +59,8 @@ residue is seeded one peptide bond (0.380 nm) from the C-terminus, EV-clear.
 ```bash
 cd tutorials/08_csp_cg_ribosome
 
-python -m cosmo.csp -f csp.ini      # -> synth_out_csp/L_<L>/  (per-stage traj_s<1,2,3>.dcd)
-#   installed console script:  cosmo-csp -f csp.ini
+cosmo-csp -f csp.ini      # -> synth_out_csp/L_<L>/  (per-stage traj_s<1,2,3>.dcd)
+#   or as a module:  python -m cosmo.csp -f csp.ini
 ```
 
 The config defaults to `device = CPU` so it runs anywhere. Kinetics use the **real

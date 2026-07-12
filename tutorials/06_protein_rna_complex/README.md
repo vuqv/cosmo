@@ -48,7 +48,8 @@ the merged file is clean.
 
 ### 2. Run the complex
 ```bash
-python run_simulation.py -f md.ini
+cosmo-mdrun -f md.ini                # == python -m cosmo.mdrun -f md.ini
+python run_simulation.py -f md.ini   # equivalent in-folder shim
 ```
 Outputs go to `traj/complex.*` (see Tutorial 1/4 for the full file list). The
 build log reports **two chains** and uses the `hps_kr` force field, which scores

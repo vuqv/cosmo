@@ -37,7 +37,8 @@ from the checkpoint, not the PDB.
 
 ### 1. Run the first leg
 ```bash
-python run_simulation.py -f md.ini
+cosmo-mdrun -f md.ini                # == python -m cosmo.mdrun -f md.ini
+python run_simulation.py -f md.ini   # equivalent in-folder shim
 ```
 This runs 2000 steps and writes `traj/asyn.log`, `traj/asyn.dcd`, `traj/asyn.chk`,
 plus the provenance files. Note the final step number at the bottom of
@@ -45,7 +46,8 @@ plus the provenance files. Note the final step number at the bottom of
 
 ### 2. Continue from the checkpoint
 ```bash
-python run_simulation.py -f md_restart.ini
+cosmo-mdrun -f md_restart.ini                # == python -m cosmo.mdrun -f md_restart.ini
+python run_simulation.py -f md_restart.ini   # equivalent in-folder shim
 ```
 The build log shows it loading `traj/asyn.chk`, reporting 2000 steps already done,
 and running the remaining 2000. When it finishes, `traj/asyn.log` and

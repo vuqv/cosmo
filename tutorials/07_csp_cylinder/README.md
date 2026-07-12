@@ -47,8 +47,8 @@ run for **one MD segment** whose length is set by the codon's translation time.
 ```bash
 cd tutorials/07_csp_cylinder
 
-python -m cosmo.csp.cylinder -f cylinder.ini    # -> synth_out_cyl/L_<L>/
-#   installed console script:  cosmo-cylinder -f cylinder.ini
+cosmo-cylinder -f cylinder.ini                  # -> synth_out_cyl/L_<L>/
+#   or as a module:  python -m cosmo.csp.cylinder -f cylinder.ini
 ```
 
 The config defaults to `device = CPU` so it runs anywhere; switch to `device = GPU`
