@@ -45,3 +45,6 @@ ENV/
 .vscode/
 *.swp
 *~
+
+# CodeGraph index (local code-intelligence cache; never commit)
+.codegraph/
