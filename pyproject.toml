@@ -42,6 +42,8 @@ cosmo-make-mrna = "cosmo.csp.synth_mrna:main"
 
 [tool.setuptools_scm]
 # Version from git tags (e.g. 2026.1). Between tags, a dev version is derived.
+# Drop the "+g<hash>" local part so dev versions stay PyPI-upload-clean.
+local_scheme = "no-local-version"
 
 [tool.setuptools.packages.find]
 # Only ship the importable package (not docs/tutorials/scripts at the repo root).

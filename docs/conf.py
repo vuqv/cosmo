@@ -38,7 +38,7 @@ def _release_version():
     # checkout (the docs CI fetches full history + tags).
     try:
         from setuptools_scm import get_version
-        return get_version(root=root)
+        return get_version(root=root, local_scheme='no-local-version')
     except Exception:
         pass
     # Fallback: the installed package's recorded version.
