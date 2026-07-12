@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 210" role="img"
+     aria-label="A single harmonic spring holds the nascent C-terminus at the A- or P-site target point; the tRNA sites read E, P, A from left to right.">
+  <title>CSP position restraint (trna_tether = no)</title>
+  <style>
+    :root{
+      --ink:#1b1e26; --muted:#5f6675; --faint:#8b91a0; --line:#d7dbe3; --hair:#e7eaf0;
+      --nasc:#4b57a6; --trna:#1f9488; --bond:#c26a25; --angle:#8a7fc4;
+    }
+    @media (prefers-color-scheme:dark){:root{
+      --ink:#eef0f5; --muted:#9aa0b0; --faint:#6c7382; --line:#2c313d; --hair:#2f3542;
+      --nasc:#8590de; --trna:#3fb9ab; --bond:#e0964a; --angle:#a99fe0;
+    }}
+    text{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+    .lbl{fill:var(--ink);font-size:14px;font-weight:600}
+    .site{fill:var(--ink);font-size:15px;font-weight:700}
+    .sub{fill:var(--muted);font-size:11.5px}
+    .bondlbl{fill:var(--bond);font-size:12px;font-weight:600;font-family:ui-monospace,monospace}
+    .beadN{fill:var(--nasc)}
+  </style>
+
+  <g style="stroke:var(--hair)" stroke-width="1">
+    <line x1="150" y1="52" x2="150" y2="180"/><line x1="300" y1="52" x2="300" y2="180"/><line x1="450" y1="52" x2="450" y2="180"/>
+  </g>
+  <text class="site" x="150" y="34" text-anchor="middle" opacity=".5">E</text>
+  <text class="site" x="300" y="34" text-anchor="middle">P</text>
+  <text class="site" x="450" y="34" text-anchor="middle">A</text>
+  <text class="sub" x="150" y="48" text-anchor="middle" opacity=".55">exit · no tRNA</text>
+  <text class="sub" x="300" y="48" text-anchor="middle">peptidyl</text>
+  <text class="sub" x="450" y="48" text-anchor="middle">aminoacyl</text>
+
+  <g style="stroke:var(--trna)" stroke-width="2.6" fill="none">
+    <path d="M444,84 l12,12 M456,84 l-12,12"/>
+  </g>
+  <text class="sub" x="450" y="78" text-anchor="middle" style="fill:var(--trna)">r₀ (stages 1–2)</text>
+  <g style="stroke:var(--trna)" stroke-width="2.6" fill="none">
+    <path d="M294,84 l12,12 M306,84 l-12,12"/>
+  </g>
+  <text class="sub" x="300" y="78" text-anchor="middle" style="fill:var(--trna)">r₀ (stage 3)</text>
+
+  <circle cx="450" cy="160" r="14" class="beadN"/>
+  <text class="lbl" x="450" y="164" text-anchor="middle" style="fill:#fff" font-size="12">N</text>
+  <text class="sub" x="450" y="188" text-anchor="middle">C-terminus (res L)</text>
+  <polyline points="450,146 450,140 440,135 460,127 440,119 460,111 450,104 450,98"
+            fill="none" style="stroke:var(--bond)" stroke-width="2.4" stroke-linejoin="round"/>
+  <text class="bondlbl" x="470" y="130" text-anchor="start">U = k·|r−r₀|²</text>
+
+  <path d="M436,124 C390,118 350,120 316,120" fill="none" style="stroke:var(--muted)" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#arrM)"/>
+  <text class="sub" x="378" y="112" text-anchor="middle">switch r₀ · A→P</text>
+  <defs>
+    <marker id="arrM" markerWidth="9" markerHeight="9" refX="5" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" style="fill:var(--muted)"/></marker>
+  </defs>
+</svg>

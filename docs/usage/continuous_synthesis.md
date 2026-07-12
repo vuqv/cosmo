@@ -171,6 +171,114 @@ switched A→P across the stages) **is** modelled when `trna_tether = yes`. The 
 **mechanics** are a reduced model.
 ```
 
+### 4a. C-terminus restraint: position restraint vs. tRNA tether
+
+The C-terminus must be held at the PTC and translocated A→P each residue. cosmo offers two
+mechanisms, chosen by the `trna_tether` key (see {doc}`synthesis_control`); both drive the
+*same* A→P schedule across the three stages, but the tether additionally controls the
+chain's **orientation**.
+
+**Position restraint (`trna_tether = no`, default).** A single harmonic spring pins the
+C-terminal bead to the A/P target *point* (the equilibrium-optimized A- or P-site location),
+`U = k·|r − r₀|²`. Stages 1–2 target the A-point, stage 3 targets the P-point; the A→P
+switch is just changing `r₀`. This is the validated default — simplest, and it needs no
+particular tRNA beads.
+
+```{figure} img/csp_restraint_position.svg
+:alt: A single harmonic spring holds the C-terminus at the A- or P-site target point; sites read E, P, A left to right.
+:width: 560px
+:align: center
+
+**Position restraint** (`trna_tether = no`). A single harmonic spring pins the C-terminal
+bead to the A- or P-site target *point*; translocation is just moving the target `r₀` from
+the A-point (stages 1–2) to the P-point (stage 3) — right→left in the E–P–A frame.
+```
+
+**O'Brien tRNA tether (`trna_tether = yes`).** Reproduces the covalent attachment of the
+nascent C-terminus to the tRNA with the full bonded geometry — not a point restraint but a
+set of bonded terms to the **tRNA's 3′-terminal nucleotide, residue 76 (A76)**.
+
+*Which residue?* The truncated ribosome keeps only the acceptor-stem 3′ end of each tRNA
+(a handful of residues: `AtR` 73–76, `PtR` 72–76), each nucleotide represented by a few CG
+beads — `P` (phosphate), `R` (ribose), `BR1`/`BR2` (base). **The tether attaches to residue
+76 only** — the 3′-terminal adenosine A76, which is exactly the CCA-3′ site where the amino
+acid esterifies to the tRNA. The other tRNA residues are rigid excluded-volume scenery,
+*not* part of the tether. It uses three beads *of A76*:
+
+- `R` — the **ribose** of A76: the C-terminus **bonds** to it.
+- `P` — the **phosphate** of A76: used in the orienting angle `N–R–P`.
+- `BR2` — the second **base** bead of A76 (present only because A76 is a purine): used in
+  `N–R–BR2` and the improper.
+
+For the current C-terminus `N` (the newest residue) it adds:
+
+| term | force | connectivity (beads of A76) | A-site (`AtR`) | P-site (`PtR`) |
+|------|-------|-----------------------------|----------------|----------------|
+| bond | harmonic | `N → R` | 0.427 nm | 0.476 nm |
+| angle | harmonic | `N–R–P` | 106° | 117° |
+| angle | harmonic | `N–R–BR2` | 127° | 130° |
+| improper | periodic (`CustomTorsion`) | `N–R–P–BR2` | 128° | −161° |
+| backbone | Gaussian angle | `prev–N–R` | aims the chain down the tunnel (**`hps_ss` model only** — the HPS/mpipi models have no bonded angle term, so this term is skipped) |
+
+(bond/angle stiffness = 200 kcal/mol/Å²; angle/improper = 25 kcal/mol/rad².) The two
+orienting angles + the improper fix the residue's **bearing in the A76 frame** — this is
+what the plain point restraint cannot do.
+
+```{figure} img/csp_restraint_tether_geom.svg
+:alt: The C-terminus bonds to the ribose R of tRNA A76, with orienting angles to the phosphate P and base BR2, plus an improper dihedral.
+:width: 560px
+:align: center
+
+**tRNA tether geometry** (`trna_tether = yes`). The C-terminus (`N`) **bonds** to the
+**ribose (`R`)** of A76; two orienting angles (`N–R–P`, `N–R–BR2`) and the improper
+(`N–R–P–BR2`) fix its bearing in the A76 frame, and a backbone angle (`prev–N–R`, for the
+`hps_ss` model) aims the chain down the tunnel. Values shown are the P-site (`PtR`) set;
+A-site (`AtR`) values are in the table above. Only A76 is tethered — the rest of the tRNA
+is rigid scenery.
+```
+
+**Per-stage tethering (tRNA-tether mode).** Each stage rebuilds the length-`L` system and
+re-attaches the tether to the appropriate site — there is **no sliding spring**; the A→P
+"switch" is realized by the tether referencing the P-site beads (`PtR`) instead of the
+A-site beads (`AtR`):
+
+| stage | C-terminus (residue `L`) | previous residue (`L−1`) |
+|-------|--------------------------|--------------------------|
+| **1** | A-site (`AtR`) | **P-site (`PtR`)** |
+| **2** | A-site (`AtR`) | — free — |
+| **3** | **P-site (`PtR`)** | — free — |
+
+- **Stage 1** double-tethers *both* ends of the freshly-formed peptide bond (the new
+  residue at A, the previous one at P), so the new bond starts at its equilibrium PTC
+  geometry the instant the residue appears.
+- **Stage 2** keeps the new residue at A; the previous residue is released (held only by
+  the nascent-chain backbone + the tunnel wall).
+- **Stage 3** re-tethers the new residue A→P — starting from stage 2's coordinates, the
+  minimize + MD carries it from the A-site to the P-site: **this is the translocation.**
+- **Cold start** (the first residue `L0`, no previous residue): tethered to the P-site in
+  all three stages.
+
+```{figure} img/csp_restraint_ap_stages.svg
+:alt: tRNA sites drawn E, P, A left to right; across the three stages the new residue moves from the A-site to the P-site, right to left.
+:width: 600px
+:align: center
+
+**The A→P switch across the three stages.** Each stage rebuilds the system and re-attaches
+the tether (no sliding spring). Stage 1 double-tethers both ends of the new peptide bond
+(new residue `N` at A, previous at P); stage 2 keeps `N` at A (previous released); stage 3
+re-tethers `N` to the P-site — the minimize + MD carry it A→P (right→left), **this is the
+translocation.** Sites are drawn E–P–A per convention; CSP models only the P- and A-site
+tRNAs (no E-site tRNA).
+```
+
+```{note}
+The tRNA tether requires a **well-formed A/P tRNA** in the ribosome PDB (segids `AtR`/`PtR`,
+resid 76, beads `R`/`P`/`BR2`; the acceptor must be a purine, which carries `BR2`). A site
+missing its `P` or `BR2` bead simply skips that angle/improper. The A/P target *points*
+(used by both modes, and for the tunnel-wall plane) come from the always-on PTC-geometry
+optimization.
+```
+
 ### 5. From codon to MD steps (the kinetics)
 
 The timing core is `cosmo.csp.kinetics` (pure Python, no OpenMM), **identical to topo's**.
