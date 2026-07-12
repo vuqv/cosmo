@@ -46,6 +46,7 @@ underlying HPS / Mpipi force fields (and the synthesis references when you run C
    usage/continuous_synthesis
    usage/cylinder_synthesis
    usage/synthesis_resume
+   usage/synthesis_visualization
    usage/synthesis_control
 
 .. toctree::

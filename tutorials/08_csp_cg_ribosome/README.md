@@ -1,7 +1,7 @@
 # Tutorial 8 — Continuous Synthesis on a coarse-grained *E. coli* ribosome (`cosmo-csp`)
 
 **Goal:** synthesize a nascent chain **residue by residue on an explicit
-coarse-grained ribosome**, with the elongation cycle split into O'Brien's **three
+coarse-grained ribosome**, with the elongation cycle split into **three
 kinetic sub-stages**. This is the explicit-ribosome half of the Continuous Synthesis
 Protocol ported to COSMO's IDP force field (`cosmo.csp`, mirroring `topo.csp`). Its
 sibling — the same protocol through an **analytic cylindrical tunnel** — is
@@ -14,7 +14,7 @@ peptidyl-transferase center (PTC). Everything is **standalone COSMO**: the ribos
 is a truncated CG bead model, no external CHARMM files.
 
 > **This is the tutorial-scaled version of a production run.** It uses the *same*
-> E. coli ribosome, mRNA and O'Brien codon kinetics as the production configuration
+> E. coli ribosome, mRNA and codon kinetics as the production configuration
 > in [`sandbox/Ecoli/`](../../sandbox/Ecoli/) (`csp_val.ini`), but with a short `L`
 > range, clamped `max_steps_per_stage`, and CPU so it **builds, times, runs and
 > writes outputs** end to end in seconds. It is a mechanics demo, not a physical
@@ -31,14 +31,14 @@ Nascent chain: **α-synuclein** (`asyn.pdb`, 140 residues, from Tutorial 1).
 
 The ribosome is the **E. coli 50S subunit, PDB [4V9D](https://www.rcsb.org/structure/4V9D)**
 (with the [5JTE](https://www.rcsb.org/structure/5JTE) A-site tRNA grafted in),
-coarse-grained to the O'Brien **3/4-bead P/R/BR rRNA representation** (4576 beads) and
+coarse-grained to the **3/4-bead P/R/BR rRNA representation** (4576 beads) and
 truncated to the region around the exit tunnel:
 `4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb`. It enters as **rigid (mass-0) scenery**:
 fixed beads that supply the ribosome↔nascent **12-10-6 excluded volume + Yukawa
 electrostatics** wall and the **A-/P-site anchors**. This is the exact same structure
 used by the production `sandbox/Ecoli/` run.
 
-Each elongation cycle is split into O'Brien's three kinetic sub-stages —
+Each elongation cycle is split into three kinetic sub-stages —
 **peptidyl-transfer → translocation → tRNA-binding** — with the new residue's
 C-terminus restraint switching **A→P** across them, so a residue is delivered to the
 A site and ratcheted into the P site. The PTC geometry is always optimized: the new
@@ -72,17 +72,20 @@ steps via `scale_factor`. `max_steps_per_stage` clamps each sub-stage's (otherwi
 ### Stitch a movie
 
 ```bash
-python -m cosmo.csp.movie -o synth_out_csp --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
-#   installed console script:  cosmo-csp-movie -o synth_out_csp --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
+cosmo-csp-movie -o synth_out_csp --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
+#   or: python -m cosmo.csp.movie -o synth_out_csp --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
+cd synth_out_csp && vmd -e movie.tcl        # run from synth_out_csp/: movie.tcl loads its files by basename
 ```
 
-`--ribosome` overlays the static ribosome so you see the chain growing inside it.
-Writes a fixed-width VMD-playable movie (`movie.dcd` / `movie.psf` / `movie.tcl`).
+`--ribosome` overlays the static ribosome (copied to `movie_ribosome.pdb`) so you see the
+chain growing inside it. Writes a fixed-width VMD-playable movie (`movie.dcd` /
+`movie.psf` / `movie.tcl`). For the full movie reference (both synthesis models, all
+options), see [Visualizing the synthesis process](../usage/synthesis_visualization.md).
 
 ## What it produces
 
 - `synth_out_csp/L_001/ … L_008/`, each with per-stage `traj_s1/2/3.dcd` — the
-  A→P restraint switch across the three O'Brien sub-stages.
+  A→P restraint switch across the three kinetic sub-stages.
 - **Nascent-only trajectories**: the shared `L_<L>/traj.psf` + per-stage `traj_s*.dcd` contain only the
   `L` nascent beads — the 4576-bead ribosome is excluded from the trajectory and
   re-attached as static scenery by the movie stitcher's `--ribosome` overlay.
@@ -113,4 +116,4 @@ compare co-translational behaviour across ribosome structures.
 The two co-translational tutorials split `cosmo.csp` by confinement geometry:
 [Tutorial 7](../07_csp_cylinder/) is the **analytic cylindrical tunnel** (no ribosome
 beads; fast, never jams), and this one is the **explicit coarse-grained ribosome**
-with O'Brien's 3-stage per-codon kinetics.
+with 3-stage per-codon kinetics.

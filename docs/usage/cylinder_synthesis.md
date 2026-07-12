@@ -40,8 +40,8 @@ purely steric, no electrostatics, no bead clashes.
 cd tutorials/07_csp_cylinder
 cosmo-cylinder -f cylinder.ini         # -> synth_out_cyl/
 
-cosmo-csp-movie -o synth_out_cyl       # stitch per-length trajectories into a movie
-vmd -e synth_out_cyl/movie.tcl
+cosmo-csp-movie -o synth_out_cyl --tunnel cylinder.ini   # stitch + draw the analytic tunnel
+cd synth_out_cyl && vmd -e movie.tcl                     # movie.tcl loads its files by basename
 ```
 
 `cosmo-cylinder` writes, per residue `L`, a standalone trajectory under `<outdir>/L_<L>/`,
@@ -134,8 +134,12 @@ segment per residue the whole codon dwell `τ` is one segment, not a three-way s
 └── progress.log            # append-only DONE/RUNNING resume status
 ```
 
-**Movie.** `cosmo-csp-movie -o <outdir>` stitches the per-length trajectories (it
-auto-detects the flat `L_<L>/` layout used here vs. the 3-stage layout of `cosmo-csp`).
+**Movie.** `cosmo-csp-movie -o <outdir> --tunnel cylinder.ini` stitches the per-length
+trajectories (it auto-detects the flat `L_<L>/` layout used here vs. the 3-stage layout of
+`cosmo-csp`) **and** draws the analytic tunnel — bore tube, closed PTC cap, and the
+infinite exit-face wall — reading the geometry from the same `cylinder.ini`. Omit
+`--tunnel` for a plain movie. For the interactive vs. `cd <outdir>` recipe, see
+{doc}`synthesis_visualization`.
 
 **Resume.** Like `cosmo-csp`, an interrupted cylinder run continues from the last
 completed residue when re-invoked (`resume = auto`, on by default) — the schedule is

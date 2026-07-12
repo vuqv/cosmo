@@ -2,7 +2,7 @@
 
 **Goal:** synthesize a nascent chain **residue by residue with codon-resolved
 kinetics**, confining it with an **analytic cylindrical tunnel** instead of explicit
-ribosome beads. This is the tunnel-geometry half of the O'Brien Continuous Synthesis
+ribosome beads. This is the tunnel-geometry half of the Continuous Synthesis
 Protocol ported to COSMO's IDP force field (`cosmo.csp`, mirroring `topo.csp`). Its
 sibling — the same protocol on an **explicit coarse-grained ribosome** — is
 [Tutorial 8](../08_csp_cg_ribosome/).
@@ -60,13 +60,20 @@ switch to GPU for production.
 
 ### Stitch a movie
 
+Draw the analytic exit tunnel into the movie by passing the same `cylinder.ini`, then
+open it in VMD *from inside* the run folder (`movie.tcl` loads `movie.{psf,dcd}` by
+basename, so it only resolves from there):
+
 ```bash
-python -m cosmo.csp.movie -o synth_out_cyl      # layout auto-detected
-#   installed console script:  cosmo-csp-movie -o synth_out_cyl
+cosmo-csp-movie -o synth_out_cyl --tunnel cylinder.ini      # or: python -m cosmo.csp.movie -o synth_out_cyl --tunnel cylinder.ini
+cd synth_out_cyl && vmd -e movie.tcl
 ```
 
-Writes a fixed-width VMD-playable movie (`movie.dcd` / `movie.psf` / `movie.tcl`)
-that plays the growing chain length by length.
+Writes a fixed-width VMD-playable movie (`movie.dcd` / `movie.psf` / `movie.tcl`) that
+plays the growing chain threading the (blue) bore, past the red PTC cap and the grey
+exit wall. Omit `--tunnel` for a plain movie with no tunnel. For the full movie
+reference (both synthesis models, all options), see
+[Visualizing the synthesis process](../usage/synthesis_visualization.md).
 
 ## What it produces
 
@@ -85,6 +92,6 @@ trajectories/checkpoints). Delete them and re-run to reproduce.
 ## Where this sits in the series
 
 Tutorials 7–10 explored *how to confine the nascent chain*. `cosmo.csp` consolidates
-those into one package with codon-resolved O'Brien kinetics and post-elongation
+those into one package with codon-resolved kinetics and post-elongation
 phases. This tutorial is its **analytic-tunnel** mode; the **explicit
 coarse-grained ribosome** mode is [Tutorial 8](../08_csp_cg_ribosome/).

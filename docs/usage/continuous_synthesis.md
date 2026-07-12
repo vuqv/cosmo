@@ -44,7 +44,7 @@ cosmo-csp -f csp.ini              # 3-stage synthesis -> synth_out_csp/
 
 # stitch the per-stage trajectories into one VMD movie
 cosmo-csp-movie -o synth_out_csp --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
-vmd -e synth_out_csp/movie.tcl
+cd synth_out_csp && vmd -e movie.tcl        # movie.tcl loads its files by basename
 ```
 
 `cosmo-csp` writes, per residue `L` and sub-stage `s`, a standalone trajectory under
@@ -450,8 +450,10 @@ ribosome — into one VMD-playable movie (auto-detects the 3-stage vs flat layou
 
 ```bash
 cosmo-csp-movie -o <outdir> --ribosome 4v9d_50S_PtR_5jte_AtR_model_cg_trunc.pdb
-vmd -e <outdir>/movie.tcl
+cd <outdir> && vmd -e movie.tcl        # movie.tcl loads its files by basename
 ```
+
+For the cylinder-tunnel equivalent and more detail, see {doc}`synthesis_visualization`.
 
 ---
 

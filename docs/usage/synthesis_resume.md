@@ -221,6 +221,8 @@ persistent (not node-local) storage so the partial output survives between slots
 
 ## See also
 
+- {doc}`synthesis_visualization` — once the run finishes, stitch the segments into a movie
+  (cylinder tunnel or CG ribosome).
 - {doc}`continuous_synthesis` — the CSP runner, physics, and full output layout.
 - {doc}`synthesis_control` — the canonical per-key `csp.ini` reference (incl. `resume`).
 - `cosmo.csp.resume` — the module implementing the schedule/progress persistence and the
