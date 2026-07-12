@@ -1,10 +1,12 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "cosmo"
-version = "2026.1"
+# Version is derived from the git tag (CalVer YEAR.N) by setuptools-scm; see
+# [tool.setuptools_scm] below and scripts/next_version.sh.
+dynamic = ["version"]
 description = "COarse-grained Simulation of intrinsically disordered prOteins (HPS / Mpipi models), built on OpenMM."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -37,6 +39,9 @@ cosmo-csp-movie = "cosmo.csp.movie:main"
 # runners do for `mrna = fastest/slowest`):
 # `cosmo-make-mrna --pdb prot.pdb --codon-times table.txt --mode fastest`
 cosmo-make-mrna = "cosmo.csp.synth_mrna:main"
+
+[tool.setuptools_scm]
+# Version from git tags (e.g. 2026.1). Between tags, a dev version is derived.
 
 [tool.setuptools.packages.find]
 # Only ship the importable package (not docs/tutorials/scripts at the repo root).

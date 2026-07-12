@@ -27,24 +27,24 @@ author = u'Quyen Vu'
 # Release version — CalVer YEAR.N (see scripts/next_version.sh). Auto-derived, never
 # hand-edited per release: on a CI tag build use the pushed tag; otherwise the newest
 # YEAR.N tag in git; else a YEAR.dev marker.
-import subprocess
 import datetime
 
 
 def _release_version():
-    ref = os.environ.get('GITHUB_REF', '')
-    if ref.startswith('refs/tags/'):
-        return ref[len('refs/tags/'):]
+    root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    # Read the version straight from git via setuptools-scm (the release source of
+    # truth). On the exact tag commit this is the clean CalVer (e.g. "2026.1");
+    # between tags it is a derived dev version. Needs the repo's tags in the
+    # checkout (the docs CI fetches full history + tags).
     try:
-        tags = subprocess.check_output(
-            ['git', 'tag', '--list', '[0-9][0-9][0-9][0-9].[0-9]*'],
-            cwd=os.path.dirname(os.path.abspath(__file__)),
-            text=True, stderr=subprocess.DEVNULL).split()
-        cal = sorted((t for t in tags if t.count('.') == 1
-                      and t.split('.')[0].isdigit() and t.split('.')[1].isdigit()),
-                     key=lambda t: (int(t.split('.')[0]), int(t.split('.')[1])))
-        if cal:
-            return cal[-1]
+        from setuptools_scm import get_version
+        return get_version(root=root)
+    except Exception:
+        pass
+    # Fallback: the installed package's recorded version.
+    try:
+        from importlib.metadata import version as _dist_version
+        return _dist_version('cosmo')
     except Exception:
         pass
     return datetime.datetime.utcnow().strftime('%Y') + '.dev'

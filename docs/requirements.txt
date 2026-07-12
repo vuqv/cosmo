@@ -1,3 +1,4 @@
 Sphinx>=6.0
 furo>=2024.1
 myst-parser>=2.0
+setuptools-scm>=8   # conf.py derives the docs version from the git tag
