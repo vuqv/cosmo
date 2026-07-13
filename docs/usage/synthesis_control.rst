@@ -252,6 +252,10 @@ Shared options (both runners)
      - Type
      - Default
      - Description
+   * - ``stall_steps``
+     - int
+     - ``0``
+     - Post-synthesis stall phase length (steps); ``0`` = skip. Holds the finished chain at the PTC with the C-terminus restraint / tRNA tether still **ON** (mimics ribosome stalling). Runs **before** ``ejection``.
    * - ``ejection_steps``
      - int
      - ``0``
@@ -381,10 +385,13 @@ Tunnel wall vs. analytic tunnel (``tunnel_wall`` / ``tunnel_*``)
     ``tunnel_center`` / ``tunnel_k`` / ``tunnel_mouth_round`` keys (see
     :doc:`cylinder_synthesis`).
 
-Post-synthesis phase (``ejection_steps``)
-    After the last residue, ``ejection_steps > 0`` runs a phase with the C-terminus
-    restraint **released** (ribosome/tunnel still present), so the finished chain diffuses
-    out. It writes its own output folder; ``0`` skips the phase.
+Post-synthesis phases (``stall_steps``, ``ejection_steps``)
+    After the last residue, up to two optional phases run in order. ``stall_steps > 0``
+    first holds the finished chain at the PTC with the C-terminus restraint / tRNA tether
+    still **ON** (a ribosome-stalling hold), then ``ejection_steps > 0`` runs a phase with
+    the restraint **released** (ribosome/tunnel still present), so the finished chain
+    diffuses out. Each writes its own output folder (``stall/`` then ``ejection/``); ``0``
+    skips that phase.
 
 Output layout, resume and movies
     Each residue writes one ``<outdir>/L_<L>/`` folder (CSP: shared ``traj.psf`` +

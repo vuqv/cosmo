@@ -35,10 +35,11 @@ the ribosome / exit tunnel is modeled**.
 | 8 | [Continuous Synthesis — coarse-grained *E. coli* ribosome (`cosmo-csp`)](./08_csp_cg_ribosome/) | **`cosmo.csp`, explicit rigid CG ribosome** (E. coli 4V9D, topo P/R/BR rep, 4576 beads) as scenery + A-/P-anchors; each cycle split into O'Brien's 3 kinetic sub-stages (peptidyl-transfer / translocation / tRNA-binding). | Codon-resolved synthesis on a real CG ribosome; nascent-only trajectories, ribosome overlaid in the movie. |
 
 The two tutorials split `cosmo.csp` (mirroring the sibling `topo.csp`) by confinement
-geometry: **11** is the analytic cylindrical bore (`cosmo-cylinder`) — fast, never
-jams — and **12** is the explicit rigid coarse-grained ribosome (`cosmo-csp`) with
-O'Brien's 3-stage per-codon kinetics. Both add an optional post-synthesis `ejection`
-free run.
+geometry: **7** is the analytic cylindrical bore (`cosmo-cylinder`) — fast, never
+jams — and **8** is the explicit rigid coarse-grained ribosome (`cosmo-csp`) with
+O'Brien's 3-stage per-codon kinetics. Both add optional post-synthesis phases, run in
+order: `stall` (held at the PTC with the restraint still on — ribosome stalling) then
+`ejection` (restraint released; the finished chain diffuses free).
 
 The **ready-to-run files** for each tutorial (PDB, `cylinder.ini` / `csp.ini`) live
 in the matching folder here under `tutorials/`. The synthesis tutorials are launched

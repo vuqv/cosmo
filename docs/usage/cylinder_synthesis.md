@@ -45,7 +45,7 @@ cd synth_out_cyl && vmd -e movie.tcl                     # movie.tcl loads its f
 ```
 
 `cosmo-cylinder` writes, per residue `L`, a standalone trajectory under `<outdir>/L_<L>/`,
-an optional post-synthesis free run (`ejection/`), and a per-residue
+optional post-synthesis phases (`stall/`, `ejection/`), and a per-residue
 dwell-time log `<outdir>/dwell_times.dat`.
 
 ---
@@ -96,9 +96,10 @@ chain simply extrudes forward as it grows.
 (1) No `ribosome` PDB — the tunnel is analytic, its geometry set by the `tunnel_*` keys.
 (2) **One MD segment per residue** (no peptidyl-transfer / translocation / tRNA-binding
 sub-stages), so `time_stage_1` / `time_stage_2` are inherited but **unused** — the whole
-codon dwell is a single segment. (3) The post-synthesis free run is `ejection_steps`
-(same keyword as the explicit-ribosome runner, dropping the
-C-terminus restraint). (4) The explicit-ribosome
+codon dwell is a single segment. (3) The post-synthesis phases are `stall_steps` (hold at
+the PTC with the C-terminus restraint still on — ribosome stalling) then `ejection_steps`
+(free run, dropping the C-terminus restraint) — same keywords as the explicit-ribosome
+runner. (4) The explicit-ribosome
 knobs (`trna_tether`, `tunnel_wall`) and the always-on PTC-geometry optimization do not apply.
 (5) Purely steric — no ribosome electrostatics.
 ```
@@ -128,6 +129,7 @@ segment per residue the whole codon dwell `τ` is one segment, not a three-way s
 │   ├── traj.dcd            # (nascent-only) trajectory for that length
 │   ├── traj_final.pdb      # last conformation (seeds the next residue)
 │   └── traj.log, traj.psf, ...
+├── stall/                  # held at PTC, restraint on (if stall_steps > 0)
 ├── ejection/               # free run, restraint off (if ejection_steps > 0)
 ├── dwell_times.dat         # per-residue: codon, sampled dwell (s), ns, integration steps
 └── progress.log            # append-only DONE/RUNNING resume status

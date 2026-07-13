@@ -48,7 +48,7 @@ cd synth_out_csp && vmd -e movie.tcl        # movie.tcl loads its files by basen
 ```
 
 `cosmo-csp` writes, per residue `L` and sub-stage `s`, a standalone trajectory under
-`<outdir>/L_<L>/` (one folder per residue, per-stage `traj_s<s>.dcd`), an optional `ejection/` phase, and a
+`<outdir>/L_<L>/` (one folder per residue, per-stage `traj_s<s>.dcd`), optional `stall/` and `ejection/` phases, and a
 per-residue dwell-time log `<outdir>/dwell_times.dat`.
 
 ---
@@ -370,9 +370,12 @@ optimization reduces how often this fires (equilibrium seeding lowers the stage-
 
 ### 7. After the last residue: ejection
 
-Once the final residue is added, the simulation runs a **post-synthesis ejection phase**
-(`ejection_steps`): the C-terminus restraint is **released** while the rigid ribosome and
-tunnel wall remain, so the chain diffuses out along +x.
+Once the final residue is added, up to two **post-synthesis phases** run in order. First,
+an optional **stall phase** (`stall_steps`) keeps the finished chain at the PTC with the
+C-terminus restraint / tRNA tether still **on** — a ribosome-stalling hold. Then the
+**ejection phase** (`ejection_steps`) **releases** the restraint while the rigid ribosome
+and tunnel wall remain, so the chain diffuses out along +x. Each phase is skipped when its
+step count is `0`.
 
 ---
 
@@ -411,6 +414,7 @@ A few CSP-specific behaviors worth calling out (the physics behind the keys):
 │   ├── traj_s1.log         # energies, stage 1
 │   ├── traj_runinfo.log    # folded run-info: one [run:...]/[result:...] per stage
 │   └── traj_final.pdb      # stage-3 final — seeds L+1 and is the resume-reload target
+├── stall/                  # post-synthesis stall phase, held at PTC (if stall_steps > 0)
 ├── ejection/               # post-synthesis ejection phase (if ejection_steps > 0)
 ├── dwell_times.dat         # per-residue dwell-time log / schedule (#PTC header)
 └── progress.log            # append-only DONE/RUNNING resume status

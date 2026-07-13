@@ -93,7 +93,8 @@ timing — required, no
 bundled default — **or** a positive number of seconds for a uniform codon time),
 `scale_factor`, `time_stage_1`,
 `time_stage_2`, `random_seed`, `max_steps_per_stage` / `min_steps_per_stage` (test
-clamps), `ejection_steps` (post-synthesis free run).
+clamps), `stall_steps` (post-synthesis hold at the PTC, restraint ON — ribosome
+stalling) then `ejection_steps` (post-synthesis free run, restraint OFF).
 
 **MD / ribosome keys:** `model` (nascent force field — **`hps_kr` default**), `dt`,
 `ref_t`, `tau_t`, `nstout`, `device`, `ppn`, `constraints` (default `None` — flexible
@@ -132,7 +133,7 @@ model-dependent (the residue's formal charge, e.g. mpipi's partial charges). The
 `traj_s{1,2,3}.dcd` + `.log`, one folded `traj_runinfo.log` (a section per stage), and a
 single `traj_final.pdb` (stage-3 final — it seeds the next residue and is the
 resume-reload target). No per-stage `.chk`. Plus a per-residue `dwell_times.dat` and
-optional `ejection/`. The cylinder runner writes the flat
+optional `stall/` + `ejection/`. The cylinder runner writes the flat
 `<outdir>/L_<L>/traj.*` layout (one segment per residue).
 
 **Resume.** Re-invoking `cosmo-csp` / `cosmo-cylinder` on an interrupted `<outdir>`

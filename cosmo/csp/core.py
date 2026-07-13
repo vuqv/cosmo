@@ -528,7 +528,8 @@ class RunParams:
     # --- test clamps (production: leave both at their defaults / None) ---
     max_steps_per_stage: Optional[int] = None  # cap each stage (tutorial: small)
     min_steps_per_stage: int = 1               # floor each stage
-    # --- post-synthesis phase (steps; 0 = skip) ---
+    # --- post-synthesis phases (steps; 0 = skip; run in order stall -> ejection) ---
+    stall_steps: int = 0                # hold at the PTC (restraint/tether still ON) -- ribosome stalling
     ejection_steps: int = 0             # release the restraint; the finished chain diffuses free
 
 

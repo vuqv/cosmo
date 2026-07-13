@@ -417,7 +417,7 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
               f"Remove for production.")
 
     total_steps = (sum(r.steps for r in schedule)
-                   + max(params.ejection_steps, 0))
+                   + max(params.stall_steps, 0) + max(params.ejection_steps, 0))
     print(f"[schedule] {L_max - L0 + 1} residues, {total_steps:,} planned MD steps"
           f"{resume_mod.est_walltime(total_steps, params)}")
     print(f"Per-residue dwell-time table: {dwell_log}")
@@ -440,6 +440,29 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
     print()
     print(f"Done. Synthesized {L0} -> {L_max}. Per-length outputs under {out_path}/")
     print(f"Per-residue dwell-time table: {dwell_log}")
+
+    # Post-synthesis stall: once the chain reaches its final length, hold it at the PTC
+    # with the C-terminus restraint still ON (ribosome stalling) before ejection releases
+    # it. Continues the length-L_max system from the previous final; its own progress unit
+    # (skipped on resume if already done); its final structure seeds the ejection phase.
+    if params.stall_steps > 0:
+        if do_resume and prog.is_done("stall"):
+            prev_final = resume_mod.load_final_pdb(
+                resume_mod.phase_final_path(out_path, "stall"))
+            print("[resume] stall already complete; skipping.")
+        else:
+            print()
+            print(f"=== Stall (L = {L_max}, {params.stall_steps} steps, "
+                  f"C-terminus restraint ON -> held at PTC) -> {out_path / 'stall'}/ ===")
+            resume_mod.append_progress(out_path, "stall", "RUNNING")
+            prev_final = run_length(
+                L_max, full_pdb=full_pdb, prev_final=None, out_root=out_path, params=params,
+                cterm_seed=cterm_seed, x_lo=x_lo, x_exit=x_exit, seed_override=prev_final,
+                restrain=True, out_subdir="stall",
+                n_steps_override=params.stall_steps,
+                label=f"Stall (L = {L_max})")
+            resume_mod.append_progress(out_path, "stall", "DONE")
+            print(f"Done. Stall written to {out_path / 'stall'}/")
 
     # Post-synthesis free run: once the chain reaches its final length, release the
     # C-terminus restraint and let the finished protein diffuse out the exit (ejection).
@@ -507,8 +530,9 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     - **Tunnel geometry**: ``tunnel_radius`` (nm), ``tunnel_length`` (nm),
       ``tunnel_x_lo`` (nm), ``tunnel_center`` (``"y0,z0"`` nm), ``tunnel_k``
       (kJ/mol/nm^2), ``tunnel_mouth_round`` (nm).
-    - **Post-synthesis**: ``ejection_steps`` -- free run with the C-terminus restraint
-      released (0 = skip).
+    - **Post-synthesis** (run in order stall -> ejection): ``stall_steps`` -- hold at the
+      PTC with the C-terminus restraint still ON (ribosome stalling; 0 = skip);
+      ``ejection_steps`` -- free run with the C-terminus restraint released (0 = skip).
 
     Inline ``#``/``;`` comments are ignored. **Units:** OpenMM defaults.
     """
@@ -633,6 +657,8 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     if opt("tunnel_mouth_round") is not None:
         p.tunnel_mouth_round_nm = float(opt("tunnel_mouth_round"))
     # --- post-synthesis ---
+    if opt("stall_steps") is not None:
+        p.stall_steps = as_int(opt("stall_steps"))
     if opt("ejection_steps") is not None:
         p.ejection_steps = as_int(opt("ejection_steps"))
     # Resume policy (same as CSP): auto (default) / yes / no. See cosmo.csp.resume.
@@ -663,9 +689,11 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
         f"x_lo={p.tunnel_x_lo_nm} nm, center={p.tunnel_center_nm} nm, "
         f"k={p.tunnel_k} kJ/mol/nm^2, mouth_round={p.tunnel_mouth_round_nm} nm")
     log(f"  mechanics: restraint_k={p.restraint_k} kJ/mol/nm^2, minimize={p.minimize}")
+    if p.stall_steps:
+        log(f"  post-synthesis: stall={p.stall_steps} steps (held at PTC, restraint ON)")
     if p.ejection_steps:
         log(f"  post-synthesis: ejection={p.ejection_steps} steps")
-    else:
+    if not p.stall_steps and not p.ejection_steps:
         log("  post-synthesis: off")
     log(f"  integrator: dt={p.dt_ps} ps, ref_t={p.ref_t} K, tau_t={p.tau_t} /ps, nstout={p.nstout}")
     log(f"  hardware/output: device={p.device}, ppn={p.ppn}, outdir={outdir}")

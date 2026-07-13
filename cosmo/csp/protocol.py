@@ -245,7 +245,7 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
 
     # --- up-front cost report: exact step total, nominal wall-time ----------
     total_steps = (sum(sum(r.steps) for r in schedule)
-                   + max(ep.ejection_steps, 0))
+                   + max(ep.stall_steps, 0) + max(ep.ejection_steps, 0))
     print(f"[schedule] {L_max - L0 + 1} residues, {total_steps:,} planned MD steps"
           f"{resume_mod.est_walltime(total_steps, ep)}")
     print(f"Per-residue dwell-time table: {dwell_log}")
@@ -312,6 +312,29 @@ def run_continuous_synthesis(full_pdb: str, ribosome_pdb: str, *,
     print()
     print(f"Done. Synthesized {L0} -> {L_max}. Per-residue outputs under {out_path}/L_<L>/")
     print(f"Per-residue dwell-time table: {dwell_log}")
+
+    # --- post-synthesis: stall (held at the PTC, restraint ON) --------------
+    # Ribosome stalling: keep the finished chain at the P-site with the C-terminus
+    # restraint / tRNA tether still ON (whatever mode the run uses), before ejection
+    # releases it. Its own progress unit (skipped on resume if already done); its
+    # final structure seeds the ejection phase.
+    if ep.stall_steps > 0:
+        if do_resume and prog.is_done("stall"):
+            prev_final = resume_mod.load_final_pdb(
+                resume_mod.phase_final_path(out_path, "stall"))
+            print("[resume] stall already complete; skipping.")
+        else:
+            print()
+            print(f"=== Stall (L = {L_max}, {ep.stall_steps} steps, held at PTC / "
+                  f"restraint ON) -> {out_path / 'stall'}/ ===")
+            resume_mod.append_progress(out_path, "stall", "RUNNING")
+            prev_final = run_length(
+                L_max, full_pdb=full_pdb, p_anchor=p_target, a_anchor=a_anchor,
+                prev_final=None, seed_override=prev_final, out_root=out_path, params=ep,
+                ribo=ribo, wall_x0_nm=wall_x0, cterm_seed=p_target, restrain=True,
+                tether_segid="PtR", out_subdir="stall",
+                n_steps_override=ep.stall_steps, label="stalling")
+            resume_mod.append_progress(out_path, "stall", "DONE")
 
     # --- post-synthesis: ejection (free run) --------------------------------
     # The ejection phase is its own progress unit; on resume a completed phase is skipped.
@@ -380,6 +403,8 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
       dwell (s); stage 3 = codon total minus these.
     - ``random_seed`` -- seed for the FPT sampler (reproducible schedules).
     - ``max_steps_per_stage`` / ``min_steps_per_stage`` -- clamp each stage's step count.
+    - ``stall_steps`` -- post-synthesis hold at the PTC with the C-terminus restraint /
+      tRNA tether still ON (ribosome stalling), before ejection (0 = skip).
     - ``ejection_steps`` -- post-synthesis free run; restraint released (0 = skip).
     - ``resume`` -- ``auto`` (default) / ``yes`` / ``no``: continue an interrupted run.
 
@@ -507,6 +532,8 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
         p.max_steps_per_stage = as_int(opt("max_steps_per_stage"))
     if opt("min_steps_per_stage") is not None:
         p.min_steps_per_stage = as_int(opt("min_steps_per_stage"))
+    if opt("stall_steps") is not None:
+        p.stall_steps = as_int(opt("stall_steps"))
     if opt("ejection_steps") is not None:
         p.ejection_steps = as_int(opt("ejection_steps"))
     # Resume policy: auto (default; resume iff an interrupted run is present), yes
@@ -541,6 +568,8 @@ def read_csp_config(config_file: str, verbose: bool = True) -> CSPConfig:
         f"; tunnel wall: {'on (plane auto-derived)' if p.tunnel_wall else 'off'}")
     log(f"  PTC geometry: optimized (A/P targets one peptide bond apart, EV-clear)")
     log(f"  integrator: dt={p.dt_ps} ps, ref_t={p.ref_t} K, tau_t={p.tau_t} /ps, nstout={p.nstout}")
+    if p.stall_steps:
+        log(f"  post-synthesis: stall={p.stall_steps} steps (held at PTC, restraint ON)")
     if p.ejection_steps:
         log(f"  post-synthesis: ejection={p.ejection_steps} steps")
     log(f"  hardware/output: device={p.device}, ppn={p.ppn}, outdir={outdir}")
