@@ -32,13 +32,17 @@ import datetime
 
 def _release_version():
     root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    # Read the version straight from git via setuptools-scm (the release source of
-    # truth). On the exact tag commit this is the clean CalVer (e.g. "2026.1");
-    # between tags it is a derived dev version. Needs the repo's tags in the
-    # checkout (the docs CI fetches full history + tags).
+    # Read the version from git via setuptools-scm and DISPLAY the last released CalVer
+    # tag (e.g. "2026.1"). The custom version_scheme returns just the tag and ignores
+    # commit distance, so a between-tags checkout shows the last *release* rather than
+    # setuptools-scm's guessed-next dev version ("2026.2.devN"). This is a docs-only
+    # display choice; the package/wheel version is unaffected. On the exact tag commit
+    # it is already the clean tag. Needs the repo's tags in the checkout (the docs CI
+    # fetches full history + tags).
     try:
         from setuptools_scm import get_version
-        return get_version(root=root, local_scheme='no-local-version')
+        return get_version(root=root, local_scheme='no-local-version',
+                           version_scheme=lambda v: str(v.tag))
     except Exception:
         pass
     # Fallback: the installed package's recorded version.
