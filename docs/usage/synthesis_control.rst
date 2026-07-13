@@ -259,11 +259,15 @@ Shared options (both runners)
    * - ``ejection_steps``
      - int
      - ``0``
-     - Post-synthesis ejection phase length (steps); ``0`` = skip. Releases the C-terminus restraint so the chain diffuses out (+x).
+     - Post-synthesis ejection phase length (steps); ``0`` = skip. Releases the C-terminus restraint so the chain diffuses out (+x). **Cumulative target.** Extending it (continuing from the checkpoint instead of re-running) is opt-in via ``restart`` -- see below.
    * - ``resume``
      - str
      - ``auto``
      - Resume policy for interrupted runs: ``auto`` (resume iff a ``progress.log`` is present under ``outdir``, else fresh), ``yes`` (require a resumable run, else error), ``no`` (always fresh). CLI ``--fresh`` / ``--no-resume`` forces ``no``. See :doc:`synthesis_resume`.
+   * - ``restart``
+     - str
+     - ``no``
+     - Ejection restart policy. ``no`` (default): a **completed** ejection is **skipped** on resume (like the ``stall`` phase); otherwise (fresh run, or a never-completed ejection) it runs **fresh** from step 0 to ``ejection_steps``. Raising ``ejection_steps`` alone does **not** re-run or extend a completed ejection. ``yes``: **continue** the ejection from its checkpoint (``ejection/traj.chk``: positions + velocities + step count) on a resumed run, appending only the steps needed to reach ``ejection_steps`` -- if the checkpoint already reached it, the run reports "already met" and does nothing. Use ``restart = yes`` to extend a finished ejection.
 
 Coarse-grained ribosome runner only (``cosmo-csp``)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -392,6 +396,25 @@ Post-synthesis phases (``stall_steps``, ``ejection_steps``)
     the restraint **released** (ribosome/tunnel still present), so the finished chain
     diffuses out. Each writes its own output folder (``stall/`` then ``ejection/``); ``0``
     skips that phase.
+
+    The ejection free run is **extendable**, but extension is an explicit opt-in via the
+    ``restart`` key (default ``no``):
+
+    * ``restart = no`` (default) -- a **completed** ejection (``ejection DONE`` in
+      ``progress.log``) is **skipped** on resume, exactly like the ``stall`` phase; a fresh
+      run (or a never-completed ejection) runs from step 0 to ``ejection_steps``. Raising
+      ``ejection_steps`` alone does **not** re-run or extend a finished ejection -- use
+      ``restart = yes`` for that (or ``resume = no`` to redo the whole synthesis fresh).
+    * ``restart = yes`` -- on a resumed run (``resume = auto``/``yes``) with a prior
+      ``ejection/traj.chk``, the ejection **continues** from that checkpoint (positions +
+      velocities + step count) and appends only the steps needed to reach the *cumulative*
+      ``ejection_steps`` target, a true simulation restart. If the checkpoint already
+      reached ``ejection_steps``, the run prints "already met" and steps nothing.
+
+    So CSP continuation has two independent knobs: ``resume`` (whole synthesis, residue
+    granularity) and ``restart`` (the ejection MD checkpoint). Unlike the earlier
+    behavior, raising ``ejection_steps`` no longer implicitly restarts. See
+    :doc:`synthesis_resume`, "Resume vs. restart".
 
 Output layout, resume and movies
     Each residue writes one ``<outdir>/L_<L>/`` folder (CSP: shared ``traj.psf`` +

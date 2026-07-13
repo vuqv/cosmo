@@ -377,6 +377,19 @@ C-terminus restraint / tRNA tether still **on** — a ribosome-stalling hold. Th
 and tunnel wall remain, so the chain diffuses out along +x. Each phase is skipped when its
 step count is `0`.
 
+The ejection is **extendable**, but extension is opt-in via `restart` (default `no`):
+`ejection_steps` is the *cumulative* free-run length. If the chain has not fully left the
+ribosome, set `restart = yes`, raise `ejection_steps`, and re-run on the existing `outdir`
+(with `resume = auto`) — the ejection continues from its checkpoint (positions, velocities
+and step count) and appends only the additional steps, exactly like resuming a simulation
+(if the checkpoint already reached the target it reports "already met" and does nothing).
+With the default `restart = no`, a **completed** ejection is instead **skipped** on resume
+(like the `stall` phase) — raising `ejection_steps` does not re-run or extend it; use
+`restart = yes` (or `resume = no` to redo the whole synthesis). Inspect
+`ejection/traj_final.pdb` yourself and top it up until the
+chain is clear; the nascent-only final is then a ready ribosome-free input for a
+post-translation `cosmo-mdrun`.
+
 ---
 
 ## Configuration

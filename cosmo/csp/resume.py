@@ -60,6 +60,15 @@ def phase_final_path(out_root: Path, name: str) -> Path:
     return Path(out_root) / name / "traj_final.pdb"
 
 
+def phase_checkpoint_path(out_root: Path, name: str) -> Path:
+    """Path of a post-synthesis phase's OpenMM checkpoint (``ejection/traj.chk``).
+
+    Present only for a phase that writes one (the ejection phase, so a later run can
+    restart from it and *extend* the free run by raising ``ejection_steps``).
+    """
+    return Path(out_root) / name / "traj.chk"
+
+
 # --------------------------------------------------------------------------
 # The 3-stage schedule table (dwell_times.dat) + PTC-geometry header
 # --------------------------------------------------------------------------

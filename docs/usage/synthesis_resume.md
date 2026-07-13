@@ -27,7 +27,8 @@ to both; examples use `cosmo-csp` unless noted.
 
 ```ini
 # csp.ini  — resume is on by default (nothing to add)
-resume = auto        # auto (default) | yes | no
+resume  = auto       # auto (default) | yes | no  — continue an interrupted synthesis
+restart = no         # no (default) | yes         — continue the ejection MD from its checkpoint
 ```
 
 ```bash
@@ -147,10 +148,12 @@ Two consequences worth knowing:
   `random_seed` or retuned kinetic knob on resume cannot corrupt the tail — the RNG is
   never consulted again. (A genuinely different *force* config on resume is a self-inflicted
   footgun the tool does not police; keep the config stable across a requeue.)
-- **Extending a run is a fresh run.** The schedule is fixed at first launch to cover exactly
-  `L0..L_max`. Resuming with a **larger `L_max`** is rejected with an actionable error
-  (`persisted schedule covers L=1..10 but this run asks for L=1..20 … Extending a run is a
-  fresh run`). Decide the final length before launching.
+- **Extending the *synthesis* is a fresh run.** The schedule is fixed at first launch to
+  cover exactly `L0..L_max`. Resuming with a **larger `L_max`** is rejected with an actionable
+  error (`persisted schedule covers L=1..10 but this run asks for L=1..20 … Extending a run is
+  a fresh run`). Decide the final length before launching. (Extending the post-synthesis
+  **ejection** free run is the opposite — a supported, cheap restart; see
+  [Resume vs. restart](#resume-vs-restart).)
 
 ```{warning}
 **Presence guard.** `progress.log` records intent; the disk records reality. Before
@@ -163,6 +166,58 @@ and leaving a permanent hole. Re-run fresh, or restore the missing length.
 ```{note}
 **Concurrent invocations.** Two `cosmo-csp` processes on the same `outdir` would race
 `progress.log`; don't do that. Resume assumes one writer at a time.
+```
+
+---
+
+## Resume vs. restart
+
+Two different mechanisms continue a stopped run, at two different levels — and they are easy
+to confuse because the **ejection-extend** workflow uses both. **Resume** (everything above)
+is the driver-level machinery that picks a multi-residue *synthesis* back up. **Restart** is
+the OpenMM-checkpoint machinery that continues a *single MD run* step-for-step.
+
+| | **Resume** (`resume =` key) | **Restart** (`restart =` key) |
+|---|---|---|
+| Level | CSP driver (`cosmo.csp.resume`) | OpenMM engine (`setup_simulation`) |
+| Unit | one **residue** (or a whole post-synthesis phase) | **MD steps** |
+| State carried | positions (`traj_final.pdb`) + schedule + progress | positions **+ velocities + step count** (`traj.chk`) |
+| In-flight work | the interrupted unit is **dropped and redone fresh** | the run **continues exactly**, velocity-continuous |
+| Trigger | re-run the command on an existing `outdir` (`resume = auto`) | set `restart = yes` and raise `ejection_steps`, on a resumed run |
+| Default | `auto` (on) | `no` (**off** — ejection re-runs fresh) |
+| Used for | surviving a crash/pre-emption of the hours-to-days synthesis | **extending the ejection free run** so the chain finishes leaving the ribosome |
+
+**When to use which:**
+
+- **Resume** — you don't really *choose* it: leave `resume = auto`, and re-running a
+  requeued or interrupted job continues the synthesis. It is residue-granular and reseeds
+  each stage from `traj_final.pdb`, so it needs no OpenMM checkpoint.
+- **Restart** — reach for it when the finished chain **has not fully left the ribosome** by
+  the end of the ejection phase. It is **opt-in**: set `restart = yes` (default `no`), raise
+  `ejection_steps`, and re-run on the existing `outdir` (`resume = auto`). The ejection phase
+  then reloads its `ejection/traj.chk` (positions + velocities + step count) and appends only
+  the additional steps to reach the new *cumulative* `ejection_steps` — a true continuation of
+  the same free-diffusion trajectory, not a fresh, re-thermalized run. If the checkpoint has
+  already reached `ejection_steps`, the phase prints "already met" and steps nothing. With the
+  default `restart = no`, a **completed** ejection is instead **skipped** on resume (like the
+  `stall` phase) — raising `ejection_steps` does not re-run or extend it; use `restart = yes`
+  (or `resume = no` to redo the whole synthesis). Inspect `ejection/traj_final.pdb` yourself and top it
+  up until the chain is clear; the nascent-only final is then a ready ribosome-free input for a
+  post-translation `cosmo-mdrun`. See {doc}`continuous_synthesis`.
+
+Why only the ejection phase carries a checkpoint: each elongation *stage* is a short segment
+reseeded from the previous `traj_final.pdb`, so a per-stage `.chk` would be dead weight. The
+ejection free run is the one phase you may want to continue *step-for-step* — to add diffusion
+time without a velocity discontinuity — so it, and only it, writes `traj.chk`.
+
+```{note}
+The checkpoint-continue applies to the **extend** workflow (`restart = yes`), where the prior
+ejection reached `DONE`. A crash *in the middle* of an ejection run leaves it `RUNNING`, so
+resume's drop-the-in-flight-unit rule removes the `ejection/` directory (checkpoint included)
+and re-ejects fresh — consistent with the residue-granular policy. So: with `restart = yes`,
+`ejection/traj.chk` extends a **completed** ejection; it does not rescue a **half-finished**
+one. With the default `restart = no`, a completed ejection is **skipped** on resume (like
+`stall`); only a fresh run or a never-completed ejection runs.
 ```
 
 ---

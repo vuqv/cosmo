@@ -150,6 +150,7 @@ def run_length(L: int, *, full_pdb: str,
                seed_override: Optional[np.ndarray] = None,
                restrain: bool = True, out_subdir: Optional[str] = None,
                n_steps_override: Optional[int] = None,
+               restart: bool = False, append: bool = False,
                label: Optional[str] = None) -> np.ndarray:
     """Build, seed, (restrain,) minimize and run one length-``L`` nascent System.
 
@@ -223,6 +224,9 @@ def run_length(L: int, *, full_pdb: str,
     cfg = _make_cfg(out_dir, sub_pdb, params)
     if n_steps_override is not None:
         cfg.md_steps = n_steps_override
+    # Restart = extend a prior ejection: setup_simulation loads traj.chk and runs only the
+    # steps remaining to reach the cumulative md_steps target (n_steps_override).
+    cfg.restart = bool(restart)
     seed_pdb = str(out_dir / "seed.pdb")
     _write_pdb(cgModel.topology, nascent_pos, seed_pdb)
     cfg.init_position = seed_pdb
@@ -248,17 +252,28 @@ def run_length(L: int, *, full_pdb: str,
     with _quiet():
         ctx = engine.setup_simulation(cfg, cgModel, control_file=None,
                                       shift_positions=False)
-        if params.minimize:
+        if params.minimize and not restart:
             ctx.simulation.minimizeEnergy()
             ctx.simulation.context.setVelocitiesToTemperature(cfg.ref_t)
-        engine.attach_reporters(cfg, ctx.simulation, total_steps=cfg.md_steps)
-        ctx.simulation.step(cfg.md_steps)
+        engine.attach_reporters(cfg, ctx.simulation, append=append,
+                                total_steps=cfg.md_steps)
+        # On a restart, setup_simulation set nsteps_remain = md_steps - checkpoint steps
+        # (0 if the cumulative target was already reached); a fresh run gets md_steps.
+        if ctx.nsteps_remain > 0:
+            ctx.simulation.step(ctx.nsteps_remain)
         final_pe = ctx.simulation.context.getState(getEnergy=True).getPotentialEnergy(
             ).value_in_unit(unit.kilojoule_per_mole)
         engine.finalize_simulation(cfg, ctx, cgModel.topology, start)
 
-    print(f"  L={L:>3d}  {(label or 'run'):<28s}  {cfg.md_steps:>6d} steps  "
-          f"{time.time() - start:>6.2f} s  PE={final_pe:>+13.4e} kJ/mol")
+    # A restart whose checkpoint already reached the cumulative target stepped nothing --
+    # say so explicitly rather than reporting the (unrun) step count.
+    if restart and ctx.nsteps_remain <= 0:
+        print(f"  L={L:>3d}  {(label or 'run'):<28s}  cumulative {cfg.md_steps} steps already "
+              f"met at checkpoint step {ctx.done_steps}; nothing to run  "
+              f"PE={final_pe:>+13.4e} kJ/mol")
+    else:
+        print(f"  L={L:>3d}  {(label or 'run'):<28s}  {cfg.md_steps:>6d} steps  "
+              f"{time.time() - start:>6.2f} s  PE={final_pe:>+13.4e} kJ/mol")
 
     # 7. final nascent coordinates seed the next length.
     final = mm.app.PDBFile(cfg.output_path("_final.pdb")).getPositions(
@@ -470,20 +485,43 @@ def run_cylinder_synthesis(full_pdb: str, *, L0: int = 1, L_max: Optional[int] =
     # tunnel stays on (only way out is the exit). The ejection phase is its own progress
     # unit; on resume a completed phase is skipped.
     if params.ejection_steps > 0:
-        if do_resume and prog.is_done("ejection"):
+        # ejection_steps is the CUMULATIVE free-run length. Continuing a prior ejection from
+        # its checkpoint is an explicit opt-in (`restart = yes`), not implied by simply
+        # raising ejection_steps:
+        #   - restart=yes + a prior checkpoint on a resumed run -> continue from the
+        #     checkpoint (positions + velocities + step count) and append only the steps
+        #     needed to reach the cumulative ejection_steps target. If the checkpoint
+        #     already reached it, run_length reports "already met" and steps nothing.
+        #   - restart=no (default), or no checkpoint yet -> a fresh full run from step 0 to
+        #     ejection_steps (any prior ejection output is overwritten).
+        # `do_resume` is kept in the gate so a stale checkpoint from a since-overwritten
+        # synthesis can never be continued after a fresh start. Inspect ejection/traj_final.pdb
+        # yourself and raise ejection_steps (with restart=yes) until the chain has cleared the tunnel.
+        if do_resume and prog.is_done("ejection") and not params.ejection_restart:
+            # Plain resume of an already-complete ejection: skip it (like the stall phase).
+            # `restart = yes` is the escape hatch to continue/extend a completed ejection.
             prev_final = resume_mod.load_final_pdb(
                 resume_mod.phase_final_path(out_path, "ejection"))
-            print("[resume] ejection already complete; skipping.")
-        else:
             print()
-            print(f"=== Ejection (L = {L_max}, {params.ejection_steps} steps, "
-                  f"C-terminus restraint OFF -> free diffusion) -> {out_path / 'ejection'}/ ===")
+            print("[resume] ejection already complete; skipping "
+                  "(set restart = yes to continue/extend it).")
+        else:
+            restart = (params.ejection_restart and do_resume
+                       and resume_mod.phase_checkpoint_path(out_path, "ejection").is_file())
+            print()
+            if restart:
+                print(f"=== Ejection (L = {L_max}, restraint OFF; restart from checkpoint toward "
+                      f"cumulative {params.ejection_steps} steps) -> {out_path / 'ejection'}/ ===")
+            else:
+                print(f"=== Ejection (L = {L_max}, {params.ejection_steps} steps, "
+                      f"C-terminus restraint OFF -> free diffusion) -> {out_path / 'ejection'}/ ===")
             resume_mod.append_progress(out_path, "ejection", "RUNNING")
             prev_final = run_length(
                 L_max, full_pdb=full_pdb, prev_final=None, out_root=out_path, params=params,
                 cterm_seed=cterm_seed, x_lo=x_lo, x_exit=x_exit, seed_override=prev_final,
                 restrain=False, out_subdir="ejection",
                 n_steps_override=params.ejection_steps,
+                restart=restart, append=restart,
                 label=f"Ejection (L = {L_max})")
             resume_mod.append_progress(out_path, "ejection", "DONE")
             print(f"Done. Ejection written to {out_path / 'ejection'}/")
@@ -533,6 +571,12 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     - **Post-synthesis** (run in order stall -> ejection): ``stall_steps`` -- hold at the
       PTC with the C-terminus restraint still ON (ribosome stalling; 0 = skip);
       ``ejection_steps`` -- free run with the C-terminus restraint released (0 = skip).
+    - ``resume`` -- ``auto`` (default) / ``yes`` / ``no``: continue an interrupted run.
+    - ``restart`` -- ``yes`` / ``no`` (default ``no``): whether to *continue* the ejection
+      free run from its checkpoint. ``yes`` + a larger ``ejection_steps`` on a resumed run
+      extends the ejection (appending only the extra steps); if the checkpoint already
+      reached ``ejection_steps`` it reports "already met" and runs nothing. ``no`` re-runs
+      the whole ejection fresh (0 -> ``ejection_steps``).
 
     Inline ``#``/``;`` comments are ignored. **Units:** OpenMM defaults.
     """
@@ -668,6 +712,10 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
             raise ValueError(f"{config_file}: resume must be 'auto', 'yes' or 'no', "
                              f"got {opt('resume')!r}.")
         p.resume = r
+    # Ejection restart policy: yes -> continue the ejection free run from its checkpoint
+    # (extend it); no (default) -> re-run the ejection fresh. See RunParams.ejection_restart.
+    if opt("restart") is not None:
+        p.ejection_restart = bool(strtobool(opt("restart")))
 
     # Per-codon timing needs both the (protein-specific) mRNA and an explicit codon-time
     # table -- there is no bundled default (pick one under assets/csp/codon_dwell_times/).
@@ -692,7 +740,8 @@ def read_cylinder_config(config_file: str, verbose: bool = True) -> CylinderConf
     if p.stall_steps:
         log(f"  post-synthesis: stall={p.stall_steps} steps (held at PTC, restraint ON)")
     if p.ejection_steps:
-        log(f"  post-synthesis: ejection={p.ejection_steps} steps")
+        log(f"  post-synthesis: ejection={p.ejection_steps} steps"
+            f"{' (restart: continue from checkpoint)' if p.ejection_restart else ' (fresh run)'}")
     if not p.stall_steps and not p.ejection_steps:
         log("  post-synthesis: off")
     log(f"  integrator: dt={p.dt_ps} ps, ref_t={p.ref_t} K, tau_t={p.tau_t} /ps, nstout={p.nstout}")
