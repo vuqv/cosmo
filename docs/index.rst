@@ -12,7 +12,8 @@ force field and runs Langevin dynamics — for single-chain dimensions, liquid�
 phase separation, protein–RNA complexes, and **protein synthesis**.
 
 **New here?** Read :doc:`overview` to see the two things COSMO does and jump to the
-right tutorials, and :doc:`modules/introduction` for installation and package layout.
+right tutorials, :doc:`modules/installation` to get it running, and
+:doc:`modules/introduction` for the package layout.
 
 **Using COSMO in a paper?** See :doc:`citation` for how to cite the software and the
 underlying HPS / Mpipi force fields (and the synthesis references when you run CSP).
@@ -22,6 +23,7 @@ underlying HPS / Mpipi force fields (and the synthesis references when you run C
    :caption: Getting started
 
    overview
+   modules/installation
    modules/introduction
    citation
 

@@ -19,22 +19,16 @@ Part B reuses the Part A force fields, so start with A if you are new here.
 
 Currently, these models are supported:
 
-1) `hps_urry`: Hydropathy according to the Urry scale (default, recommended).
-2) `hps_kr`: Kapcha-Rossy scale. Includes parameters for nucleic acids and
-   post-translational modifications.
-3) `hps_ss`: `hps_urry` with bonded potential.
-4) `mpipi`: Wang-Frenkel short-range potential instead of LJ 12-6.
-5) Additional models can be added by defining them in
-   `cosmo/parameters/model_parameters.py`.
+| Model      | Description                                                                 | Components supported                  | Implemented             |
+|------------|----------------------------------------------------------------------------|---------------------------------------|-------------------------|
+| `hps_urry` | Hydropathy according to the Urry scale (default, recommended).             | protein, DNA                          | protein                 |
+| `hps_kr`   | Kapcha-Rossy scale; includes parameters for nucleic acids and PTMs.        | protein, RNA, phosphorylation protein | protein, p-protein, RNA |
+| `hps_ss`   | `hps_urry` with bonded potential.                                          | protein                               | protein                 |
+| `mpipi`    | Wang-Frenkel short-range potential instead of LJ 12-6.                     | protein, RNA                          | protein, RNA            |
+| *(custom)* | New model — defined in `cosmo/parameters/model_parameters.py`.             | user-defined                          | user-defined            |
 
-### Models summary
-
-| Model      | Components supported                  | Implemented             | Tested  |
-|------------|---------------------------------------|-------------------------|---------|
-| `hps_kr`   | protein, RNA, phosphorylation protein | protein, p-protein, RNA | protein / RNA |
-| `hps_urry` | protein, DNA                          | protein                 | protein |
-| `hps_ss`   | protein                               | protein                 | protein |
-| `mpipi`    | protein, RNA                          | protein, RNA            | protein / RNA |
+Additional models can be added easily by defining them in
+`cosmo/parameters/model_parameters.py`, following the existing entries above.
 
 COSMO can be used to study single-chain conformations, LLPS, and related phenomena.
 
@@ -44,12 +38,23 @@ COSMO can be used to study single-chain conformations, LLPS, and related phenome
 - Tutorials: hands-on, ready-to-run examples in [`tutorials/`](tutorials/) (start
   with [tutorial 1](tutorials/01_single_chain_quickstart/); see the
   [tutorials overview](tutorials/README.md)).
-- Additional notes: https://vuqv.github.io/
+- Additional notes may be given at: https://vuqv.github.io/blog/
 
 ## Requirements
 
-- OpenMM >= 7.7 (choose a CUDA toolkit compatible with your NVIDIA driver)
-- ParmEd
+- **Python** ≥ 3.9
+- **OpenMM** ≥ 7.7 (the MD engine; install from the `conda-forge` channel, and choose a
+  CUDA toolkit compatible with your NVIDIA driver)
+- **ParmEd** ≥ 3.4
+- **NumPy** ≥ 1.22, **pandas** ≥ 1.4
+- **MDAnalysis** ≥ 2.2, **mdtraj** ≥ 1.9.7 (trajectory / structure I/O)
+
+These are the exact runtime dependencies of `import cosmo`, declared in
+[`pyproject.toml`](pyproject.toml). Floors are the oldest versions known to work;
+there are no upper caps — the package runs on current releases (e.g. NumPy 2.x,
+OpenMM 8.x). The standalone analysis tools under `scripts/` need a few extra packages
+(scipy, matplotlib, numba, ...); those live in `requirements.txt`, not in
+`pyproject.toml`.
 
 Notes:
 - `getStepCount()` is not available or reliable before OpenMM 7.7 and is required to
@@ -58,22 +63,37 @@ Notes:
 
 ## Installation and usage (Linux)
 
-1) Create a conda environment:
-   `conda create -n py310 python=3.10`
-2) Activate it:
-   `conda activate py310`
-3) Install OpenMM 7.7 or later:
+1) Create and activate a fresh conda/mamba environment with a recent Python
+   (e.g. 3.9+):
+   `conda create -n cosmo python=3.10 && conda activate cosmo`
+2) Install OpenMM 7.7 or later:
    `conda install -c conda-forge openmm=7.7 cudatoolkit=10.2`
    - Conda may pick a newer CUDA toolkit by default. Choose a version compatible with
      your NVIDIA driver.
+3) Install the remaining dependencies. The full list (numpy, parmed, MDAnalysis,
+   mdtraj, pandas, plus analysis-only extras used by `scripts/`) is in
+   `requirements.txt`:
+   `conda install --file requirements.txt`
+   - If you use the pip install in step 5, COSMO's runtime dependencies are pulled
+     in automatically from `pyproject.toml`; `requirements.txt` still adds the
+     analysis-only packages.
 4) Download this repository to a target path, for example: `PATH_TO_CODE/cosmo/`
-5) Install COSMO. Two options:
-   - **pip (recommended)** — from the repo root (the directory with `pyproject.toml`),
-     an editable install also registers the `cosmo-mdrun` console command:
+5) Install COSMO. Two main ways:
+
+   **(I) Add to PYTHONPATH (no install)** — add the repo root to your Python path
+   in `.bashrc`:
+   `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
+   This exposes `import cosmo` and the module form of every tool
+   (`python -m cosmo.mdrun`, etc.), but not the console commands.
+
+   **(II) Install with pip** — from the repo root (the directory with
+   `pyproject.toml`). This additionally registers the `cosmo-mdrun` and other
+   console commands (see [Console commands](#console-commands)) on your CLI:
+   - editable (recommended for development), reflects source edits immediately:
      `pip install -e .`
-   - **PYTHONPATH (no install)** — add the repo root to your Python path in `.bashrc`:
-     `export PYTHONPATH=$PYTHONPATH:PATH_TO_CODE/cosmo/`
-     (the `python -m cosmo.mdrun` module form still works without the console command)
+   - regular install, copies the package into `site-packages` (source edits
+     require a reinstall):
+     `pip install .`
 
 Remember to replace `PATH_TO_CODE` with your actual path.
 
@@ -96,7 +116,7 @@ Remember to replace `PATH_TO_CODE` with your actual path.
 
 A ready-to-run example is at `tutorials/01_single_chain_quickstart`. You will need a control file
 (for example, `md.ini`). See the parameter reference here:
-https://vuqv.github.io/docs-cosmo/usage/simulation_control.html
+https://vuqv.github.io/cosmo/usage/simulation_control.html
 
 Example `md.ini`:
 
@@ -104,9 +124,9 @@ Example `md.ini`:
 [OPTIONS]
 md_steps = 10_000 # number of steps
 dt = 0.01 ; time step in ps
-nstxout = 100 ; number of steps to write checkpoint = nstxout
-nstlog = 100 ; number of steps to print log
-nstcomm = 100 ; frequency for center of mass motion removal
+nstxout = 100 ; steps between trajectory/checkpoint frames
+nstlog = 100 ; steps between log lines
+nstcomm = 100 ; frequency for center-of-mass motion removal
 ; select model, available options: hps_kr, hps_urry, hps_ss or mpipi
 model = mpipi
 
@@ -207,7 +227,7 @@ job script:
 
 Then activate your environment, for example:
 
-`conda activate py310`
+`conda activate cosmo`
 
 ## Bugs
 
@@ -225,6 +245,8 @@ Polish Academy of Sciences (Prof. Mai Suan Li), and Penn State University (Prof.
 ## Cite this work
 
 If you use this software in your publications, please cite the following sources.
+If your work is published with the help of this package, please also give it a star
+on GitHub in addition to citing it — it helps others find the project.
 
 - Vu, Q. V.; Sitarik, I.; Li, M. S.; O’Brien, E. P. Noncovalent Lasso Entanglements are
   Common in Experimentally Derived Intrinsically Disordered Protein Ensembles and
