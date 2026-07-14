@@ -24,6 +24,7 @@ Cite the paper that introduces this coarse-grained toolkit:
    Entanglements are Common in Experimentally Derived Intrinsically Disordered
    Protein Ensembles and Strongly Influenced by Protein Length and Charge.*
    **J. Phys. Chem. B** 129, 4682–4691 (2025).
+   https://doi.org/10.1021/acs.jpcb.5c01260
 
 .. code-block:: bibtex
 
@@ -35,7 +36,8 @@ Cite the paper that introduces this coarse-grained toolkit:
      journal = {The Journal of Physical Chemistry B},
      year    = {2025},
      volume  = {129},
-     pages   = {4682--4691}
+     pages   = {4682--4691},
+     doi     = {10.1021/acs.jpcb.5c01260}
    }
 
 The software itself is archived on `Zenodo <https://zenodo.org/>`_. Cite the

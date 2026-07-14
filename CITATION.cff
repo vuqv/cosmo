@@ -15,8 +15,6 @@ authors:
   - family-names: Vu
     given-names: Quyen
     orcid: "https://orcid.org/0000-0002-9863-0486"
-  - family-names: "O'Brien"
-    given-names: "Edward P."
 version: "2026.1"
 date-released: "2026-07-12"
 license: GPL-3.0-or-later
@@ -61,4 +59,4 @@ preferred-citation:
   volume: 129
   start: 4682
   end: 4691
-  # doi: "[PLACEHOLDER — add the JPCB DOI]"
+  doi: "10.1021/acs.jpcb.5c01260"

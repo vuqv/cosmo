@@ -253,7 +253,7 @@ on GitHub in addition to citing it — it helps others find the project.
 - **Paper (preferred):** Vu, Q. V.; Sitarik, I.; Li, M. S.; O’Brien, E. P. Noncovalent
   Lasso Entanglements are Common in Experimentally Derived Intrinsically Disordered
   Protein Ensembles and Strongly Influenced by Protein Length and Charge. J Phys Chem B
-  129, 4682–4691 (2025).
+  129, 4682–4691 (2025). https://doi.org/10.1021/acs.jpcb.5c01260
 
 - **Software:** Vu, Q. (2026). *COSMO: COarse-grained Simulation of intrinsically
   disordered prOteins with OpenMM* (Version 2026.1) [Computer software]. Zenodo.
