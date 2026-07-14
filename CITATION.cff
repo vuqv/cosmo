@@ -14,12 +14,12 @@ type: software
 authors:
   - family-names: Vu
     given-names: Quyen
-    # orcid: "https://orcid.org/[PLACEHOLDER]"
+    orcid: "https://orcid.org/0000-0002-9863-0486"
   - family-names: "O'Brien"
     given-names: "Edward P."
-version: "0.1.0"              # see pyproject.toml
-date-released: "[YYYY-MM-DD]"
-license: GPL-3.0
+version: "2026.1"
+date-released: "2026-07-12"
+license: GPL-3.0-or-later
 url: "https://github.com/vuqv/cosmo"
 repository-code: "https://github.com/vuqv/cosmo"
 keywords:
@@ -40,6 +40,7 @@ preferred-citation:
   authors:
     - family-names: Vu
       given-names: "Quyen V."
+      orcid: "https://orcid.org/0000-0002-9863-0486"
     - family-names: Sitarik
       given-names: Ian
     - family-names: Li
