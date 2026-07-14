@@ -38,8 +38,15 @@ Cite the paper that introduces this coarse-grained toolkit:
      pages   = {4682--4691}
    }
 
-If you archive a specific release on `Zenodo <https://zenodo.org/>`_ (or similar),
-also cite that version-specific DOI, and record the exact version
+The software itself is archived on `Zenodo <https://zenodo.org/>`_. Cite the
+**concept DOI** (always the latest release) alongside the paper:
+
+   Vu, Q. (2026). *COSMO: COarse-grained Simulation of intrinsically disordered
+   prOteins with OpenMM* (Version 2026.1) [Computer software]. Zenodo.
+   https://doi.org/10.5281/zenodo.21361272
+
+To pin the exact version you ran, use the version-specific DOI for 2026.1 instead
+(https://doi.org/10.5281/zenodo.21361273), and record the version
 (``import cosmo; print(cosmo.__version__)`` or ``pyproject.toml``) and commit
 (``git rev-parse --short HEAD``) — different versions can produce different numbers.
 

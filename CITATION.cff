@@ -20,6 +20,15 @@ authors:
 version: "2026.1"
 date-released: "2026-07-12"
 license: GPL-3.0-or-later
+# Concept DOI (Zenodo) — always resolves to the latest version.
+doi: "10.5281/zenodo.21361272"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.21361272"
+    description: "Concept DOI — all versions"
+  - type: doi
+    value: "10.5281/zenodo.21361273"
+    description: "Version DOI — 2026.1"
 url: "https://github.com/vuqv/cosmo"
 repository-code: "https://github.com/vuqv/cosmo"
 keywords:

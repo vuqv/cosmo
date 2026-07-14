@@ -1,5 +1,7 @@
 # COSMO: COarse-grained Simulation of intrinsically disordered prOteins with OpenMM
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21361272.svg)](https://doi.org/10.5281/zenodo.21361272)
+
 COSMO is a coarse-grained simulation engine for intrinsically disordered proteins and
 related biomolecules, built on OpenMM.
 
@@ -248,9 +250,18 @@ If you use this software in your publications, please cite the following sources
 If your work is published with the help of this package, please also give it a star
 on GitHub in addition to citing it — it helps others find the project.
 
-- Vu, Q. V.; Sitarik, I.; Li, M. S.; O’Brien, E. P. Noncovalent Lasso Entanglements are
-  Common in Experimentally Derived Intrinsically Disordered Protein Ensembles and
-  Strongly Influenced by Protein Length and Charge. J Phys Chem B 129, 4682–4691 (2025).
+- **Paper (preferred):** Vu, Q. V.; Sitarik, I.; Li, M. S.; O’Brien, E. P. Noncovalent
+  Lasso Entanglements are Common in Experimentally Derived Intrinsically Disordered
+  Protein Ensembles and Strongly Influenced by Protein Length and Charge. J Phys Chem B
+  129, 4682–4691 (2025).
+
+- **Software:** Vu, Q. (2026). *COSMO: COarse-grained Simulation of intrinsically
+  disordered prOteins with OpenMM* (Version 2026.1) [Computer software]. Zenodo.
+  https://doi.org/10.5281/zenodo.21361272 (concept DOI, all versions; use
+  [10.5281/zenodo.21361273](https://doi.org/10.5281/zenodo.21361273) to pin 2026.1).
+  GitHub's "Cite this repository" button reads
+  [`CITATION.cff`](CITATION.cff); see the [citation guide](docs/citation.rst) for the
+  full list of models and datasets to cite.
 
 - `hps` family (`hps-urry`, `hps-kr`, and `hps-ss`):
   - Dignon, G. L.; Zheng, W.; Kim, Y. C.; Best, R. B.; Mittal, J. Sequence Determinants
